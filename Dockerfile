@@ -1,4 +1,4 @@
-# AutoSpec Dockerfile with Frama-C
+# CodeNova Dockerfile with Frama-C
 
 # Use official Frama-C Docker image as base
 FROM framac/frama-c:31.0

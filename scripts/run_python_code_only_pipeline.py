@@ -23,7 +23,7 @@ def main() -> None:
     p.add_argument("--request-timeout", type=int, default=120); p.add_argument("--llm-retries", type=int, default=3); p.add_argument("--llm-retry-delay", type=int, default=15)
     p.add_argument("--verify-timeout", type=int, default=120); p.add_argument("--nagini-bin", default=os.getenv("NAGINI_BIN", "nagini"))
     p.add_argument("--skip-verify", action="store_true"); p.add_argument("--enable-code-repair", action="store_true"); p.add_argument("--code-repair-max-iter", type=int, default=3)
-    p.add_argument("--code-repair-strategy", choices=["simple", "wybecoder"], default="simple"); p.add_argument("--wybecoder-candidates", type=int, default=3)
+    p.add_argument("--code-repair-strategy", choices=["simple", "vgcr"], default="simple"); p.add_argument("--vgcr-candidates", type=int, default=3)
     p.add_argument("--reuse-artifacts-from", type=Path); p.add_argument("--task-id", type=int); p.add_argument("--resume", action="store_true")
     a = p.parse_args(); items = load_python_code_only_contracts(a.contracts_file)
     if a.task_id is not None: items = [x for x in items if x.id == a.task_id]
@@ -31,7 +31,7 @@ def main() -> None:
     key = a.api_key or os.getenv(a.api_key_env) or os.getenv("OPENAI_API_KEY")
     if "openrouter.ai" in a.endpoint and not key: raise SystemExit(f"Missing API key. Set {a.api_key_env} or pass --api-key.")
     client = OpenAICompatibleClient(ChatConfig(model=a.model, endpoint=a.endpoint, temperature=a.temperature, max_tokens=a.max_tokens, api_key=key, timeout_seconds=a.request_timeout, retry_on_connection_error=a.llm_retries, retry_delay_seconds=a.llm_retry_delay))
-    pipeline = PythonCodeOnlyContractPipeline(contracts=items, llm_client=client, output_dir=a.output_dir, verify_timeout=a.verify_timeout, skip_verify=a.skip_verify, logger=lambda m: print(m, flush=True), nagini_bin=a.nagini_bin, enable_code_repair=a.enable_code_repair, code_repair_max_iter=a.code_repair_max_iter, code_repair_strategy=a.code_repair_strategy, wybecoder_candidates=a.wybecoder_candidates, reuse_artifacts_from=a.reuse_artifacts_from, pipeline_variant="code_only")
+    pipeline = PythonCodeOnlyContractPipeline(contracts=items, llm_client=client, output_dir=a.output_dir, verify_timeout=a.verify_timeout, skip_verify=a.skip_verify, logger=lambda m: print(m, flush=True), nagini_bin=a.nagini_bin, enable_code_repair=a.enable_code_repair, code_repair_max_iter=a.code_repair_max_iter, code_repair_strategy=a.code_repair_strategy, vgcr_candidates=a.vgcr_candidates, reuse_artifacts_from=a.reuse_artifacts_from, pipeline_variant="code_only")
     out = pipeline.run(as_requirement_items(items), resume=a.resume); print(f"[DONE] report={out['report_path']}")
 
 if __name__ == "__main__": main()

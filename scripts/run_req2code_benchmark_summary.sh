@@ -8,7 +8,7 @@ PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 cd "$PROJECT_ROOT"
 export PYTHONPATH="$PROJECT_ROOT${PYTHONPATH:+:$PYTHONPATH}"
 
-OUTPUT_DIR="${OUTPUT_DIR:-outputs/C-ce-dsv41-time-5-0916}"  # default output directory
+OUTPUT_DIR="${OUTPUT_DIR:-outputs/C-cgs-dsv41-time-5-0916}"  # default output directory
 RESULTS_FILE="${RESULTS_FILE:-}"         # optional
 ENTAILMENT_FILE="${ENTAILMENT_FILE:-}"   # optional
 REPORT_FILE="${REPORT_FILE:-}"           # optional

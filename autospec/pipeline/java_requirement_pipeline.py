@@ -274,10 +274,10 @@ Output constraints:
 - Prefer minimal, OpenJML-friendly fixes.
 """
 
-JAVA_WYBECODER_REPAIR_ANALYSIS_SYSTEM_PROMPT = """You are a verification-guided Java/JML repair planner.
+JAVA_VGCR_REPAIR_ANALYSIS_SYSTEM_PROMPT = """You are a verification-guided Java/JML repair planner.
 Return strict JSON only."""
 
-JAVA_WYBECODER_REPAIR_ANALYSIS_USER_PROMPT_TEMPLATE = """Analyze a failed OpenJML verification attempt and produce a repair plan.
+JAVA_VGCR_REPAIR_ANALYSIS_USER_PROMPT_TEMPLATE = """Analyze a failed OpenJML verification attempt and produce a repair plan.
 
 Requirement:
 {requirement}
@@ -323,10 +323,10 @@ Output constraints (IMPORTANT):
 - Prefer Java body changes, helper code, and statement-level loop annotations.
 """
 
-JAVA_WYBECODER_REPAIR_CANDIDATE_SYSTEM_PROMPT = """You are an expert Java/OpenJML developer using prove-as-you-generate repair.
+JAVA_VGCR_REPAIR_CANDIDATE_SYSTEM_PROMPT = """You are an expert Java/OpenJML developer using prove-as-you-generate repair.
 Output Java source code only."""
 
-JAVA_WYBECODER_REPAIR_CANDIDATE_USER_PROMPT_TEMPLATE = """Repair the Java implementation using this verifier-derived plan.
+JAVA_VGCR_REPAIR_CANDIDATE_USER_PROMPT_TEMPLATE = """Repair the Java implementation using this verifier-derived plan.
 
 Requirement:
 {requirement}
@@ -760,12 +760,12 @@ class JavaRequirementToCodePipeline:
         logger: Optional[Callable[[str], None]] = None,
         openjml_bin: str = "openjml",
         openjml_solver: Optional[str] = None,
-        enable_constraint_extraction: bool = True,
+        enable_cgs: bool = True,
         spec_self_check_rounds: int = 1,
         enable_code_repair: bool = True,
         code_repair_max_iter: int = 3,
         code_repair_strategy: str = "simple",
-        wybecoder_candidates: int = 3,
+        vgcr_candidates: int = 3,
         reuse_artifacts_from: Optional[Path] = None,
     ):
         self.llm_client = llm_client
@@ -777,14 +777,14 @@ class JavaRequirementToCodePipeline:
             openjml_cmd=openjml_bin,
             solver=openjml_solver,
         )
-        self.enable_constraint_extraction = enable_constraint_extraction
+        self.enable_cgs = enable_cgs
         self.spec_self_check_rounds = max(0, spec_self_check_rounds)
         self.enable_code_repair = enable_code_repair
         self.code_repair_max_iter = max(0, code_repair_max_iter)
-        if code_repair_strategy not in {"simple", "wybecoder"}:
+        if code_repair_strategy not in {"simple", "vgcr"}:
             raise ValueError(f"Unsupported code_repair_strategy: {code_repair_strategy}")
         self.code_repair_strategy = code_repair_strategy
-        self.wybecoder_candidates = max(1, wybecoder_candidates)
+        self.vgcr_candidates = max(1, vgcr_candidates)
         self.reuse_artifacts_from = reuse_artifacts_from
 
     def _log(self, message: str) -> None:
@@ -847,18 +847,18 @@ class JavaRequirementToCodePipeline:
             "language": "java",
             "verifier": "openjml",
             "enhanced_modules": {
-                "constraint_extraction": self.enable_constraint_extraction,
+                "cgs": self.enable_cgs,
                 "spec_self_check_rounds": (
-                    self.spec_self_check_rounds if self.enable_constraint_extraction else 0
+                    self.spec_self_check_rounds if self.enable_cgs else 0
                 ),
                 "code_repair": self.enable_code_repair,
                 "code_repair_max_iter": (
                     self.code_repair_max_iter if self.enable_code_repair else 0
                 ),
                 "code_repair_strategy": self.code_repair_strategy,
-                "wybecoder_candidates": (
-                    self.wybecoder_candidates
-                    if self.enable_code_repair and self.code_repair_strategy == "wybecoder"
+                "vgcr_candidates": (
+                    self.vgcr_candidates
+                    if self.enable_code_repair and self.code_repair_strategy == "vgcr"
                     else 0
                 ),
                 "reuse_artifacts_from": str(self.reuse_artifacts_from)
@@ -1093,12 +1093,12 @@ class JavaRequirementToCodePipeline:
                     "repair_attempts": [],
                 },
                 "enhanced": {
-                    "enable_constraint_extraction": False,
+                    "enable_cgs": False,
                     "spec_self_check_rounds": 0,
                     "enable_code_repair": self.enable_code_repair,
                     "code_repair_max_iter": self.code_repair_max_iter,
                     "code_repair_strategy": self.code_repair_strategy,
-                    "wybecoder_candidates": self.wybecoder_candidates,
+                    "vgcr_candidates": self.vgcr_candidates,
                     "reuse_artifacts_from": str(self.reuse_artifacts_from),
                     "generation_skipped_due_to_reuse": True,
                 },
@@ -1129,12 +1129,12 @@ class JavaRequirementToCodePipeline:
         signature_fallback = item.signature_hint
         helper_fallback = item.type_context
 
-        if self.enable_constraint_extraction:
-            self._log(f"[id={item.id}] stage=constraint_extraction start")
+        if self.enable_cgs:
+            self._log(f"[id={item.id}] stage=cgs start")
             constraints = self._extract_constraints(item)
             signature_fallback = item.signature_hint or constraints.get("function_signature", "")
             helper_fallback = item.type_context or constraints.get("helper_declarations", "")
-            self._log(f"[id={item.id}] stage=constraint_extraction done")
+            self._log(f"[id={item.id}] stage=cgs done")
 
             self._log(f"[id={item.id}] stage=constraint_to_spec start")
             initial_spec = self._constraints_to_spec(
@@ -1199,7 +1199,7 @@ class JavaRequirementToCodePipeline:
             spec_json = self._generate_direct_spec(item)
             alignment_info = {
                 "enabled": False,
-                "reason": "constraint extraction module disabled",
+                "reason": "constraint-guided specification (CGS) module disabled",
                 "rounds": [],
                 "final_aligned": None,
                 "max_rounds": 0,
@@ -1245,18 +1245,18 @@ class JavaRequirementToCodePipeline:
             },
             "raw_model_output": spec_json.get("raw_model_output", ""),
             "enhanced_modules": {
-                "constraint_extraction": self.enable_constraint_extraction,
+                "cgs": self.enable_cgs,
                 "spec_self_check_rounds": (
-                    self.spec_self_check_rounds if self.enable_constraint_extraction else 0
+                    self.spec_self_check_rounds if self.enable_cgs else 0
                 ),
                 "code_repair": self.enable_code_repair,
                 "code_repair_max_iter": (
                     self.code_repair_max_iter if self.enable_code_repair else 0
                 ),
                 "code_repair_strategy": self.code_repair_strategy,
-                "wybecoder_candidates": (
-                    self.wybecoder_candidates
-                    if self.enable_code_repair and self.code_repair_strategy == "wybecoder"
+                "vgcr_candidates": (
+                    self.vgcr_candidates
+                    if self.enable_code_repair and self.code_repair_strategy == "vgcr"
                     else 0
                 ),
             },
@@ -1302,12 +1302,12 @@ class JavaRequirementToCodePipeline:
             },
             "code_sanitization": code_sanitization,
             "enhanced": {
-                "enable_constraint_extraction": self.enable_constraint_extraction,
+                "enable_cgs": self.enable_cgs,
                 "spec_self_check_rounds": self.spec_self_check_rounds,
                 "enable_code_repair": self.enable_code_repair,
                 "code_repair_max_iter": self.code_repair_max_iter,
                 "code_repair_strategy": self.code_repair_strategy,
-                "wybecoder_candidates": self.wybecoder_candidates,
+                "vgcr_candidates": self.vgcr_candidates,
             },
         }
         if self.skip_verify:
@@ -1361,13 +1361,13 @@ class JavaRequirementToCodePipeline:
                 "details_file": str(detail_path) if details else None,
             }
             try:
-                if self.code_repair_strategy == "wybecoder":
+                if self.code_repair_strategy == "vgcr":
                     (
                         code_text,
                         verdict,
                         strategy_info,
                         contract_enforcements,
-                    ) = self._build_wybecoder_repair(
+                    ) = self._build_vgcr_repair(
                         item=item,
                         code_file=code_file,
                         code_text=code_text,
@@ -1378,7 +1378,7 @@ class JavaRequirementToCodePipeline:
                         details=details,
                         attempt=attempt,
                     )
-                    history_entry["wybecoder"] = strategy_info
+                    history_entry["vgcr"] = strategy_info
                     contract_enforcement = (
                         contract_enforcements[-1] if contract_enforcements else {}
                     )
@@ -1491,7 +1491,7 @@ class JavaRequirementToCodePipeline:
             "code_sanitization": code_sanitization,
         }
 
-    def _wybecoder_repair_plan(
+    def _vgcr_repair_plan(
         self,
         item: JavaRequirementItem,
         code_text: str,
@@ -1501,7 +1501,7 @@ class JavaRequirementToCodePipeline:
         verdict: Any,
         details: str,
     ) -> Dict[str, Any]:
-        plan_prompt = JAVA_WYBECODER_REPAIR_ANALYSIS_USER_PROMPT_TEMPLATE.format(
+        plan_prompt = JAVA_VGCR_REPAIR_ANALYSIS_USER_PROMPT_TEMPLATE.format(
             requirement=item.requirement,
             class_name=item.class_name,
             function_signature=function_signature,
@@ -1516,7 +1516,7 @@ class JavaRequirementToCodePipeline:
             verdict_message=verdict.message,
             verdict_details=_truncate_for_prompt(details, max_chars=7000),
         )
-        raw = self.llm_client.chat(JAVA_WYBECODER_REPAIR_ANALYSIS_SYSTEM_PROMPT, plan_prompt)
+        raw = self.llm_client.chat(JAVA_VGCR_REPAIR_ANALYSIS_SYSTEM_PROMPT, plan_prompt)
         try:
             plan = _extract_json_object(raw)
         except Exception as exc:
@@ -1581,7 +1581,7 @@ class JavaRequirementToCodePipeline:
         )
         return focuses
 
-    def _build_wybecoder_repair(
+    def _build_vgcr_repair(
         self,
         item: JavaRequirementItem,
         code_file: Path,
@@ -1593,7 +1593,7 @@ class JavaRequirementToCodePipeline:
         details: str,
         attempt: int,
     ) -> tuple[str, Any, Dict[str, Any], List[Dict[str, Any]]]:
-        plan = self._wybecoder_repair_plan(
+        plan = self._vgcr_repair_plan(
             item=item,
             code_text=code_text,
             function_signature=function_signature,
@@ -1602,7 +1602,7 @@ class JavaRequirementToCodePipeline:
             verdict=verdict,
             details=details,
         )
-        candidate_count = self.wybecoder_candidates
+        candidate_count = self.vgcr_candidates
         focuses = self._candidate_focuses(plan)
         candidate_records: List[Dict[str, Any]] = []
         contract_enforcements: List[Dict[str, Any]] = []
@@ -1612,10 +1612,10 @@ class JavaRequirementToCodePipeline:
         for candidate_idx in range(1, candidate_count + 1):
             focus = focuses[(candidate_idx - 1) % len(focuses)]
             self._log(
-                f"[id={item.id}] stage=wybecoder_repair attempt={attempt} "
+                f"[id={item.id}] stage=vgcr_repair attempt={attempt} "
                 f"candidate={candidate_idx}/{candidate_count}"
             )
-            candidate_prompt = JAVA_WYBECODER_REPAIR_CANDIDATE_USER_PROMPT_TEMPLATE.format(
+            candidate_prompt = JAVA_VGCR_REPAIR_CANDIDATE_USER_PROMPT_TEMPLATE.format(
                 requirement=item.requirement,
                 class_name=item.class_name,
                 function_signature=function_signature,
@@ -1632,7 +1632,7 @@ class JavaRequirementToCodePipeline:
                 candidate_focus=focus,
             )
             raw = self.llm_client.chat(
-                JAVA_WYBECODER_REPAIR_CANDIDATE_SYSTEM_PROMPT,
+                JAVA_VGCR_REPAIR_CANDIDATE_SYSTEM_PROMPT,
                 candidate_prompt,
             )
             candidate_code = _extract_java_code(raw)
@@ -1668,7 +1668,7 @@ class JavaRequirementToCodePipeline:
 
         code_file.write_text(best_code)
         return best_code, best_verdict, {
-            "strategy": "wybecoder",
+            "strategy": "vgcr",
             "plan": plan,
             "candidates": candidate_records,
         }, contract_enforcements

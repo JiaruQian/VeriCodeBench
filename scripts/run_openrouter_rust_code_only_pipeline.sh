@@ -19,7 +19,7 @@ VERUS_BIN="${VERUS_BIN:-verus}"
 ENABLE_CODE_REPAIR="${ENABLE_CODE_REPAIR:-false}"
 CODE_REPAIR_MAX_ITER="${CODE_REPAIR_MAX_ITER:-3}"
 CODE_REPAIR_STRATEGY="${CODE_REPAIR_STRATEGY:-simple}"
-WYBECODER_CANDIDATES="${WYBECODER_CANDIDATES:-3}"
+VGCR_CANDIDATES="${VGCR_CANDIDATES:-3}"
 REUSE_ARTIFACTS_FROM="${REUSE_ARTIFACTS_FROM:-}"
 SKIP_VERIFY="${SKIP_VERIFY:-false}"
 TASK_ID="${TASK_ID:-}"
@@ -40,7 +40,7 @@ args=(
   --verus-bin "$VERUS_BIN"
   --code-repair-max-iter "$CODE_REPAIR_MAX_ITER"
   --code-repair-strategy "$CODE_REPAIR_STRATEGY"
-  --wybecoder-candidates "$WYBECODER_CANDIDATES"
+  --vgcr-candidates "$VGCR_CANDIDATES"
 )
 
 [[ "${ENABLE_CODE_REPAIR,,}" == "true" ]] && args+=(--enable-code-repair)

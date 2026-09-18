@@ -1,6 +1,6 @@
-# AutoSpec Benchmarks
+# CodeNova Benchmarks
 
-This directory contains benchmark programs for testing AutoSpec's specification generation and verification capabilities.
+This directory contains benchmark programs for testing CodeNova's specification generation and verification capabilities.
 
 ## Benchmark Suites
 
@@ -136,7 +136,7 @@ Run benchmarks inside the Docker container:
 
 ```bash
 # Start interactive shell
-docker run -it -v $(pwd):/workspace autospec /bin/bash
+docker run -it -v $(pwd):/workspace codenova /bin/bash
 
 # Inside container, run benchmarks
 ./scripts/run_all_benchmarks.sh
@@ -147,7 +147,7 @@ docker run -it -v $(pwd):/workspace autospec /bin/bash
 Or run directly:
 
 ```bash
-docker run -v $(pwd):/workspace autospec ./scripts/run_all_benchmarks.sh
+docker run -v $(pwd):/workspace codenova ./scripts/run_all_benchmarks.sh
 ```
 
 ## Expected Results
@@ -263,5 +263,5 @@ For the course project:
 1. Run baseline benchmarks to establish current performance
 2. Implement LLM-based specification generation
 3. Add iterative refinement loop
-4. Compare results with/without AutoSpec improvements
+4. Compare results with/without CodeNova improvements
 5. Document improvements in verification success rates

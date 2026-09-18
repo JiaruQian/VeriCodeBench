@@ -23,7 +23,7 @@ from .rust_requirement_pipeline import (
 class RustCodeOnlyContractPipeline(RustRequirementToCodePipeline):
     def __init__(self, *, contracts: list[RustCodeOnlyItem], **kwargs: Any):
         super().__init__(
-            enable_constraint_extraction=False,
+            enable_cgs=False,
             spec_self_check_rounds=0,
             pipeline_variant="code_only",
             enhancement_method=None,

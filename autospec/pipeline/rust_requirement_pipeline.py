@@ -252,10 +252,10 @@ Output constraints:
 - Prefer minimal, Verus-friendly fixes.
 """
 
-RUST_WYBECODER_REPAIR_ANALYSIS_SYSTEM_PROMPT = """You are a verification-guided Rust/Verus repair planner.
+RUST_VGCR_REPAIR_ANALYSIS_SYSTEM_PROMPT = """You are a verification-guided Rust/Verus repair planner.
 Return strict JSON only."""
 
-RUST_WYBECODER_REPAIR_ANALYSIS_USER_PROMPT_TEMPLATE = """Analyze a failed Verus verification attempt and produce a repair plan.
+RUST_VGCR_REPAIR_ANALYSIS_USER_PROMPT_TEMPLATE = """Analyze a failed Verus verification attempt and produce a repair plan.
 
 Requirement:
 {requirement}
@@ -301,10 +301,10 @@ Output constraints (IMPORTANT):
 - Prefer Rust body changes, helper proof code, and loop annotations.
 """
 
-RUST_WYBECODER_REPAIR_CANDIDATE_SYSTEM_PROMPT = """You are an expert Rust/Verus developer using prove-as-you-generate repair.
+RUST_VGCR_REPAIR_CANDIDATE_SYSTEM_PROMPT = """You are an expert Rust/Verus developer using prove-as-you-generate repair.
 Output Rust source code only."""
 
-RUST_WYBECODER_REPAIR_CANDIDATE_USER_PROMPT_TEMPLATE = """Repair the Rust/Verus implementation using this verifier-derived plan.
+RUST_VGCR_REPAIR_CANDIDATE_USER_PROMPT_TEMPLATE = """Repair the Rust/Verus implementation using this verifier-derived plan.
 
 Requirement:
 {requirement}
@@ -762,12 +762,12 @@ class RustRequirementToCodePipeline:
         skip_verify: bool = False,
         logger: Optional[Callable[[str], None]] = None,
         verus_bin: str = "verus",
-        enable_constraint_extraction: bool = True,
+        enable_cgs: bool = True,
         spec_self_check_rounds: int = 1,
         enable_code_repair: bool = True,
         code_repair_max_iter: int = 3,
         code_repair_strategy: str = "simple",
-        wybecoder_candidates: int = 3,
+        vgcr_candidates: int = 3,
         reuse_artifacts_from: Optional[Path] = None,
         pipeline_variant: str = "enhanced",
         enhancement_method: Optional[str] = None,
@@ -777,14 +777,14 @@ class RustRequirementToCodePipeline:
         self.skip_verify = skip_verify
         self.logger = logger
         self.verifier = VerusVerifier(timeout=verify_timeout, verus_cmd=verus_bin)
-        self.enable_constraint_extraction = enable_constraint_extraction
+        self.enable_cgs = enable_cgs
         self.spec_self_check_rounds = max(0, spec_self_check_rounds)
         self.enable_code_repair = enable_code_repair
         self.code_repair_max_iter = max(0, code_repair_max_iter)
-        if code_repair_strategy not in {"simple", "wybecoder"}:
+        if code_repair_strategy not in {"simple", "vgcr"}:
             raise ValueError(f"Unsupported code_repair_strategy: {code_repair_strategy}")
         self.code_repair_strategy = code_repair_strategy
-        self.wybecoder_candidates = max(1, wybecoder_candidates)
+        self.vgcr_candidates = max(1, vgcr_candidates)
         self.reuse_artifacts_from = reuse_artifacts_from
         self.pipeline_variant = pipeline_variant
         self.enhancement_method = enhancement_method
@@ -852,18 +852,18 @@ class RustRequirementToCodePipeline:
             "pipeline_variant": self.pipeline_variant,
             "enhancement_method": self.enhancement_method,
             "enhanced_modules": {
-                "constraint_extraction": self.enable_constraint_extraction,
+                "cgs": self.enable_cgs,
                 "spec_self_check_rounds": (
-                    self.spec_self_check_rounds if self.enable_constraint_extraction else 0
+                    self.spec_self_check_rounds if self.enable_cgs else 0
                 ),
                 "code_repair": self.enable_code_repair,
                 "code_repair_max_iter": (
                     self.code_repair_max_iter if self.enable_code_repair else 0
                 ),
                 "code_repair_strategy": self.code_repair_strategy,
-                "wybecoder_candidates": (
-                    self.wybecoder_candidates
-                    if self.enable_code_repair and self.code_repair_strategy == "wybecoder"
+                "vgcr_candidates": (
+                    self.vgcr_candidates
+                    if self.enable_code_repair and self.code_repair_strategy == "vgcr"
                     else 0
                 ),
                 "reuse_artifacts_from": str(self.reuse_artifacts_from)
@@ -1147,12 +1147,12 @@ class RustRequirementToCodePipeline:
                     "reason": "Verus contracts are part of function signatures; reused artifacts are frozen.",
                 },
                 "enhanced": {
-                    "enable_constraint_extraction": False,
+                    "enable_cgs": False,
                     "spec_self_check_rounds": 0,
                     "enable_code_repair": self.enable_code_repair,
                     "code_repair_max_iter": self.code_repair_max_iter,
                     "code_repair_strategy": self.code_repair_strategy,
-                    "wybecoder_candidates": self.wybecoder_candidates,
+                    "vgcr_candidates": self.vgcr_candidates,
                     "reuse_artifacts_from": str(self.reuse_artifacts_from),
                     "generation_skipped_due_to_reuse": True,
                 },
@@ -1183,12 +1183,12 @@ class RustRequirementToCodePipeline:
         constraints: Optional[Dict[str, Any]] = None
         signature_fallback = item.signature_hint
 
-        if self.enable_constraint_extraction:
+        if self.enable_cgs:
             try:
-                self._log(f"[id={item.id}] stage=constraint_extraction start")
+                self._log(f"[id={item.id}] stage=cgs start")
                 constraints = self._extract_constraints(item)
                 signature_fallback = item.signature_hint or constraints.get("function_signature", "")
-                self._log(f"[id={item.id}] stage=constraint_extraction done")
+                self._log(f"[id={item.id}] stage=cgs done")
 
                 self._log(f"[id={item.id}] stage=constraint_to_spec start")
                 initial_spec = self._constraints_to_spec(
@@ -1214,7 +1214,7 @@ class RustRequirementToCodePipeline:
                     "panic_freedom": [],
                     "mutation_frame": [],
                     "invariants": [],
-                    "notes": "Constraint extraction failed; direct spec fallback was used.",
+                    "notes": "Constraint-Guided Specification (CGS) failed; direct spec fallback was used.",
                     "fallback_error": str(exc),
                 }
                 signature_fallback = item.signature_hint
@@ -1272,7 +1272,7 @@ class RustRequirementToCodePipeline:
             spec_json = self._generate_direct_spec(item)
             alignment_info = {
                 "enabled": False,
-                "reason": "constraint extraction module disabled",
+                "reason": "constraint-guided specification (CGS) module disabled",
                 "rounds": [],
                 "final_aligned": None,
                 "max_rounds": 0,
@@ -1289,7 +1289,7 @@ class RustRequirementToCodePipeline:
                 spec_postprocessing,
             ) = self._validate_spec_fields(spec_json, signature_fallback=signature_fallback)
         except ValueError as exc:
-            if self.enable_constraint_extraction and not alignment_info.get("fallback_to_direct_spec"):
+            if self.enable_cgs and not alignment_info.get("fallback_to_direct_spec"):
                 spec_json, fallback_alignment = self._fallback_to_direct_spec(
                     item=item,
                     reason=str(exc),
@@ -1331,18 +1331,18 @@ class RustRequirementToCodePipeline:
             "raw_model_output": spec_json.get("raw_model_output", ""),
             "spec_postprocessing": spec_postprocessing,
             "enhanced_modules": {
-                "constraint_extraction": self.enable_constraint_extraction,
+                "cgs": self.enable_cgs,
                 "spec_self_check_rounds": (
-                    self.spec_self_check_rounds if self.enable_constraint_extraction else 0
+                    self.spec_self_check_rounds if self.enable_cgs else 0
                 ),
                 "code_repair": self.enable_code_repair,
                 "code_repair_max_iter": (
                     self.code_repair_max_iter if self.enable_code_repair else 0
                 ),
                 "code_repair_strategy": self.code_repair_strategy,
-                "wybecoder_candidates": (
-                    self.wybecoder_candidates
-                    if self.enable_code_repair and self.code_repair_strategy == "wybecoder"
+                "vgcr_candidates": (
+                    self.vgcr_candidates
+                    if self.enable_code_repair and self.code_repair_strategy == "vgcr"
                     else 0
                 ),
             },
@@ -1385,12 +1385,12 @@ class RustRequirementToCodePipeline:
                 "reason": "The generated target function header is replaced with the canonical Verus contract before verification.",
             },
             "enhanced": {
-                "enable_constraint_extraction": self.enable_constraint_extraction,
+                "enable_cgs": self.enable_cgs,
                 "spec_self_check_rounds": self.spec_self_check_rounds,
                 "enable_code_repair": self.enable_code_repair,
                 "code_repair_max_iter": self.code_repair_max_iter,
                 "code_repair_strategy": self.code_repair_strategy,
-                "wybecoder_candidates": self.wybecoder_candidates,
+                "vgcr_candidates": self.vgcr_candidates,
             },
         }
         if self.skip_verify:
@@ -1446,8 +1446,8 @@ class RustRequirementToCodePipeline:
                 "details_file": str(detail_path) if details else None,
             }
             try:
-                if self.code_repair_strategy == "wybecoder":
-                    code_text, verdict, strategy_info = self._build_wybecoder_repair(
+                if self.code_repair_strategy == "vgcr":
+                    code_text, verdict, strategy_info = self._build_vgcr_repair(
                         item=item,
                         code_file=code_file,
                         code_text=code_text,
@@ -1459,7 +1459,7 @@ class RustRequirementToCodePipeline:
                         details=details,
                         attempt=attempt,
                     )
-                    history_entry["wybecoder"] = strategy_info
+                    history_entry["vgcr"] = strategy_info
                 else:
                     code_text, strategy_info = self._build_simple_repair(
                         item=item,
@@ -1556,7 +1556,7 @@ class RustRequirementToCodePipeline:
             "contract_rewritten": contract_rewritten,
         }
 
-    def _wybecoder_repair_plan(
+    def _vgcr_repair_plan(
         self,
         item: RustRequirementItem,
         code_text: str,
@@ -1567,7 +1567,7 @@ class RustRequirementToCodePipeline:
         verdict: Any,
         details: str,
     ) -> Dict[str, Any]:
-        plan_prompt = RUST_WYBECODER_REPAIR_ANALYSIS_USER_PROMPT_TEMPLATE.format(
+        plan_prompt = RUST_VGCR_REPAIR_ANALYSIS_USER_PROMPT_TEMPLATE.format(
             requirement=item.requirement,
             function_signature=function_signature,
             verus_contract=verus_contract or "(see structured clauses)",
@@ -1583,7 +1583,7 @@ class RustRequirementToCodePipeline:
             verdict_details=_truncate_for_prompt(details, max_chars=7000),
         )
         raw = self.llm_client.chat(
-            RUST_WYBECODER_REPAIR_ANALYSIS_SYSTEM_PROMPT,
+            RUST_VGCR_REPAIR_ANALYSIS_SYSTEM_PROMPT,
             plan_prompt,
         )
         try:
@@ -1651,7 +1651,7 @@ class RustRequirementToCodePipeline:
         )
         return focuses
 
-    def _build_wybecoder_repair(
+    def _build_vgcr_repair(
         self,
         item: RustRequirementItem,
         code_file: Path,
@@ -1664,7 +1664,7 @@ class RustRequirementToCodePipeline:
         details: str,
         attempt: int,
     ) -> tuple[str, Any, Dict[str, Any]]:
-        plan = self._wybecoder_repair_plan(
+        plan = self._vgcr_repair_plan(
             item=item,
             code_text=code_text,
             function_signature=function_signature,
@@ -1674,7 +1674,7 @@ class RustRequirementToCodePipeline:
             verdict=verdict,
             details=details,
         )
-        candidate_count = self.wybecoder_candidates
+        candidate_count = self.vgcr_candidates
         focuses = self._candidate_focuses(plan)
         candidate_records: List[Dict[str, Any]] = []
         best_code = code_text
@@ -1683,10 +1683,10 @@ class RustRequirementToCodePipeline:
         for candidate_idx in range(1, candidate_count + 1):
             focus = focuses[(candidate_idx - 1) % len(focuses)]
             self._log(
-                f"[id={item.id}] stage=wybecoder_repair attempt={attempt} "
+                f"[id={item.id}] stage=vgcr_repair attempt={attempt} "
                 f"candidate={candidate_idx}/{candidate_count}"
             )
-            candidate_prompt = RUST_WYBECODER_REPAIR_CANDIDATE_USER_PROMPT_TEMPLATE.format(
+            candidate_prompt = RUST_VGCR_REPAIR_CANDIDATE_USER_PROMPT_TEMPLATE.format(
                 requirement=item.requirement,
                 function_signature=function_signature,
                 verus_contract=verus_contract or "(see structured clauses)",
@@ -1703,7 +1703,7 @@ class RustRequirementToCodePipeline:
                 candidate_focus=focus,
             )
             raw = self.llm_client.chat(
-                RUST_WYBECODER_REPAIR_CANDIDATE_SYSTEM_PROMPT,
+                RUST_VGCR_REPAIR_CANDIDATE_SYSTEM_PROMPT,
                 candidate_prompt,
             )
             candidate_code, contract_rewritten = _enforce_rust_contract(
@@ -1731,7 +1731,7 @@ class RustRequirementToCodePipeline:
 
         code_file.write_text(best_code)
         return best_code, best_verdict, {
-            "strategy": "wybecoder",
+            "strategy": "vgcr",
             "plan": plan,
             "candidates": candidate_records,
         }

@@ -3,10 +3,10 @@ import json
 from pathlib import Path
 
 RUNS = {
-    "deepseek-default": {"base": "outputs/req2code-base-0622", "base+ce": "outputs/C-ce-only-0623-old", "base+repair": "outputs/C-wybecoder-0623", "base+ce+repair": "outputs/C-ce-wybecoder-0623"},
-    "kimi-k2.7-code": {"base": "outputs/C-base-kimi-0629", "base+ce": "outputs/C-ce-kimi-0630", "base+repair": "outputs/C-wybecoder-kimi-0630", "base+ce+repair": "outputs/C-ce-wybecoder-kimi-0630"},
-    "qwen3.6-plus": {"base": "outputs/C-base-qwen36plus-0625", "base+ce": "outputs/C-ce-qwen-0626", "base+repair": "outputs/C-wybecoder-qwen-0626", "base+ce+repair": "outputs/C-ce-wybecoder-qwen-0627"},
-    "claude-sonnet-5": {"base": "outputs/C-base-claude-0706", "base+ce": "outputs/C-ce-claude-0706", "base+repair": "outputs/C-wybecoder-claude-0706", "base+ce+repair": "outputs/C-ce-wybecoder-claude-0706"},
+    "deepseek-default": {"direct": "outputs/req2code-base-0622", "cgs": "outputs/C-cgs-only-0623-old", "vgcr": "outputs/C-vgcr-0623", "codenova": "outputs/C-cgs-vgcr-0623"},
+    "kimi-k2.7-code": {"direct": "outputs/C-base-kimi-0629", "cgs": "outputs/C-cgs-kimi-0630", "vgcr": "outputs/C-vgcr-kimi-0630", "codenova": "outputs/C-cgs-vgcr-kimi-0630"},
+    "qwen3.6-plus": {"direct": "outputs/C-base-qwen36plus-0625", "cgs": "outputs/C-cgs-qwen-0626", "vgcr": "outputs/C-vgcr-qwen-0626", "codenova": "outputs/C-cgs-vgcr-qwen-0627"},
+    "claude-sonnet-5": {"direct": "outputs/C-base-claude-0706", "cgs": "outputs/C-cgs-claude-0706", "vgcr": "outputs/C-vgcr-claude-0706", "codenova": "outputs/C-cgs-vgcr-claude-0706"},
 }
 
 rows = []

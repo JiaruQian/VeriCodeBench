@@ -67,27 +67,27 @@ The Rust runner supports the same base/enhanced ablation shape as the C and
 Java tracks:
 
 ```bash
-# Base: direct requirement -> Verus spec -> Rust code -> Verus, no CE or repair.
+# Direct: requirement -> Verus spec -> Rust code -> Verus, no CGS or repair.
 PIPELINE_VARIANT=base \
 OUTPUT_DIR=outputs/rust-req2code-base \
 ./scripts/run_openrouter_rust_requirement_pipeline.sh
 
-# Constraint extraction/spec self-check only.
+# CGS: constraint-guided specification/spec self-check only.
 PIPELINE_VARIANT=enhanced \
-ENHANCEMENT_METHOD=ce \
-OUTPUT_DIR=outputs/rust-req2code-ce-only \
+ENHANCEMENT_METHOD=cgs \
+OUTPUT_DIR=outputs/rust-req2code-cgs-only \
 ./scripts/run_openrouter_rust_requirement_pipeline.sh
 
-# Verification-guided code repair only.
+# VGCR: verifier-guided candidate repair only.
 PIPELINE_VARIANT=enhanced \
-ENHANCEMENT_METHOD=repair \
+ENHANCEMENT_METHOD=vgcr \
 OUTPUT_DIR=outputs/rust-req2code-repair-only \
 ./scripts/run_openrouter_rust_requirement_pipeline.sh
 
-# Both enhancement modules.
+# CodeNova: CGS + VGCR.
 PIPELINE_VARIANT=enhanced \
 ENHANCEMENT_METHOD=both \
-OUTPUT_DIR=outputs/rust-req2code-both \
+OUTPUT_DIR=outputs/rust-req2code-codenova \
 ./scripts/run_openrouter_rust_requirement_pipeline.sh
 ```
 
@@ -121,13 +121,13 @@ ENABLE_CODE_REPAIR=false \
 ./scripts/run_openrouter_rust_code_only_pipeline.sh
 ```
 
-Simple and WybeCoder repair runs must reuse the same initial artifacts:
+Simple and VGCR repair runs must reuse the same initial artifacts:
 
 ```bash
-OUTPUT_DIR=outputs/rust-code-only-wybecoder \
+OUTPUT_DIR=outputs/rust-code-only-vgcr \
 REUSE_ARTIFACTS_FROM=outputs/rust-code-only-base \
 ENABLE_CODE_REPAIR=true \
-CODE_REPAIR_STRATEGY=wybecoder \
+CODE_REPAIR_STRATEGY=vgcr \
 ./scripts/run_openrouter_rust_code_only_pipeline.sh
 ```
 

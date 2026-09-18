@@ -1,78 +1,78 @@
-# Requirement -> Spec -> Code -> Verify 管线说明（含增量增强）
+# Requirement -> Spec -> Code -> Verify Pipeline (with Incremental Enhancements)
 
-本文档说明基于 AutoSpec 重构后的新流程，并给出可直接用于 ablation 的变体：
+This document describes the new flow after the CodeNova refactor and provides variants that can be used directly for ablations:
 
-- `base`：最小可运行基线（单轮）
-- `enhanced`：在 `base` 上增加轻量增强模块；其中 `constraint_extraction` 与 `code_repair` 可独立开关
+- `base`: minimal runnable baseline (single round)
+- `enhanced`: adds lightweight enhancement modules on top of `base`; the Constraint-Guided Specification (CGS) and code repair modules can be toggled independently
 
-目标是保持实验可复现、对比清晰，而不是一次性推翻原有管线。
+The goal is to keep experiments reproducible and comparisons clear, rather than overhauling the existing pipeline all at once.
 
-## 1. 任务定义
+## 1. Task Definition
 
-我们定义端到端任务为：
+We define the end-to-end task as:
 
 `Requirement -> Spec -> Code -> Verify`
 
-输入：
+Input:
 
-- 自然语言需求 `r`
+- natural-language requirement `r`
 
-输出：
+Output:
 
-- 形式化规格 `s`（ACSL）
-- 程序 `c`（C）
+- formal specification `s` (ACSL)
+- program `c` (C)
 
-优化目标是双目标：
+The optimization objective is dual:
 
-1. `c |= s`（形式化验证通过）
-2. `s ~= r`（规格与需求语义对齐）
+1. `c |= s` (formal verification passes)
+2. `s ~= r` (the specification is semantically aligned with the requirement)
 
-> 核心点：不仅追求 verify pass，也要提升 requirement-spec 的覆盖与对齐质量。
+> Key point: we pursue not only verify pass, but also improved requirement-spec coverage and alignment quality.
 
-## 2. Base Pipeline（Ablation-0）
+## 2. Base Pipeline (Ablation-0)
 
-当前基线流程：
+The current baseline flow:
 
 `r --(LLM)--> s --(LLM)--> c --(Frama-C/WP)--> verify`
 
-特征：
+Characteristics:
 
-- 无结构化约束抽取
-- 无 requirement-spec 对齐检查
-- 无 verify 失败后的代码修复循环
+- no structured constraint extraction (CGS)
+- no requirement-spec alignment check
+- no code-repair loop after verification failure
 
-这条线保留不动，作为稳定对照组。
+This line is kept unchanged as a stable control group.
 
-## 3. Enhanced Pipeline（增量增强，不替换 base）
+## 3. Enhanced Pipeline (incremental enhancement, does not replace Direct)
 
-增强版在 base 之上增加可选轻量模块。默认 `enhanced` 为全开，以保持与旧命令兼容；做 ablation 时可分别关闭。
+The enhanced version adds optional lightweight modules on top of Direct. By default, `enhanced` turns everything on to stay compatible with the old commands; for ablations each module can be disabled separately.
 
-### 3.1 Requirement -> Constraint Extraction
+### 3.1 Requirement -> Constraint-Guided Specification (CGS)
 
-先把需求拆成结构化约束：
+First decompose the requirement into structured constraints:
 
 `r -> {preconditions, postconditions, invariants}`
 
-并可给出一个 `function_signature` 候选。输出为 JSON，便于后续评估和复用。
+and optionally produce a `function_signature` candidate. The output is JSON so it can be evaluated and reused later.
 
-开关：
+Switches:
 
-- CLI：`--enable-constraint-extraction` / `--disable-constraint-extraction`
-- OpenRouter wrapper：`ENABLE_CONSTRAINT_EXTRACTION=true|false`
+- CLI: `--enable-cgs` / `--disable-cgs`
+- OpenRouter wrapper: `ENABLE_CGS=true|false`
 
-关闭后，spec 生成退回 base 的直接 `requirement -> ACSL` prompt，不再运行 `Constraint -> ACSL Mapping` 与 `Spec Self-Check + Refine`。
+When disabled, spec generation falls back to the Direct `requirement -> ACSL` prompt and no longer runs `Constraint -> ACSL Mapping` or `Spec Self-Check + Refine`.
 
 ### 3.2 Constraint -> ACSL Mapping
 
-将结构化约束映射为 ACSL（`requires/assigns/ensures`）。
+Map structured constraints to ACSL (`requires/assigns/ensures`).
 
-相比“直接从 requirement 一步出 ACSL”，这种两阶段方式更稳健：
+Compared with producing ACSL directly from the requirement in one step, this two-stage approach is more robust:
 
-- 降低 hallucination
-- 提高约束覆盖率
-- 便于后续做缺失约束分析
+- reduces hallucination
+- improves constraint coverage
+- makes later missing-constraint analysis easier
 
-输出 JSON 中允许包含 `code_annotation_hints`：
+The output JSON may contain `code_annotation_hints`:
 
 ```json
 {
@@ -87,34 +87,36 @@
 }
 ```
 
-`acsl_block` 必须只包含函数合同。`loop invariant`、`loop assigns`、`loop variant`
-属于函数体内的 statement annotation，不能写进函数合同。若模型误把这些 loop annotation
-写入 `acsl_block`，pipeline 会把它们移入 `code_annotation_hints` 并从合同中删除。
+`acsl_block` must contain only the function contract. `loop invariant`, `loop assigns`, and
+`loop variant` are statement annotations inside the function body and must not be written into the
+function contract. If the model mistakenly writes these loop annotations into `acsl_block`, the
+pipeline moves them into `code_annotation_hints` and removes them from the contract.
 
-### 3.3 Spec Self-Check + Refine（1~2 轮）
+### 3.3 Spec Self-Check + Refine (1-2 rounds)
 
-加入轻量对齐检查：
+Add a lightweight alignment check:
 
-- 输入：`requirement + constraints + spec`
-- 输出：`is_aligned / missing_constraints / inconsistent_items / refinement_hints`
+- input: `requirement + constraints + spec`
+- output: `is_aligned / missing_constraints / inconsistent_items / refinement_hints`
 
-若发现缺失或不一致，则自动 refinement（轮数可配）。
+If missing or inconsistent items are found, refinement is performed automatically (the number of rounds is configurable).
 
-形成：
+This forms:
 
 `generate -> check -> refine`
 
 ### 3.4 Code Generation with Annotation Hints
 
-代码生成阶段输入：
+Inputs to the code generation stage:
 
 - `requirement`
 - `function_signature`
-- 函数合同 `acsl_block`
+- function contract `acsl_block`
 - `code_annotation_hints`
 
-生成的 C 文件必须把 `acsl_block` 保持在函数定义正上方。若使用 loop hints，
-只能把它们作为循环前的 statement annotation 插入函数体，例如：
+The generated C file must keep `acsl_block` directly above the function definition. If loop hints
+are used, they may only be inserted into the function body as statement annotations before the loop,
+for example:
 
 ```c
 /*@
@@ -127,124 +129,144 @@ while (i < n) {
 }
 ```
 
-这样保留 `req -> spec -> code` 的结构：spec 阶段可以提出验证所需的循环注解候选，
-但这些候选不参与 requirement-spec 主覆盖评估，也不会污染函数合同。
+This preserves the `req -> spec -> code` structure: the spec stage may propose loop-annotation
+candidates needed for verification, but these candidates do not participate in the main
+requirement-spec coverage evaluation and do not pollute the function contract.
 
-Java/JML/OpenJML 后端额外维护一个 contract-preservation 不变量：
+The Java/JML/OpenJML backend additionally maintains a contract-preservation invariant:
 
-- `specs/*.json` 中的 `jml_block` 是 canonical method contract。
-- 代码生成后，pipeline 会按 `function_signature` 找到目标方法，并把 canonical `jml_block`
-  程序化地插入或替换到方法定义正上方。
-- OpenJML 验证的 Java 源码必须使用这个 canonical contract，不能使用模型在源码中改写出的
-  更弱或不同 JML contract。
-- 该后处理信息记录在 `reports/results.json` 的 `contract_enforcement` 字段中。
+- `jml_block` in `specs/*.json` is the canonical method contract.
+- After code generation, the pipeline locates the target method by `function_signature` and
+  programmatically inserts or replaces the canonical `jml_block` directly above the method
+  definition.
+- Java source verified by OpenJML must use this canonical contract; it must not use a weaker or
+  different JML contract rewritten into the source by the model.
+- This post-processing information is recorded in the `contract_enforcement` field of
+  `reports/results.json`.
 
-### 3.5 Verification-guided Code Repair（3~5 轮）
+### 3.5 Verification-guided Code Repair (3-5 rounds)
 
 `spec -> c0 -> verify`
 
-若验证失败，则把错误信息回灌给 LLM 修复代码：
+If verification fails, the error information is fed back to the LLM to repair the code:
 
 `c0 -> verify -> c1 -> verify -> ...`
 
-默认设置最大迭代次数，避免无限循环。
+A maximum iteration count is set by default to avoid infinite loops.
 
-开关：
+Switches:
 
-- CLI：`--enable-code-repair` / `--disable-code-repair`
-- CLI strategy：`--code-repair-strategy simple|wybecoder`
-- OpenRouter wrapper：`ENABLE_CODE_REPAIR=true|false`
-- OpenRouter strategy：`CODE_REPAIR_STRATEGY=simple|wybecoder`
+- CLI: `--enable-code-repair` / `--disable-code-repair`
+- CLI strategy: `--code-repair-strategy simple|vgcr`
+- OpenRouter wrapper: `ENABLE_CODE_REPAIR=true|false`
+- OpenRouter strategy: `CODE_REPAIR_STRATEGY=simple|vgcr`
 
-关闭后只执行首轮 Frama-C/WP verify，不进入修复循环。也可用 `--code-repair-max-iter 0` 达到等价效果。
+When disabled, only the first Frama-C/WP verify round runs and no repair loop is entered. The same
+effect can be achieved with `--code-repair-max-iter 0`.
 
-当前默认 repair strategy 是 `simple`，也就是把 verifier 失败信息直接回灌给 LLM 生成下一版代码。
-实验性 `wybecoder` strategy 借鉴 WybeCoder 的 prove-as-you-generate 思路：先把 Frama-C/WP
-失败日志总结为结构化 failure/subgoal plan，再生成多个不同 focus 的修复候选并逐个验证。
-它仍然只允许修改代码体和 statement-level annotations，不允许削弱或替换生成的函数合同。
-详细迁移方案见 `docs/wybecoder_repair_migration_plan.md`。
+The current default repair strategy is `simple`, i.e. feeding the verifier failure information
+directly back to the LLM to generate the next version of the code.
+The experimental `vgcr` strategy follows the Verifier-Guided Candidate Repair (VGCR)
+prove-as-you-generate idea: it first summarizes the Frama-C/WP failure log into a structured
+failure/subgoal plan, then generates multiple repair candidates with different focuses and verifies
+them one by one.
+It is still only allowed to modify the code body and statement-level annotations; it may not weaken
+or replace the generated function contract.
+See `docs/wybecoder_repair_migration_plan.md` for the detailed migration plan.
 
-Java/JML/OpenJML 的 repair 阶段同样强制保留 canonical `jml_block`。模型可以修改 Java
-方法体、helper code 和 loop annotations，但 repair 输出写入文件前会再次用 `specs/*.json`
-中的 method contract 覆盖源码中的 JML contract。因此 `code_validity_rate` 表示“代码在生成
-spec 下通过 OpenJML”，而不是“代码在 repair 后可能被削弱的源码 contract 下通过 OpenJML”。
+Java/JML/OpenJML repair likewise enforces preservation of the canonical `jml_block`. The model may
+modify the Java method body, helper code, and loop annotations, but before repair output is written
+to file the JML contract in the source is overwritten again with the method contract from
+`specs/*.json`. Therefore `code_validity_rate` means "the code passes OpenJML under the generated
+spec", not "the code passes OpenJML under the possibly weakened source contract after repair".
 
-Rust/Verus 后端额外做 Rust-only canonicalization：
+The Rust/Verus backend additionally performs Rust-only canonicalization:
 
-- 生成的 Rust function signature 若缺少结尾分号，pipeline 会自动补齐。
-- 若返回值是未命名形式（例如 `-> u64;`），pipeline 会改写为 Verus 友好的命名返回
-  `-> (r: u64);`，并把 generated clauses 中的 `result` 规范化为 `r`。
-- pipeline 会过滤当前 Rust/Verus 题集不支持的 C/Viper 风格 spec 片段，例如 `null`、
-  `pointer_valid`、`valid`、`wf`、`well_formed`、`fully_owned`、`independent_of`、
-  `allocated` 和 `panics`。
-- 若 self-check/refine 没有在配置轮数内得到 aligned spec，pipeline 不再盲目使用最后一次
-  refinement，而是回退到 refinement 前的 spec；回退信息记录在 `alignment_check` 中。
+- If a generated Rust function signature is missing its trailing semicolon, the pipeline adds it
+  automatically.
+- If the return value is in unnamed form (for example `-> u64;`), the pipeline rewrites it to the
+  Verus-friendly named return `-> (r: u64);` and normalizes `result` in the generated clauses to
+  `r`.
+- The pipeline filters out C/Viper-style spec fragments that the current Rust/Verus problem set
+  does not support, such as `null`, `pointer_valid`, `valid`, `wf`, `well_formed`, `fully_owned`,
+  `independent_of`, `allocated`, and `panics`.
+- If self-check/refine does not obtain an aligned spec within the configured number of rounds, the
+  pipeline no longer blindly uses the last refinement; instead it falls back to the spec from
+  before refinement. The fallback information is recorded in `alignment_check`.
 
-Python/Nagini 后端额外维护一个 contract-preservation 不变量：
+The Python/Nagini backend additionally maintains a contract-preservation invariant:
 
-- `specs/*.json` 中的 `nagini_contract` 与结构化 `nagini_clauses` 是 canonical function contract。
-- 代码生成后，pipeline 会按 `function_signature` 找到目标函数，并把 canonical
-  `Requires(...)`/`Ensures(...)` 语句插入或替换为函数体最前面的语句。
-- Nagini 验证的 Python 源码必须使用这个 canonical contract，不能使用模型在源码中改写出的
-  更弱或不同 Nagini contract。
-- repair 阶段可以修改函数体和 loop `Invariant(...)`，但写回文件前会再次强制恢复 canonical
-  function contract。该后处理信息记录在 `reports/results.json` 的
-  `contract_enforcement` 字段中。
+- `nagini_contract` and the structured `nagini_clauses` in `specs/*.json` are the canonical
+  function contract.
+- After code generation, the pipeline locates the target function by `function_signature` and
+  inserts or replaces the canonical `Requires(...)`/`Ensures(...)` statements as the first
+  statements of the function body.
+- Python source verified by Nagini must use this canonical contract; it must not use a weaker or
+  different Nagini contract rewritten into the source by the model.
+- The repair stage may modify the function body and loop `Invariant(...)`, but before writing back
+  to file it again forcibly restores the canonical function contract. This post-processing
+  information is recorded in the `contract_enforcement` field of `reports/results.json`.
 
 ### 3.6 Requirement-Spec Evaluation
 
-为避免“`spec` 与 `code` 能互相验证，但二者共同偏离 `requirement`”的问题，
-当前主评估使用 **Constraint Entailment Framework (CEF)**，见
-`docs/constraint_entailment_benchmark.md`。
+To avoid the problem that `spec` and `code` can verify each other while both drift away from
+`requirement`, the current main evaluation uses the **Constraint Entailment Framework (CEF)**; see
+`docs/constraint_entailment_benchmark.md`.
 
-CEF 使用统一的 manual ground-truth spec 文件与 ACSL 子句抽取，按子句类型检查蕴含方向：
+CEF uses a unified manual ground-truth spec file and ACSL clause extraction, and checks the
+entailment direction by clause type:
 
-- `requires`：检查 manual ground-truth `requires` 是否蕴含生成的 `requires`
-- `ensures/assigns`：检查生成的 `ensures/assigns` 是否蕴含 manual ground-truth 子句
+- `requires`: check whether the manual ground-truth `requires` entails the generated `requires`
+- `ensures/assigns`: check whether the generated `ensures/assigns` entails the manual ground-truth
+  clauses
 
-Java/JML 评估使用同一套 entailment 框架，但 clause 抽取支持 `assignable`、`signals`、
-`signals_only`，并将缺失 spec 的题目按 `0/n` 计入 ground-truth coverage 分母。Java summary
-还会检查源码中的 JML clauses 是否与 `specs/*.json` 中的 canonical `jml_block` 一致；不一致时
-该题的 code validity 视为失败，并在 `contract_mismatch_count` 中统计。
+Java/JML evaluation uses the same entailment framework, but clause extraction supports `assignable`,
+`signals`, and `signals_only`, and tasks with a missing spec are counted as `0/n` in the
+ground-truth coverage denominator. The Java summary also checks whether the JML clauses in the
+source are consistent with the canonical `jml_block` in `specs/*.json`; on mismatch, the code
+validity of that task is treated as failed and counted in `contract_mismatch_count`.
 
-Rust/Verus 评估同样使用同一套 entailment 框架，但 Rust 签名使用 Rust-only parser，
-避免把返回类型误识别为参数；并将 `r`、`result` 和 named return 统一 canonicalize 为同一
-返回值别名，以减少纯命名差异造成的 coverage 误判。
+Rust/Verus evaluation likewise uses the same entailment framework, but Rust signatures use a
+Rust-only parser, avoiding misidentifying the return type as a parameter; `r`, `result`, and named
+returns are also canonicalized to the same return-value alias, reducing coverage false negatives
+caused by purely naming differences.
 
-Python/Nagini 评估同样使用同一套 entailment 框架。Python spec artifact 优先读取结构化
-`nagini_clauses`；如果缺失，则回退解析 `nagini_contract` 中的 `Requires(...)` 与
-`Ensures(...)`。Python 签名使用 Python-only parser，避免把类型标注如 `x: int` 的 `int`
-误识别为参数名；`Result()`/`result` 会统一 canonicalize 为同一返回值别名。缺失 spec 的题目
-按 `0/n` 计入 Python ground-truth coverage 分母。
+Python/Nagini evaluation likewise uses the same entailment framework. The Python spec artifact
+preferentially reads the structured `nagini_clauses`; if absent, it falls back to parsing
+`Requires(...)` and `Ensures(...)` from `nagini_contract`. Python signatures use a Python-only
+parser, avoiding misidentifying a type annotation such as `int` in `x: int` as a parameter name;
+`Result()`/`result` are canonicalized to the same return-value alias. Tasks with a missing spec are
+counted as `0/n` in the Python ground-truth coverage denominator.
 
-主 ground truth 文件：
+Main ground-truth file:
 
 - `benchmarks/frama-c-problems/requirements/requirements_100_ground_truth_specs.json`
 
-输出文件：
+Output files:
 
-- `reports/constraint_entailment.json`
+- `reports/cef.json`
 - `reports/benchmark_summary.json`
 
-`benchmark_summary.json` 汇总三个主指标：
+`benchmark_summary.json` aggregates three main metrics:
 
 - code valid count / validity rate
 - requirement coverage micro/macro
-- joint success：code valid 且 requirement coverage full
+- joint success: code valid and requirement coverage full
 
-旧的 LLM-as-a-judge spec evaluation 仍可作为辅助调试入口，但不作为当前 benchmark 的主指标。
+The old LLM-as-a-judge spec evaluation can still serve as an auxiliary debugging entry point, but it
+is not a main metric of the current benchmark.
 
-## 4. 实现位置
+## 4. Implementation Locations
 
 - `autospec/pipeline/requirement_pipeline.py`
-  - `RequirementToCodePipeline`：base（保持原逻辑）
-  - `EnhancedRequirementToCodePipeline`：enhanced（新增）
+  - `RequirementToCodePipeline`: base (keeps the original logic)
+  - `EnhancedRequirementToCodePipeline`: enhanced (newly added)
 - `autospec/pipeline/java_requirement_pipeline.py`
-  - Java/JML/OpenJML 后端
+  - Java/JML/OpenJML backend
 - `autospec/pipeline/rust_requirement_pipeline.py`
-  - Rust/Verus 后端
+  - Rust/Verus backend
 - `autospec/pipeline/python_nagini_requirement_pipeline.py`
-  - Python/Nagini 后端
+  - Python/Nagini backend
 - `autospec/verifier/openjml.py`
   - OpenJML verifier adapter
 - `autospec/verifier/verus.py`
@@ -252,9 +274,9 @@ Python/Nagini 评估同样使用同一套 entailment 框架。Python spec artifa
 - `autospec/verifier/nagini.py`
   - Nagini verifier adapter
 - `scripts/run_requirement_pipeline.py`
-  - 增加 `--pipeline-variant` 与增强参数
+  - adds `--pipeline-variant` and enhancement parameters
 - `scripts/run_openrouter_requirement_pipeline.sh`
-  - 增加环境变量控制 enhanced 参数
+  - adds environment variables controlling the enhanced parameters
 - `scripts/run_python_nagini_requirement_pipeline.py`
   - Python/Nagini LLM generation CLI
 - `autospec/pipeline/python_code_only_pipeline.py`
@@ -270,13 +292,13 @@ Python/Nagini 评估同样使用同一套 entailment 框架。Python spec artifa
 - `scripts/run_python_nagini_constraint_entailment_evaluation.sh`
   - Python/Nagini requirement coverage evaluator wrapper
 - `scripts/evaluate_constraint_entailment.py`
-  - 对已有 `specs/*.json` 做 manual ground-truth spec 覆盖评估
+  - performs manual ground-truth spec coverage evaluation on existing `specs/*.json`
 - `scripts/summarize_req2code_benchmark.py`
-  - 汇总代码验证、requirement coverage 与 joint success
+  - aggregates code verification, requirement coverage, and joint success
 
-## 5. 数据格式
+## 5. Data Format
 
-需求数据（数组）示例：
+Example requirement data (array):
 
 ```json
 [
@@ -288,15 +310,15 @@ Python/Nagini 评估同样使用同一套 entailment 框架。Python spec artifa
 ]
 ```
 
-文本字段读取优先级：
+Text field read priority:
 
 1. `requirement_zh`
 2. `requirement_en`
 3. `requirement`
 
-## 6. 输出目录
+## 6. Output Directory
 
-当 `--output-dir outputs/req2code` 时：
+When `--output-dir outputs/req2code` is used:
 
 - `outputs/req2code/specs/<relative_path>.json`
 - `outputs/req2code/code/<relative_path>.c`
@@ -304,47 +326,49 @@ Python/Nagini 评估同样使用同一套 entailment 框架。Python spec artifa
 - `outputs/req2code/reports/results.json`
 - `outputs/req2code/reports/<relative_path>.verify.log`
 
-Enhanced 额外信息会写入 `specs/*.json` 与 `results.json`，包括：
+Additional enhanced information is written to `specs/*.json` and `results.json`, including:
 
 - `enhanced_modules`
 - `constraints`
 - `alignment_check`
 - `code_annotation_hints`
 - `moved_loop_annotations`
-- `spec_evaluation`（可选的旧 LLM judge 调试信息）
+- `spec_evaluation` (optional old LLM judge debugging information)
 - `repair_attempts` / `repair_history`
-- 中间失败日志（`*.repairN.verify.log`）
+- intermediate failure logs (`*.repairN.verify.log`)
 
-## 7. 运行方式
+## 7. How to Run
 
-严格 ablation 使用 artifact chaining，而不是四组各自独立重跑：
+Strict ablations use artifact chaining rather than rerunning the four groups independently:
 
 ```text
-base
-  -> base+repair        # 复用 base 的 specs/ 和 code/，只运行 verify/repair
-base+ce
-  -> base+ce+repair     # 复用 base+ce 的 specs/ 和 code/，只运行 verify/repair
+Direct
+  -> VGCR        # reuse specs/ and code/ from Direct, run only verify/repair
+CGS
+  -> CodeNova    # reuse specs/ and code/ from CGS, run only verify/repair
 ```
 
-这样 `base` 与 `base+repair` 的 requirement coverage 完全一致，
-`base+ce` 与 `base+ce+repair` 的 requirement coverage 也完全一致。Code repair
-只度量在同一份 generated spec 和初始 code 上，verification-guided repair 能带来多少
-verification/joint-success 提升。
+This way, Direct and VGCR have exactly the same requirement coverage, and CGS and CodeNova also have
+exactly the same requirement coverage. Code repair only measures how much verification/joint-success
+improvement verification-guided repair can bring on the same generated spec and initial code.
 
-推荐所有直接调用 `scripts/run_*_requirement_pipeline.py` 的长任务都显式带上：
+It is recommended that all long-running jobs that call `scripts/run_*_requirement_pipeline.py`
+directly pass the following explicitly:
 
-- `--request-timeout 120`：单次 LLM/API 生成请求的超时上限，用于保证公平对比。
-- `--llm-retries 3 --llm-retry-delay 15`：只对连接中断、`IncompleteRead`、429/5xx 等
-  transient 失败做有界重试。
-- `--resume`：从已有 `reports/results.partial.json` 或 `reports/results.json` 跳过已完成的
-  `status=ok` 任务，失败或半成品任务会重新生成。
-- `--signature-file ..._ground_truth_specs.json`：读取固定 `function_signature`；Java
-  还读取不含目标 method contract 的 `type_context`（helper 类型的字段与 invariant），
-  不把 `ground_truth_contract` 或 `ground_truth_clauses` 发给模型。缺少这个接口上下文时，
-  独立生成的模型可能把 `Range.low/high` 改成 `min/max`，或把公开字段改成 getter，造成
-  与 requirement 无关的表示漂移。
+- `--request-timeout 120`: upper bound on a single LLM/API generation request, used to ensure fair
+  comparison.
+- `--llm-retries 3 --llm-retry-delay 15`: bounded retries only for transient failures such as
+  connection interruptions, `IncompleteRead`, 429/5xx.
+- `--resume`: from an existing `reports/results.partial.json` or `reports/results.json`, skip
+  already-completed `status=ok` tasks; failed or half-finished tasks are regenerated.
+- `--signature-file ..._ground_truth_specs.json`: read a fixed `function_signature`; for Java it
+  also reads `type_context` that does not include the target method contract (fields and invariants
+  of helper types), and does not send `ground_truth_contract` or `ground_truth_clauses` to the
+  model. Without this interface context, an independently generated model may rename
+  `Range.low/high` to `min/max`, or turn public fields into getters, causing representation drift
+  unrelated to the requirement.
 
-### 7.1 运行 base（推荐先跑这个做对照）
+### 7.1 Run Direct (recommended first as the control)
 
 ```bash
 PYTHONPATH=. python3 scripts/run_requirement_pipeline.py \
@@ -363,7 +387,7 @@ PYTHONPATH=. python3 scripts/run_requirement_pipeline.py \
   --temperature 0
 ```
 
-Java/JML/OpenJML 对应的基础运行方式：
+The corresponding basic run for Java/JML/OpenJML:
 
 ```bash
 PYTHONPATH=. python3 scripts/run_java_requirement_pipeline.py \
@@ -374,7 +398,7 @@ PYTHONPATH=. python3 scripts/run_java_requirement_pipeline.py \
   --model moonshotai/kimi-k2.7-code \
   --api-key-env OPENROUTER_API_KEY \
   --openjml-solver /usr/bin/z3 \
-  --disable-constraint-extraction \
+  --disable-cgs \
   --disable-code-repair \
   --verify-timeout 120 \
   --request-timeout 120 \
@@ -385,7 +409,7 @@ PYTHONPATH=. python3 scripts/run_java_requirement_pipeline.py \
   --temperature 0
 ```
 
-Rust/Verus 对应的基础运行方式：
+The corresponding basic run for Rust/Verus:
 
 ```bash
 PYTHONPATH=. python3 scripts/run_rust_requirement_pipeline.py \
@@ -406,7 +430,7 @@ PYTHONPATH=. python3 scripts/run_rust_requirement_pipeline.py \
   --max-tokens 4096
 ```
 
-Python/Nagini 对应的基础运行方式：
+The corresponding basic run for Python/Nagini:
 
 ```bash
 PYTHONPATH=. python3 scripts/run_python_nagini_requirement_pipeline.py \
@@ -427,22 +451,21 @@ PYTHONPATH=. python3 scripts/run_python_nagini_requirement_pipeline.py \
   --temperature 0
 ```
 
-### 7.2 运行 base+ce（严格增量链的第二个生成阶段）
+### 7.2 Run CGS (the second generation stage of the strict incremental chain)
 
-严格 ablation 中，`base+ce` 应只生成带 constraint extraction / spec self-check 的
-spec/code，并关闭 repair。后续 `base+ce+repair` 或 `base+ce+wybecoder` 必须复用这里的
-artifacts。
+In a strict ablation, CGS should only generate the spec/code with constraint extraction / spec
+self-check enabled, and disable repair. The subsequent CodeNova must reuse the artifacts from here.
 
 ```bash
 PYTHONPATH=. python3 scripts/run_requirement_pipeline.py \
   --requirements-file benchmarks/frama-c-problems/requirements/requirements_100.json \
   --signature-file benchmarks/frama-c-problems/requirements/requirements_100_ground_truth_specs.json \
-  --output-dir outputs/C-ce-dsv41-time-5-0916 \
+  --output-dir outputs/C-cgs-dsv41-time-5-0916 \
   --endpoint https://openrouter.ai/api/v1/chat/completions \
   --model deepseek/deepseek-v4.1-flash  \
   --api-key-env OPENROUTER_API_KEY \
   --pipeline-variant enhanced \
-  --enable-constraint-extraction \
+  --enable-cgs \
   --spec-self-check-rounds 1 \
   --disable-code-repair \
   --verify-timeout 120 \
@@ -454,18 +477,18 @@ PYTHONPATH=. python3 scripts/run_requirement_pipeline.py \
   --resume
 ```
 
-Java/JML/OpenJML 对应的 base+ce 运行方式：
+The corresponding CGS run for Java/JML/OpenJML:
 
 ```bash
 PYTHONPATH=. python3 scripts/run_java_requirement_pipeline.py \
   --requirements-file benchmarks/java-problems/requirements/requirements_100.json \
   --signature-file benchmarks/java-problems/requirements/requirements_100_ground_truth_specs.json \
-  --output-dir outputs/java-ce-kimi-0701 \
+  --output-dir outputs/java-cgs-kimi-0701 \
   --endpoint https://openrouter.ai/api/v1/chat/completions \
   --model moonshotai/kimi-k2.7-code \
   --api-key-env OPENROUTER_API_KEY \
   --openjml-solver /usr/bin/z3 \
-  --enable-constraint-extraction \
+  --enable-cgs \
   --spec-self-check-rounds 1 \
   --disable-code-repair \
   --verify-timeout 120 \
@@ -477,19 +500,19 @@ PYTHONPATH=. python3 scripts/run_java_requirement_pipeline.py \
   --temperature 0
 ```
 
-Rust/Verus 对应的 base+ce 运行方式：
+The corresponding CGS run for Rust/Verus:
 
 ```bash
 PYTHONPATH=. python3 scripts/run_rust_requirement_pipeline.py \
   --requirements-file benchmarks/rust-verus-problems/requirements/requirements_100.json \
   --signature-file benchmarks/rust-verus-problems/requirements/requirements_100_ground_truth_specs.json \
-  --output-dir outputs/rust-ce-claude-0707 \
+  --output-dir outputs/rust-cgs-claude-0707 \
   --endpoint https://openrouter.ai/api/v1/chat/completions \
   --model anthropic/claude-sonnet-5 \
   --api-key-env OPENROUTER_API_KEY \
   --verus-bin verus \
   --pipeline-variant enhanced \
-  --enhancement-method ce \
+  --enhancement-method cgs \
   --spec-self-check-rounds 1 \
   --verify-timeout 120 \
   --request-timeout 120 \
@@ -500,19 +523,19 @@ PYTHONPATH=. python3 scripts/run_rust_requirement_pipeline.py \
   --max-tokens 4096
 ```
 
-Python/Nagini 对应的 base+ce 运行方式：
+The corresponding CGS run for Python/Nagini:
 
 ```bash
 PYTHONPATH=. python3 scripts/run_python_nagini_requirement_pipeline.py \
   --requirements-file benchmarks/python-nagini-problems/requirements/requirements_100.json \
   --signature-file benchmarks/python-nagini-problems/requirements/requirements_100_ground_truth_specs.json \
-  --output-dir outputs/python-ce-kimi-0704 \
+  --output-dir outputs/python-cgs-kimi-0704 \
   --endpoint https://openrouter.ai/api/v1/chat/completions \
   --model moonshotai/kimi-k2.7-code \
   --api-key-env OPENROUTER_API_KEY \
   --nagini-bin nagini \
   --pipeline-variant enhanced \
-  --enhancement-method ce \
+  --enhancement-method cgs \
   --spec-self-check-rounds 1 \
   --verify-timeout 120 \
   --request-timeout 120 \
@@ -523,12 +546,12 @@ PYTHONPATH=. python3 scripts/run_python_nagini_requirement_pipeline.py \
   --temperature 0
 ```
 
-### 7.3 C/ACSL 严格增量 repair 与 WybeCoder repair
+### 7.3 C/ACSL Strict Incremental Repair and VGCR Repair
 
-严格 repair ablation 不重新生成 spec/code，而是通过 `--reuse-artifacts-from` 复用已冻结
-artifacts。
+A strict repair ablation does not regenerate spec/code; instead it reuses frozen artifacts via
+`--reuse-artifacts-from`.
 
-`base+repair`：复用 `base` 的 `specs/` 与 `code/`，只运行 verification + simple repair。
+VGCR: reuse the `specs/` and `code/` of Direct, and run only verification + simple repair.
 
 ```bash
 PYTHONPATH=. python3 scripts/run_requirement_pipeline.py \
@@ -536,7 +559,7 @@ PYTHONPATH=. python3 scripts/run_requirement_pipeline.py \
   --signature-file benchmarks/frama-c-problems/requirements/requirements_100_ground_truth_specs.json \
   --output-dir outputs/req2code-base-repair-0520 \
   --pipeline-variant enhanced \
-  --disable-constraint-extraction \
+  --disable-cgs \
   --enable-code-repair \
   --model moonshotai/kimi-k2.7-code \
   --max-tokens 4096 \
@@ -550,21 +573,21 @@ PYTHONPATH=. python3 scripts/run_requirement_pipeline.py \
   --resume
 ```
 
-`base+ce+repair`：复用 `base+ce` 的 `specs/` 与 `code/`，只运行 verification + simple repair。
+CodeNova: reuse the `specs/` and `code/` of CGS, and run only verification + simple repair.
 
 ```bash
 PYTHONPATH=. python3 scripts/run_requirement_pipeline.py \
   --requirements-file benchmarks/frama-c-problems/requirements/requirements_100.json \
   --signature-file benchmarks/frama-c-problems/requirements/requirements_100_ground_truth_specs.json \
-  --output-dir outputs/req2code-ce-repair-0520 \
+  --output-dir outputs/req2code-cgs-repair-0520 \
   --pipeline-variant enhanced \
-  --disable-constraint-extraction \
+  --disable-cgs \
   --enable-code-repair \
   --model moonshotai/kimi-k2.7-code \
   --max-tokens 4096 \
   --code-repair-strategy simple \
   --code-repair-max-iter 3 \
-  --reuse-artifacts-from outputs/req2code-ce-only-0520 \
+  --reuse-artifacts-from outputs/req2code-cgs-only-0520 \
   --verify-timeout 120 \
   --request-timeout 120 \
   --llm-retries 3 \
@@ -572,21 +595,20 @@ PYTHONPATH=. python3 scripts/run_requirement_pipeline.py \
   --resume
 ```
 
-`base+wybecoder`：复用 `base` 的 `specs/` 与 `code/`，只运行 verification +
-WybeCoder-style repair。
+VGCR: reuse the `specs/` and `code/` of Direct, and run only verification + VGCR repair.
 
 ```bash
 PYTHONPATH=. python3 scripts/run_requirement_pipeline.py \
   --requirements-file benchmarks/frama-c-problems/requirements/requirements_100.json \
   --signature-file benchmarks/frama-c-problems/requirements/requirements_100_ground_truth_specs.json \
-  --output-dir outputs/C-wybecoder-dsv41-time-5-0916 \
+  --output-dir outputs/C-vgcr-dsv41-time-5-0916 \
   --pipeline-variant enhanced \
-  --disable-constraint-extraction \
+  --disable-cgs \
   --enable-code-repair \
   --model deepseek/deepseek-v4.1-flash \
   --max-tokens 4096 \
-  --code-repair-strategy wybecoder \
-  --wybecoder-candidates 3 \
+  --code-repair-strategy vgcr \
+  --vgcr-candidates 3 \
   --code-repair-max-iter 3 \
   --reuse-artifacts-from outputs/C-base-dsv41-time-5-0915 \
   --verify-timeout 120 \
@@ -598,23 +620,22 @@ PYTHONPATH=. python3 scripts/run_requirement_pipeline.py \
   --resume
 ```
 
-`base+ce+wybecoder`：复用 `base+ce` 的 `specs/` 与 `code/`，只运行 verification +
-WybeCoder-style repair。
+CodeNova: reuse the `specs/` and `code/` of CGS, and run only verification + VGCR repair.
 
 ```bash
 PYTHONPATH=. python3 scripts/run_requirement_pipeline.py \
   --requirements-file benchmarks/frama-c-problems/requirements/requirements_100.json \
   --signature-file benchmarks/frama-c-problems/requirements/requirements_100_ground_truth_specs.json \
-  --output-dir outputs/C-ce-wybecoder-dsv41-time-5-0916 \
+  --output-dir outputs/C-cgs-vgcr-dsv41-time-5-0916 \
   --pipeline-variant enhanced \
-  --disable-constraint-extraction \
+  --disable-cgs \
   --enable-code-repair \
   --model deepseek/deepseek-v4.1-flash \
   --max-tokens 4096 \
-  --code-repair-strategy wybecoder \
-  --wybecoder-candidates 3 \
+  --code-repair-strategy vgcr \
+  --vgcr-candidates 3 \
   --code-repair-max-iter 3 \
-  --reuse-artifacts-from outputs/C-ce-dsv41-time-5-0916 \
+  --reuse-artifacts-from outputs/C-cgs-dsv41-time-5-0916 \
   --verify-timeout 120 \
   --request-timeout 120 \
   --llm-retries 3 \
@@ -624,24 +645,24 @@ PYTHONPATH=. python3 scripts/run_requirement_pipeline.py \
   --resume
 ```
 
-`--reuse-artifacts-from` 会把来源目录的 `specs/` 与 `code/` 复制到当前输出目录，然后
-跳过 spec/code 生成，只运行 verification 和可选 repair。用于 `base+repair` /
-`base+wybecoder` 时来源应为 base 输出目录；用于 `base+ce+repair` /
-`base+ce+wybecoder` 时来源应为 base+ce 输出目录。
+`--reuse-artifacts-from` copies the source directory's `specs/` and `code/` into the current output
+directory, then skips spec/code generation and runs only verification and optional repair. When used
+for VGCR, the source should be the Direct output directory; when used for CodeNova, the source
+should be the CGS output directory.
 
-### 7.4 Java/JML/OpenJML 严格增量 repair ablation
+### 7.4 Java/JML/OpenJML Strict Incremental Repair Ablation
 
-Java/JML/OpenJML 后端现在已经适配与 C/ACSL 相同的严格增量运行规则：
-repair 变体必须通过 `--reuse-artifacts-from` 或 `REUSE_ARTIFACTS_FROM` 复用 frozen
-`specs/` 与 `code/`，跳过 spec/code 重新生成，只运行 OpenJML verification 和可选 repair。
-因此 Java 的四种主范式可以按下面方式组织：
+The Java/JML/OpenJML backend has now been adapted to the same strict incremental run rules as
+C/ACSL: repair variants must reuse frozen `specs/` and `code/` via `--reuse-artifacts-from` or
+`REUSE_ARTIFACTS_FROM`, skip spec/code regeneration, and run only OpenJML verification and optional
+repair. Thus the four main Java paradigms can be organized as follows:
 
-- `base`：关闭 constraint extraction 与 code repair。
-- `base+ce`：开启 constraint extraction/self-check，关闭 code repair。
-- `base+wybecoder`：复用 frozen `base` 输出，只运行 WybeCoder-style repair。
-- `base+ce+wybecoder`：复用 frozen `base+ce` 输出，只运行 WybeCoder-style repair。
+- Direct: disable constraint extraction and code repair.
+- CGS: enable constraint extraction/self-check, disable code repair.
+- VGCR: reuse the frozen Direct output, run only VGCR repair.
+- CodeNova: reuse the frozen CGS output, run only VGCR repair.
 
-Java `base+repair`（simple repair，复用 `base` 输出）：
+Java VGCR (simple repair, reusing the Direct output):
 
 ```bash
 PYTHONPATH=. python3 scripts/run_java_requirement_pipeline.py \
@@ -650,7 +671,7 @@ PYTHONPATH=. python3 scripts/run_java_requirement_pipeline.py \
   --output-dir outputs/java-base-repair-0624 \
   --reuse-artifacts-from outputs/java-base-0624 \
   --openjml-solver /usr/bin/z3 \
-  --disable-constraint-extraction \
+  --disable-cgs \
   --enable-code-repair \
   --code-repair-strategy simple \
   --code-repair-max-iter 3 \
@@ -662,21 +683,21 @@ PYTHONPATH=. python3 scripts/run_java_requirement_pipeline.py \
   --temperature 0
 ```
 
-Java `base+wybecoder`（复用 `base` 输出）：
+Java VGCR (reusing the Direct output):
 
 ```bash
 PYTHONPATH=. python3 scripts/run_java_requirement_pipeline.py \
   --requirements-file benchmarks/java-problems/requirements/requirements_100.json \
   --signature-file benchmarks/java-problems/requirements/requirements_100_ground_truth_specs.json \
-  --output-dir outputs/java-wybecoder-kimi-0702 \
+  --output-dir outputs/java-vgcr-kimi-0702 \
   --reuse-artifacts-from outputs/java-base-kimi-0701 \
   --openjml-solver /usr/bin/z3 \
-  --disable-constraint-extraction \
+  --disable-cgs \
   --model moonshotai/kimi-k2.7-code \
   --max-tokens 4096 \
   --enable-code-repair \
-  --code-repair-strategy wybecoder \
-  --wybecoder-candidates 3 \
+  --code-repair-strategy vgcr \
+  --vgcr-candidates 3 \
   --code-repair-max-iter 3 \
   --verify-timeout 120 \
   --request-timeout 120 \
@@ -686,15 +707,15 @@ PYTHONPATH=. python3 scripts/run_java_requirement_pipeline.py \
   --temperature 0
 ```
 
-Java `base+ce`（生成 frozen CE artifacts，不 repair）：
+Java CGS (generate frozen CGS artifacts, no repair):
 
 ```bash
 PYTHONPATH=. python3 scripts/run_java_requirement_pipeline.py \
   --requirements-file benchmarks/java-problems/requirements/requirements_100.json \
   --signature-file benchmarks/java-problems/requirements/requirements_100_ground_truth_specs.json \
-  --output-dir outputs/java-ce-only-0624 \
+  --output-dir outputs/java-cgs-only-0624 \
   --openjml-solver /usr/bin/z3 \
-  --enable-constraint-extraction \
+  --enable-cgs \
   --model moonshotai/kimi-k2.7-code \
   --max-tokens 4096 \
   --spec-self-check-rounds 1 \
@@ -707,21 +728,21 @@ PYTHONPATH=. python3 scripts/run_java_requirement_pipeline.py \
   --temperature 0
 ```
 
-Java `base+ce+wybecoder`（复用 `base+ce` 输出）：
+Java CodeNova (reusing the CGS output):
 
 ```bash
 PYTHONPATH=. python3 scripts/run_java_requirement_pipeline.py \
   --requirements-file benchmarks/java-problems/requirements/requirements_100.json \
   --signature-file benchmarks/java-problems/requirements/requirements_100_ground_truth_specs.json \
-  --output-dir outputs/java-ce-wybecoder-kimi-0702 \
-  --reuse-artifacts-from outputs/java-ce-kimi-0701 \
+  --output-dir outputs/java-cgs-vgcr-kimi-0702 \
+  --reuse-artifacts-from outputs/java-cgs-kimi-0701 \
   --openjml-solver /usr/bin/z3 \
   --model moonshotai/kimi-k2.7-code \
   --max-tokens 4096 \
-  --disable-constraint-extraction \
+  --disable-cgs \
   --enable-code-repair \
-  --code-repair-strategy wybecoder \
-  --wybecoder-candidates 3 \
+  --code-repair-strategy vgcr \
+  --vgcr-candidates 3 \
   --code-repair-max-iter 3 \
   --verify-timeout 120 \
   --request-timeout 120 \
@@ -731,30 +752,31 @@ PYTHONPATH=. python3 scripts/run_java_requirement_pipeline.py \
   --temperature 0
 ```
 
-`--reuse-artifacts-from` 会把来源目录的 `specs/` 与 `code/` 复制到当前 Java 输出目录，
-并在写回源码前强制恢复 `specs/*.json` 中的 canonical `jml_block`。repair 可以修改方法体、
-helper code 和 loop annotations，但不能削弱或替换 generated JML method contract。
+`--reuse-artifacts-from` copies the source directory's `specs/` and `code/` into the current Java
+output directory, and forcibly restores the canonical `jml_block` from `specs/*.json` before
+writing the source back. Repair may modify the method body, helper code, and loop annotations, but
+must not weaken or replace the generated JML method contract.
 
-Rust/Verus 现在也支持与 C/Java 相同的 artifact chaining。严格 `base+repair`、
-`base+wybecoder`、`base+ce+repair`、`base+ce+wybecoder` 应设置
-`--reuse-artifacts-from`，只复用 frozen `specs/` 与 `code/` 并运行 verification + repair。
+Rust/Verus now also supports the same artifact chaining as C/Java. Strict VGCR and CodeNova variants
+should set `--reuse-artifacts-from`, reusing only the frozen `specs/` and `code/` and running
+verification + repair.
 
-Rust/Verus `base+wybecoder`（复用 `base` 输出）：
+Rust/Verus VGCR (reusing the Direct output):
 
 ```bash
 PYTHONPATH=. python3 scripts/run_rust_requirement_pipeline.py \
   --requirements-file benchmarks/rust-verus-problems/requirements/requirements_100.json \
   --signature-file benchmarks/rust-verus-problems/requirements/requirements_100_ground_truth_specs.json \
-  --output-dir outputs/rust-wybecoder-claude-0709 \
+  --output-dir outputs/rust-vgcr-claude-0709 \
   --reuse-artifacts-from outputs/rust-base-rust-0707 \
   --verus-bin verus \
   --model anthropic/claude-sonnet-5 \
   --max-tokens 4096 \
   --pipeline-variant enhanced \
-  --disable-constraint-extraction \
+  --disable-cgs \
   --enable-code-repair \
-  --code-repair-strategy wybecoder \
-  --wybecoder-candidates 3 \
+  --code-repair-strategy vgcr \
+  --vgcr-candidates 3 \
   --code-repair-max-iter 3 \
   --verify-timeout 120 \
   --request-timeout 120 \
@@ -765,22 +787,22 @@ PYTHONPATH=. python3 scripts/run_rust_requirement_pipeline.py \
   --temperature 0
 ```
 
-Rust/Verus `base+ce+wybecoder`（复用 `base+ce` 输出）：
+Rust/Verus CodeNova (reusing the CGS output):
 
 ```bash
 PYTHONPATH=. python3 scripts/run_rust_requirement_pipeline.py \
   --requirements-file benchmarks/rust-verus-problems/requirements/requirements_100.json \
   --signature-file benchmarks/rust-verus-problems/requirements/requirements_100_ground_truth_specs.json \
-  --output-dir outputs/rust-ce-wybecoder-claude-0709 \
-  --reuse-artifacts-from outputs/rust-ce-claude-0707 \
+  --output-dir outputs/rust-cgs-vgcr-claude-0709 \
+  --reuse-artifacts-from outputs/rust-cgs-claude-0707 \
   --verus-bin verus \
   --model anthropic/claude-sonnet-5 \
   --max-tokens 4096 \
   --pipeline-variant enhanced \
-  --disable-constraint-extraction \
+  --disable-cgs \
   --enable-code-repair \
-  --code-repair-strategy wybecoder \
-  --wybecoder-candidates 3 \
+  --code-repair-strategy vgcr \
+  --vgcr-candidates 3 \
   --code-repair-max-iter 3 \
   --verify-timeout 120 \
   --request-timeout 120 \
@@ -791,22 +813,25 @@ PYTHONPATH=. python3 scripts/run_rust_requirement_pipeline.py \
   --temperature 0
 ```
 
-Rust/Verus 的 Verus contract 不像 Java/JML 那样需要回写独立 comment block；复用时 pipeline
-会复制 frozen `specs/*.json` 和 `code/*.rs`，并使用 spec artifact 中的 `verus_clauses`
-作为 repair prompt 的冻结合同。
+The Verus contract for Rust/Verus, unlike Java/JML, does not require writing back a separate comment
+block; when reusing, the pipeline copies the frozen `specs/*.json` and `code/*.rs`, and uses
+`verus_clauses` from the spec artifact as the frozen contract for the repair prompt.
 
-Rust pipeline 会在首次生成和每个 repair candidate 上强制写回 canonical
-`verus_clauses`，因此 repair 只能修改函数体、helper proof 与循环注解。汇总阶段还会比较
-spec artifact 与实际验证源码中的 contract；发现 contract 漂移时，该题 code validity
-直接计为失败。旧 Rust artifact 可通过 `scripts/migrate_rust_outputs_v2.py` 复制到
-`*-offline-v2` 后进行 raw-clause 恢复、contract 锁定、Verus 重验和 coverage 重算。
+The Rust pipeline forcibly writes back the canonical `verus_clauses` on the initial generation and
+on each repair candidate, so repair can only modify the function body, helper proofs, and loop
+annotations. The summary stage also compares the spec artifact with the contract in the actually
+verified source; when contract drift is found, the code validity of that task is counted directly
+as failed. Old Rust artifacts can be copied to `*-offline-v2` via
+`scripts/migrate_rust_outputs_v2.py`, then subjected to raw-clause recovery, contract locking, Verus
+re-verification, and coverage recomputation.
 
-Rust coverage evaluator 进一步对语义等价的 contract 形态做保守匹配：布尔与 typed enum
-表面写法、等价整数边界、按相同 guard 拆开的多条 `ensures`、`if/else`，以及用“长度、
-修改位置、未修改区间”表达的 `Seq.update`/`push`/`subrange`。序列规则只有在长度、点值和
-frame 条件全部存在时才命中，不会把部分 frame 当作完整序列效果。
+The Rust coverage evaluator further performs conservative matching for semantically equivalent
+contract shapes: boolean and typed-enum surface forms, equivalent integer bounds, multiple `ensures`
+split by the same guard, `if/else`, and `Seq.update`/`push`/`subrange` expressed via "length,
+modified positions, unmodified intervals". Sequence rules match only when the length, point values,
+and frame conditions are all present; a partial frame is not treated as a complete sequence effect.
 
-Python/Nagini 对应的非严格 code repair ablation：
+The corresponding non-strict code repair ablation for Python/Nagini:
 
 ```bash
 PYTHONPATH=. python3 scripts/run_python_nagini_requirement_pipeline.py \
@@ -815,7 +840,7 @@ PYTHONPATH=. python3 scripts/run_python_nagini_requirement_pipeline.py \
   --output-dir outputs/python-nagini-req2code-repair-only-0610 \
   --nagini-bin nagini \
   --pipeline-variant enhanced \
-  --enhancement-method repair \
+  --enhancement-method vgcr \
   --code-repair-max-iter 3 \
   --verify-timeout 120 \
   --request-timeout 120 \
@@ -825,7 +850,7 @@ PYTHONPATH=. python3 scripts/run_python_nagini_requirement_pipeline.py \
   --temperature 0
 ```
 
-Python/Nagini 严格 `base+repair`（复用 `base` 输出，只运行 verification + simple repair）：
+Python/Nagini strict VGCR (reuse the Direct output, run only verification + simple repair):
 
 ```bash
 PYTHONPATH=. python3 scripts/run_python_nagini_requirement_pipeline.py \
@@ -837,7 +862,7 @@ PYTHONPATH=. python3 scripts/run_python_nagini_requirement_pipeline.py \
   --model moonshotai/kimi-k2.7-code \
   --max-tokens 4096 \
   --pipeline-variant enhanced \
-  --disable-constraint-extraction \
+  --disable-cgs \
   --enable-code-repair \
   --code-repair-strategy simple \
   --code-repair-max-iter 3 \
@@ -849,21 +874,21 @@ PYTHONPATH=. python3 scripts/run_python_nagini_requirement_pipeline.py \
   --temperature 0
 ```
 
-Python/Nagini 严格 `base+wybecoder`（复用 `base` 输出，只运行 verification + WybeCoder-style repair）：
+Python/Nagini strict VGCR (reuse the Direct output, run only verification + VGCR repair):
 
 ```bash
 PYTHONPATH=. python3 scripts/run_python_nagini_requirement_pipeline.py \
   --requirements-file benchmarks/python-nagini-problems/requirements/requirements_100.json \
   --signature-file benchmarks/python-nagini-problems/requirements/requirements_100_ground_truth_specs.json \
-  --output-dir outputs/python-wybecoder-kimi-ds-0706 \
+  --output-dir outputs/python-vgcr-kimi-ds-0706 \
   --reuse-artifacts-from outputs/python-base-kimi-0704 \
   --model deepseek/deepseek-v3.2 \
   --nagini-bin nagini \
   --pipeline-variant enhanced \
-  --disable-constraint-extraction \
+  --disable-cgs \
   --enable-code-repair \
-  --code-repair-strategy wybecoder \
-  --wybecoder-candidates 3 \
+  --code-repair-strategy vgcr \
+  --vgcr-candidates 3 \
   --code-repair-max-iter 3 \
   --verify-timeout 120 \
   --request-timeout 120 \
@@ -874,19 +899,19 @@ PYTHONPATH=. python3 scripts/run_python_nagini_requirement_pipeline.py \
   --temperature 0
 ```
 
-Python/Nagini 严格 `base+ce+repair`（复用 `base+ce` 输出，只运行 verification + simple repair）：
+Python/Nagini strict CodeNova (reuse the CGS output, run only verification + simple repair):
 
 ```bash
 PYTHONPATH=. python3 scripts/run_python_nagini_requirement_pipeline.py \
   --requirements-file benchmarks/python-nagini-problems/requirements/requirements_100.json \
   --signature-file benchmarks/python-nagini-problems/requirements/requirements_100_ground_truth_specs.json \
-  --output-dir outputs/python-nagini-ce-repair-0627 \
-  --reuse-artifacts-from outputs/python-nagini-ce-0627 \
+  --output-dir outputs/python-nagini-cgs-repair-0627 \
+  --reuse-artifacts-from outputs/python-nagini-cgs-0627 \
   --nagini-bin nagini \
   --model moonshotai/kimi-k2.7-code \
   --max-tokens 4096 \
   --pipeline-variant enhanced \
-  --disable-constraint-extraction \
+  --disable-cgs \
   --enable-code-repair \
   --code-repair-strategy simple \
   --code-repair-max-iter 3 \
@@ -898,22 +923,22 @@ PYTHONPATH=. python3 scripts/run_python_nagini_requirement_pipeline.py \
   --temperature 0
 ```
 
-Python/Nagini 严格 `base+ce+wybecoder`（复用 `base+ce` 输出，只运行 verification + WybeCoder-style repair）：
+Python/Nagini strict CodeNova (reuse the CGS output, run only verification + VGCR repair):
 
 ```bash
 PYTHONPATH=. python3 scripts/run_python_nagini_requirement_pipeline.py \
   --requirements-file benchmarks/python-nagini-problems/requirements/requirements_100.json \
   --signature-file benchmarks/python-nagini-problems/requirements/requirements_100_ground_truth_specs.json \
-  --output-dir outputs/python-ce-wybecoder-kimi-0706 \
-  --reuse-artifacts-from outputs/python-ce-kimi-0704 \
+  --output-dir outputs/python-cgs-vgcr-kimi-0706 \
+  --reuse-artifacts-from outputs/python-cgs-kimi-0704 \
   --model moonshotai/kimi-k2.7-code \
   --max-tokens 4096 \
   --nagini-bin nagini \
   --pipeline-variant enhanced \
-  --disable-constraint-extraction \
+  --disable-cgs \
   --enable-code-repair \
-  --code-repair-strategy wybecoder \
-  --wybecoder-candidates 3 \
+  --code-repair-strategy vgcr \
+  --vgcr-candidates 3 \
   --code-repair-max-iter 3 \
   --verify-timeout 120 \
   --request-timeout 120 \
@@ -923,11 +948,12 @@ PYTHONPATH=. python3 scripts/run_python_nagini_requirement_pipeline.py \
   --temperature 0
 ```
 
-Python/Nagini 复用 frozen artifacts 时会复制 `specs/*.json` 和 `code/*.py`，并在验证或 repair 前
-按 spec artifact 中的 canonical `nagini_contract` 重新强制写回函数体开头，确保 repair 不能削弱
-或替换生成的函数合同。
+When Python/Nagini reuses frozen artifacts, it copies `specs/*.json` and `code/*.py`, and before
+verification or repair it forcibly writes back the beginning of the function body according to the
+canonical `nagini_contract` in the spec artifact, ensuring that repair cannot weaken or replace the
+generated function contract.
 
-### 7.5 只跑单个任务（调试 prompt 最常用）
+### 7.5 Run a Single Task (most common for prompt debugging)
 
 ```bash
 PYTHONPATH=. python3 scripts/run_requirement_pipeline.py \
@@ -942,7 +968,7 @@ PYTHONPATH=. python3 scripts/run_requirement_pipeline.py \
   --resume
 ```
 
-Java/JML/OpenJML 对应命令：
+The corresponding Java/JML/OpenJML command:
 
 ```bash
 PYTHONPATH=. python3 scripts/run_java_requirement_pipeline.py \
@@ -957,7 +983,7 @@ PYTHONPATH=. python3 scripts/run_java_requirement_pipeline.py \
   --resume
 ```
 
-Rust/Verus 对应命令：
+The corresponding Rust/Verus command:
 
 ```bash
 PYTHONPATH=. python3 scripts/run_rust_requirement_pipeline.py \
@@ -973,7 +999,7 @@ PYTHONPATH=. python3 scripts/run_rust_requirement_pipeline.py \
   --resume
 ```
 
-Python/Nagini 对应命令：
+The corresponding Python/Nagini command:
 
 ```bash
 PYTHONPATH=. python3 scripts/run_python_nagini_requirement_pipeline.py \
@@ -989,18 +1015,20 @@ PYTHONPATH=. python3 scripts/run_python_nagini_requirement_pipeline.py \
   --resume
 ```
 
-### 7.6 C/ACSL code-only oracle-contract 评测
+### 7.6 C/ACSL Code-Only Oracle-Contract Evaluation
 
-Code-only 任务固定人工构造并验证过的函数合同，只评估模型生成 C 实现与实现级证明注解的能力：
+Code-only tasks fix a manually constructed and validated function contract, evaluating only the
+model's ability to generate a C implementation and implementation-level proof annotations:
 
 `Requirement + Signature + Oracle Contract -> Code + Proof Annotations -> Frama-C/WP`
 
-它使用独立入口 `scripts/run_c_code_only_pipeline.py`，不会运行 spec generation、constraint
-extraction 或 spec self-check。每次生成和 repair 后，pipeline 都会程序化恢复
-`requirements_100_code_only_contracts.json` 中的 canonical ACSL contract；模型只能修改函数体、
-loop annotations 和 statement annotations。
+It uses the separate entry point `scripts/run_c_code_only_pipeline.py` and does not run spec
+generation, constraint extraction, or spec self-check. After each generation and repair, the
+pipeline programmatically restores the canonical ACSL contract in
+`requirements_100_code_only_contracts.json`; the model may only modify the function body, loop
+annotations, and statement annotations.
 
-初始生成（不 repair）：
+Initial generation (no repair):
 
 ```bash
 PYTHONPATH=. python3 scripts/run_c_code_only_pipeline.py \
@@ -1017,7 +1045,7 @@ PYTHONPATH=. python3 scripts/run_c_code_only_pipeline.py \
   --resume
 ```
 
-Simple repair 必须复用上面的初始 `specs/` 和 `code/`：
+Simple repair must reuse the initial `specs/` and `code/` above:
 
 ```bash
 PYTHONPATH=. python3 scripts/run_c_code_only_pipeline.py \
@@ -1036,18 +1064,18 @@ PYTHONPATH=. python3 scripts/run_c_code_only_pipeline.py \
   --resume
 ```
 
-WybeCoder repair 同样复用完全相同的初始 artifacts：
+VGCR repair likewise reuses exactly the same initial artifacts:
 
 ```bash
 PYTHONPATH=. python3 scripts/run_c_code_only_pipeline.py \
   --contracts-file benchmarks/frama-c-problems/requirements/requirements_100_code_only_contracts.json \
-  --output-dir outputs/c-code-only-wybecoder-claude-0826 \
+  --output-dir outputs/c-code-only-vgcr-claude-0826 \
   --reuse-artifacts-from outputs/c-code-only-base-claude-0826 \
   --model anthropic/claude-sonnet-5 \
   --api-key-env OPENROUTER_API_KEY \
   --enable-code-repair \
-  --code-repair-strategy wybecoder \
-  --wybecoder-candidates 3 \
+  --code-repair-strategy vgcr \
+  --vgcr-candidates 3 \
   --code-repair-max-iter 3 \
   --verify-timeout 120 \
   --request-timeout 120 \
@@ -1056,7 +1084,7 @@ PYTHONPATH=. python3 scripts/run_c_code_only_pipeline.py \
   --resume
 ```
 
-OpenRouter wrapper 等价命令：
+Equivalent OpenRouter wrapper commands:
 
 ```bash
 OUTPUT_DIR=outputs/c-code-only-base-0825 \
@@ -1064,36 +1092,39 @@ MODEL=anthropic/claude-sonnet-5 \
 ENABLE_CODE_REPAIR=false \
 bash scripts/run_openrouter_c_code_only_pipeline.sh
 
-OUTPUT_DIR=outputs/c-code-only-wybecoder-0825 \
+OUTPUT_DIR=outputs/c-code-only-vgcr-0825 \
 REUSE_ARTIFACTS_FROM=outputs/c-code-only-base-0825 \
 MODEL=anthropic/claude-sonnet-5 \
 ENABLE_CODE_REPAIR=true \
-CODE_REPAIR_STRATEGY=wybecoder \
+CODE_REPAIR_STRATEGY=vgcr \
 bash scripts/run_openrouter_c_code_only_pipeline.sh
 ```
 
-Code-only 的 oracle consistency 必须单独评估，不能用 requirement entailment coverage 代替。
-该检查直接比较 frozen oracle contract 与输出 `specs/` artifact；因此只要 pipeline 没有改写
-contract，结果应为 100%，且不依赖 C/ACSL 到 Z3 的表达式解析：
+Code-only oracle consistency must be evaluated separately and cannot be replaced by requirement
+entailment coverage. This check directly compares the frozen oracle contract with the output
+`specs/` artifact; therefore, as long as the pipeline has not rewritten the contract, the result
+should be 100% and does not depend on C/ACSL-to-Z3 expression parsing:
 
 ```bash
 OUTPUT_DIR=outputs/c-code-only-base-0825 \
 bash scripts/run_code_only_oracle_evaluation.sh
 ```
 
-该命令生成 `reports/oracle_contract_consistency.json`。原有
-`run_constraint_entailment_evaluation.sh` 仍用于 requirement semantic coverage；它回答的是
-oracle contract 是否覆盖人工 semantic targets，而不是 oracle contract 是否被正确保留。
+This command generates `reports/oracle_contract_consistency.json`. The existing
+`run_constraint_entailment_evaluation.sh` is still used for requirement semantic coverage; it
+answers whether the oracle contract covers the manual semantic targets, not whether the oracle
+contract is correctly preserved.
 
-### 7.6.1 Java/JML code-only oracle-contract 评测
+### 7.6.1 Java/JML Code-Only Oracle-Contract Evaluation
 
-Java code-only 任务沿用相同的严格增量语义：固定
-`benchmarks/java-problems/requirements/requirements_100_code_only_contracts.json` 中的
-方法级 JML 合同，只评估 Java 实现与实现级循环注解。入口为
-`scripts/run_java_code_only_pipeline.py`，不会执行 spec generation、constraint extraction
-或 spec self-check；每次生成和 repair 后都会恢复 canonical `jml_block`。
+Java code-only tasks follow the same strict incremental semantics: fix the method-level JML contract
+in `benchmarks/java-problems/requirements/requirements_100_code_only_contracts.json`, and evaluate
+only the Java implementation and implementation-level loop annotations. The entry point is
+`scripts/run_java_code_only_pipeline.py`, which does not execute spec generation, constraint
+extraction, or spec self-check; after each generation and repair it restores the canonical
+`jml_block`.
 
-初始生成（不 repair）：
+Initial generation (no repair):
 
 moonshotai/kimi-k2.7-code
 qwen/qwen3.6-plus
@@ -1110,7 +1141,7 @@ PYTHONPATH=. python3 scripts/run_java_code_only_pipeline.py \
   --max-tokens 4096 --temperature 0 --resume
 ```
 
-Simple repair 和 WybeCoder repair 必须复用相同的初始 artifacts：
+Simple repair and VGCR repair must reuse the same initial artifacts:
 
 ```bash
 PYTHONPATH=. python3 scripts/run_java_code_only_pipeline.py \
@@ -1123,15 +1154,15 @@ PYTHONPATH=. python3 scripts/run_java_code_only_pipeline.py \
 
 PYTHONPATH=. python3 scripts/run_java_code_only_pipeline.py \
   --contracts-file benchmarks/java-problems/requirements/requirements_100_code_only_contracts.json \
-  --output-dir outputs/java-code-only-wybecoder-claude-0827 \
+  --output-dir outputs/java-code-only-vgcr-claude-0827 \
   --reuse-artifacts-from outputs/java-code-only-base-claude-0827 \
   --model anthropic/claude-sonnet-5 --api-key-env OPENROUTER_API_KEY \
   --openjml-solver /usr/bin/z3 --enable-code-repair \
-  --code-repair-strategy wybecoder --wybecoder-candidates 3 \
+  --code-repair-strategy vgcr --vgcr-candidates 3 \
   --code-repair-max-iter 3 --max-tokens 4096 --temperature 0 --resume
 ```
 
-Java oracle consistency 单独运行：
+Run Java oracle consistency separately:
 
 ```bash
 PYTHONPATH=. python3 scripts/evaluate_java_code_only_oracle.py \
@@ -1140,16 +1171,17 @@ PYTHONPATH=. python3 scripts/evaluate_java_code_only_oracle.py \
   --report-file outputs/java-code-only-base/reports/java_oracle_contract_consistency.json
 ```
 
-### 7.6.2 Rust/Verus code-only oracle-contract 评测
+### 7.6.2 Rust/Verus Code-Only Oracle-Contract Evaluation
 
-Rust code-only 数据位于
-`benchmarks/rust-verus-problems/requirements/requirements_100_code_only_contracts.json`。
-构造器按 dataset signature 定位 reference target function，只提取函数头中的
-`requires/ensures`；函数体、loop invariants、`decreases`、assertions 和 proof code 不会进入
-oracle input。100 道 reference contracts 与人工 semantic targets 精确一一对应，当前无需添加
-auxiliary contract clauses，reference Verus 回归为 100/100 pass。
+Rust code-only data is located at
+`benchmarks/rust-verus-problems/requirements/requirements_100_code_only_contracts.json`.
+The constructor locates the reference target function by dataset signature and extracts only
+`requires/ensures` from the function header; the function body, loop invariants, `decreases`,
+assertions, and proof code do not enter the oracle input. The 100 reference contracts correspond
+exactly one-to-one with the manual semantic targets, no auxiliary contract clauses need to be added
+at present, and the reference Verus regression is 100/100 pass.
 
-初始生成：
+Initial generation:
 
 ```bash
 PYTHONPATH=. python3 scripts/run_rust_code_only_pipeline.py \
@@ -1162,7 +1194,7 @@ PYTHONPATH=. python3 scripts/run_rust_code_only_pipeline.py \
   --max-tokens 4096 --temperature 0 --resume
 ```
 
-Repair 必须复用同一批 initial artifacts：
+Repair must reuse the same batch of initial artifacts:
 
 ```bash
 PYTHONPATH=. python3 scripts/run_rust_code_only_pipeline.py \
@@ -1173,41 +1205,45 @@ PYTHONPATH=. python3 scripts/run_rust_code_only_pipeline.py \
   --code-repair-max-iter 3 --resume
 
 PYTHONPATH=. python3 scripts/run_rust_code_only_pipeline.py \
-  --output-dir outputs/rust-code-only-wybecoder-claude-0828 \
+  --output-dir outputs/rust-code-only-vgcr-claude-0828 \
   --reuse-artifacts-from outputs/rust-code-only-base-claude-0827 \
   --model anthropic/claude-sonnet-5 --api-key-env OPENROUTER_API_KEY \
-  --enable-code-repair --code-repair-strategy wybecoder \
-  --wybecoder-candidates 3 --code-repair-max-iter 3 --resume
+  --enable-code-repair --code-repair-strategy vgcr \
+  --vgcr-candidates 3 --code-repair-max-iter 3 --resume
 ```
 
-Rust 合同嵌在函数头中，因此 enforcement 同时恢复 canonical named signature 与结构化
-`verus_clauses`。一致性检查既比较 `specs/*.json`，也重新抽取 `code/*.rs` 中的目标函数头：
+The Rust contract is embedded in the function header, so enforcement restores both the canonical
+named signature and the structured `verus_clauses`. The consistency check both compares
+`specs/*.json` and re-extracts the target function header from `code/*.rs`:
 
 ```bash
 OUTPUT_DIR=outputs/rust-code-only-base \
 bash scripts/run_rust_code_only_oracle_evaluation.sh
 ```
 
-OpenRouter wrapper 为 `scripts/run_openrouter_rust_code_only_pipeline.sh`。它与 C/Java 保持相同
-的 `ENABLE_CODE_REPAIR`、`CODE_REPAIR_STRATEGY`、`WYBECODER_CANDIDATES`、
-`REUSE_ARTIFACTS_FROM`、`TASK_ID` 和 `RESUME` 语义。
+The OpenRouter wrapper is `scripts/run_openrouter_rust_code_only_pipeline.sh`. It keeps the same
+`ENABLE_CODE_REPAIR`, `CODE_REPAIR_STRATEGY`, `VGCR_CANDIDATES`, `REUSE_ARTIFACTS_FROM`, `TASK_ID`,
+and `RESUME` semantics as C/Java.
 
-在 C code-only 模式下，`run_constraint_entailment_evaluation.sh` 会读取
-`task_type=code_only_oracle_contract` 并采用 oracle-specific 语义方向：允许为内存安全、溢出和
-终止性加入辅助 `requires`，但要求 oracle contract 蕴含每个 audited semantic target。C/ACSL
-解析器会正确处理量词绑定分号、行内注释、链式比较、`\result`、标签和指针解引用；不能把
-parser failure 当成 coverage failure。
+In C code-only mode, `run_constraint_entailment_evaluation.sh` reads
+`task_type=code_only_oracle_contract` and adopts oracle-specific semantic directions: auxiliary
+`requires` may be added for memory safety, overflow, and termination, but the oracle contract is
+required to entail every audited semantic target. The C/ACSL parser correctly handles
+quantifier-binding semicolons, inline comments, chained comparisons, `\result`, labels, and pointer
+dereferences; a parser failure must not be treated as a coverage failure.
 
-输出仍采用统一布局：`specs/` 保存 frozen oracle artifacts，`code/` 保存初始或 repaired C，
-`reports/results.json` 保存 initial/post-repair validity、repair trajectory 与
-`contract_enforcement`。Rust/Verus 已使用独立 code-only contract 数据与 pipeline；
-Python/Nagini 已使用独立 code-only contract 数据与 pipeline，并保持相同 CLI 语义、artifact chaining 和指标字段。
+The output still uses a unified layout: `specs/` stores the frozen oracle artifacts, `code/` stores
+the initial or repaired C, and `reports/results.json` stores initial/post-repair validity, the
+repair trajectory, and `contract_enforcement`. Rust/Verus already uses independent code-only
+contract data and a pipeline; Python/Nagini already uses independent code-only contract data and a
+pipeline, keeping the same CLI semantics, artifact chaining, and metric fields.
 
-### 7.6.3 Python/Nagini code-only oracle contract 运行方式：
+### 7.6.3 Python/Nagini Code-Only Oracle Contract Usage:
 
-该流程跳过模型规格生成，直接读取固定的
-`benchmarks/python-nagini-problems/requirements/requirements_100_code_only_contracts.json`。
-模型只生成实现及实现级 `Invariant`/`Assert`，oracle function contract 在生成和 repair 阶段均被冻结。
+This flow skips model spec generation and directly reads the fixed
+`benchmarks/python-nagini-problems/requirements/requirements_100_code_only_contracts.json`.
+The model generates only the implementation and implementation-level `Invariant`/`Assert`, and the
+oracle function contract is frozen during both generation and repair.
 
 ```bash
 PYTHONPATH=. python3 scripts/run_python_code_only_pipeline.py \
@@ -1226,19 +1262,19 @@ PYTHONPATH=. python3 scripts/run_python_code_only_pipeline.py \
   --resume
 ```
 
-code-only 的 repair 变体必须复用同一批 initial code，不能重新采样：
+Code-only repair variants must reuse the same batch of initial code and may not resample:
 
 ```bash
 PYTHONPATH=. python3 scripts/run_python_code_only_pipeline.py \
   --contracts-file benchmarks/python-nagini-problems/requirements/requirements_100_code_only_contracts.json \
-  --output-dir outputs/python-code-only-wybecoder-kimi-0902 \
+  --output-dir outputs/python-code-only-vgcr-kimi-0902 \
   --endpoint https://openrouter.ai/api/v1/chat/completions \
   --model moonshotai/kimi-k2.7-code \
   --api-key-env OPENROUTER_API_KEY \
   --nagini-bin nagini \
   --enable-code-repair \
-  --code-repair-strategy wybecoder \
-  --wybecoder-candidates 3 \
+  --code-repair-strategy vgcr \
+  --vgcr-candidates 3 \
   --code-repair-max-iter 3 \
   --reuse-artifacts-from outputs/python-code-only-kimi-0902 \
   --verify-timeout 120 \
@@ -1250,17 +1286,17 @@ PYTHONPATH=. python3 scripts/run_python_code_only_pipeline.py \
   --resume
 ```
 
-也可以使用 OpenRouter wrapper：
+The OpenRouter wrapper can also be used:
 
 ```bash
 ENABLE_CODE_REPAIR=true \
-CODE_REPAIR_STRATEGY=wybecoder \
+CODE_REPAIR_STRATEGY=vgcr \
 REUSE_ARTIFACTS_FROM=outputs/python-code-only-kimi-0902 \
-OUTPUT_DIR=outputs/python-code-only-wybecoder-kimi-0902 \
+OUTPUT_DIR=outputs/python-code-only-vgcr-kimi-0902 \
 scripts/run_openrouter_python_code_only_pipeline.sh
 ```
 
-oracle artifact 一致性检查：
+Oracle artifact consistency check:
 
 ```bash
 PYTHONPATH=. python3 scripts/evaluate_python_code_only_oracle.py \
@@ -1270,55 +1306,55 @@ PYTHONPATH=. python3 scripts/evaluate_python_code_only_oracle.py \
   --report-file outputs/python-code-only-kimi-0902/reports/oracle_contract_consistency.json
 ```
 
-### 7.7 跳过验证（仅生成）
+### 7.7 Skip Verification (generation only)
 
 ```bash
 PYTHONPATH=. python3 scripts/run_requirement_pipeline.py --skip-verify
 ```
 
-Java/JML 对应命令：
+The corresponding Java/JML command:
 
 ```bash
 PYTHONPATH=. python3 scripts/run_java_requirement_pipeline.py --skip-verify
 ```
 
-Rust/Verus 对应命令：
+The corresponding Rust/Verus command:
 
 ```bash
 PYTHONPATH=. python3 scripts/run_rust_requirement_pipeline.py --skip-verify
 ```
 
-Python/Nagini 对应命令：
+The corresponding Python/Nagini command:
 
 ```bash
 PYTHONPATH=. python3 scripts/run_python_nagini_requirement_pipeline.py --skip-verify
 ```
 
-## 8. OpenRouter 一键脚本
+## 8. OpenRouter One-Click Scripts
 
-`scripts/run_openrouter_requirement_pipeline.sh` 支持以下变量：
+`scripts/run_openrouter_requirement_pipeline.sh` supports the following variables:
 
 - `PIPELINE_VARIANT=base|enhanced`
-- `ENABLE_CONSTRAINT_EXTRACTION=true|false`（enhanced 生效，默认 true）
-- `SPEC_SELF_CHECK_ROUNDS`（enhanced 生效）
-- `ENABLE_CODE_REPAIR=true|false`（enhanced 生效，默认 true）
-- `CODE_REPAIR_MAX_ITER`（enhanced 生效）
-- `CODE_REPAIR_STRATEGY=simple|wybecoder`（C/ACSL、Java/JML、Rust/Verus 与 Python/Nagini enhanced 生效，默认 simple）
-- `WYBECODER_CANDIDATES`（C/ACSL、Java/JML、Rust/Verus 与 Python/Nagini wybecoder repair 生效，默认 3）
-- `REUSE_ARTIFACTS_FROM`（C/ACSL、Java/JML、Rust/Verus 与 Python/Nagini 严格 repair ablation 必须设置）
-- `ENABLE_SPEC_EVALUATION=true|false`（enhanced 生效，默认 false）
-- `SIGNATURE_FILE`（固定 function signature 来源；C 默认
-  `benchmarks/frama-c-problems/requirements/requirements_100_ground_truth_specs.json`）
-- `REQUEST_TIMEOUT`（单次 LLM/API 请求超时，默认 120）
-- `LLM_RETRIES`、`LLM_RETRY_DELAY`（transient LLM/API 失败的有界重试，默认 3 / 15）
-- `RESUME=true|false`（是否跳过已有报告中 `status=ok` 的任务，默认 false）
-- `TASK_ID`、`SKIP_VERIFY`、`MODEL` 等
+- `ENABLE_CGS=true|false` (effective for enhanced, default true)
+- `SPEC_SELF_CHECK_ROUNDS` (effective for enhanced)
+- `ENABLE_CODE_REPAIR=true|false` (effective for enhanced, default true)
+- `CODE_REPAIR_MAX_ITER` (effective for enhanced)
+- `CODE_REPAIR_STRATEGY=simple|vgcr` (effective for C/ACSL, Java/JML, Rust/Verus, and Python/Nagini enhanced, default simple)
+- `VGCR_CANDIDATES` (effective for C/ACSL, Java/JML, Rust/Verus, and Python/Nagini VGCR repair, default 3)
+- `REUSE_ARTIFACTS_FROM` (required for C/ACSL, Java/JML, Rust/Verus, and Python/Nagini strict repair ablations)
+- `ENABLE_SPEC_EVALUATION=true|false` (effective for enhanced, default false)
+- `SIGNATURE_FILE` (source of the fixed function signature; for C the default is
+  `benchmarks/frama-c-problems/requirements/requirements_100_ground_truth_specs.json`)
+- `REQUEST_TIMEOUT` (single LLM/API request timeout, default 120)
+- `LLM_RETRIES`, `LLM_RETRY_DELAY` (bounded retries for transient LLM/API failures, default 3 / 15)
+- `RESUME=true|false` (whether to skip tasks with `status=ok` already present in a report, default false)
+- `TASK_ID`, `SKIP_VERIFY`, `MODEL`, etc.
 
-生成 `base+ce` 的示例：
+Example of generating CGS:
 
 ```bash
 PIPELINE_VARIANT=enhanced \
-ENABLE_CONSTRAINT_EXTRACTION=true \
+ENABLE_CGS=true \
 SPEC_SELF_CHECK_ROUNDS=1 \
 ENABLE_CODE_REPAIR=false \
 ENABLE_SPEC_EVALUATION=true \
@@ -1326,15 +1362,15 @@ REQUEST_TIMEOUT=120 \
 LLM_RETRIES=3 \
 LLM_RETRY_DELAY=15 \
 RESUME=true \
-OUTPUT_DIR=outputs/req2code-ce-only-0520 \
+OUTPUT_DIR=outputs/req2code-cgs-only-0520 \
 ./scripts/run_openrouter_requirement_pipeline.sh
 ```
 
-严格 `base+repair` 示例：
+Strict VGCR example:
 
 ```bash
 PIPELINE_VARIANT=enhanced \
-ENABLE_CONSTRAINT_EXTRACTION=false \
+ENABLE_CGS=false \
 ENABLE_CODE_REPAIR=true \
 CODE_REPAIR_STRATEGY=simple \
 CODE_REPAIR_MAX_ITER=3 \
@@ -1347,29 +1383,29 @@ OUTPUT_DIR=outputs/req2code-base-repair-0520 \
 ./scripts/run_openrouter_requirement_pipeline.sh
 ```
 
-严格 `base+ce+wybecoder` 示例：
+Strict CodeNova example:
 
 ```bash
 PIPELINE_VARIANT=enhanced \
-ENABLE_CONSTRAINT_EXTRACTION=false \
+ENABLE_CGS=false \
 ENABLE_CODE_REPAIR=true \
-CODE_REPAIR_STRATEGY=wybecoder \
-WYBECODER_CANDIDATES=3 \
+CODE_REPAIR_STRATEGY=vgcr \
+VGCR_CANDIDATES=3 \
 CODE_REPAIR_MAX_ITER=3 \
-REUSE_ARTIFACTS_FROM=outputs/req2code-ce-only-0520 \
+REUSE_ARTIFACTS_FROM=outputs/req2code-cgs-only-0520 \
 REQUEST_TIMEOUT=120 \
 LLM_RETRIES=3 \
 LLM_RETRY_DELAY=15 \
 RESUME=true \
-OUTPUT_DIR=outputs/req2code-ce-wybecoder-0520 \
+OUTPUT_DIR=outputs/req2code-cgs-vgcr-0520 \
 ./scripts/run_openrouter_requirement_pipeline.sh
 ```
 
-Java/JML/OpenJML 对应的一键脚本：
+The corresponding one-click script for Java/JML/OpenJML:
 
 ```bash
 ENABLE_CODE_REPAIR=true \
-ENABLE_CONSTRAINT_EXTRACTION=true \
+ENABLE_CGS=true \
 SPEC_SELF_CHECK_ROUNDS=1 \
 CODE_REPAIR_MAX_ITER=3 \
 REQUEST_TIMEOUT=120 \
@@ -1381,43 +1417,43 @@ OPENJML_SOLVER=/usr/bin/z3 \
 ./scripts/run_openrouter_java_requirement_pipeline.sh
 ```
 
-Java 严格 `base+wybecoder` 一键脚本示例：
+Java strict VGCR one-click script example:
 
 ```bash
-ENABLE_CONSTRAINT_EXTRACTION=false \
+ENABLE_CGS=false \
 ENABLE_CODE_REPAIR=true \
-CODE_REPAIR_STRATEGY=wybecoder \
-WYBECODER_CANDIDATES=3 \
+CODE_REPAIR_STRATEGY=vgcr \
+VGCR_CANDIDATES=3 \
 CODE_REPAIR_MAX_ITER=3 \
 REUSE_ARTIFACTS_FROM=outputs/java-base-0624 \
 REQUEST_TIMEOUT=120 \
 LLM_RETRIES=3 \
 LLM_RETRY_DELAY=15 \
 RESUME=true \
-OUTPUT_DIR=outputs/java-base-wybecoder-0624 \
+OUTPUT_DIR=outputs/java-base-vgcr-0624 \
 OPENJML_SOLVER=/usr/bin/z3 \
 ./scripts/run_openrouter_java_requirement_pipeline.sh
 ```
 
-Java 严格 `base+ce+wybecoder` 一键脚本示例：
+Java strict CodeNova one-click script example:
 
 ```bash
-ENABLE_CONSTRAINT_EXTRACTION=false \
+ENABLE_CGS=false \
 ENABLE_CODE_REPAIR=true \
-CODE_REPAIR_STRATEGY=wybecoder \
-WYBECODER_CANDIDATES=3 \
+CODE_REPAIR_STRATEGY=vgcr \
+VGCR_CANDIDATES=3 \
 CODE_REPAIR_MAX_ITER=3 \
-REUSE_ARTIFACTS_FROM=outputs/java-ce-only-0624 \
+REUSE_ARTIFACTS_FROM=outputs/java-cgs-only-0624 \
 REQUEST_TIMEOUT=120 \
 LLM_RETRIES=3 \
 LLM_RETRY_DELAY=15 \
 RESUME=true \
-OUTPUT_DIR=outputs/java-ce-wybecoder-0624 \
+OUTPUT_DIR=outputs/java-cgs-vgcr-0624 \
 OPENJML_SOLVER=/usr/bin/z3 \
 ./scripts/run_openrouter_java_requirement_pipeline.sh
 ```
 
-Rust/Verus 对应的一键脚本：
+The corresponding one-click script for Rust/Verus:
 
 ```bash
 PIPELINE_VARIANT=enhanced \
@@ -1432,37 +1468,37 @@ OUTPUT_DIR=outputs/rust-req2code-openrouter \
 ./scripts/run_openrouter_rust_requirement_pipeline.sh
 ```
 
-Rust 严格 `base+wybecoder` 一键脚本示例：
+Rust strict VGCR one-click script example:
 
 ```bash
 PIPELINE_VARIANT=enhanced \
-ENABLE_CONSTRAINT_EXTRACTION=false \
+ENABLE_CGS=false \
 ENABLE_CODE_REPAIR=true \
-CODE_REPAIR_STRATEGY=wybecoder \
-WYBECODER_CANDIDATES=3 \
+CODE_REPAIR_STRATEGY=vgcr \
+VGCR_CANDIDATES=3 \
 CODE_REPAIR_MAX_ITER=3 \
 REUSE_ARTIFACTS_FROM=outputs/rust-base-0626 \
 REQUEST_TIMEOUT=120 \
-OUTPUT_DIR=outputs/rust-base-wybecoder-0626 \
+OUTPUT_DIR=outputs/rust-base-vgcr-0626 \
 ./scripts/run_openrouter_rust_requirement_pipeline.sh
 ```
 
-Rust 严格 `base+ce+wybecoder` 一键脚本示例：
+Rust strict CodeNova one-click script example:
 
 ```bash
 PIPELINE_VARIANT=enhanced \
-ENABLE_CONSTRAINT_EXTRACTION=false \
+ENABLE_CGS=false \
 ENABLE_CODE_REPAIR=true \
-CODE_REPAIR_STRATEGY=wybecoder \
-WYBECODER_CANDIDATES=3 \
+CODE_REPAIR_STRATEGY=vgcr \
+VGCR_CANDIDATES=3 \
 CODE_REPAIR_MAX_ITER=3 \
-REUSE_ARTIFACTS_FROM=outputs/rust-ce-only-0626 \
+REUSE_ARTIFACTS_FROM=outputs/rust-cgs-only-0626 \
 REQUEST_TIMEOUT=120 \
-OUTPUT_DIR=outputs/rust-ce-wybecoder-0626 \
+OUTPUT_DIR=outputs/rust-cgs-vgcr-0626 \
 ./scripts/run_openrouter_rust_requirement_pipeline.sh
 ```
 
-Python/Nagini 对应的一键脚本：
+The corresponding one-click script for Python/Nagini:
 
 ```bash
 PIPELINE_VARIANT=enhanced \
@@ -1477,198 +1513,210 @@ OUTPUT_DIR=outputs/python-nagini-req2code-openrouter \
 ./scripts/run_openrouter_python_nagini_requirement_pipeline.sh
 ```
 
-Python/Nagini 严格 `base+wybecoder` 一键脚本示例：
+Python/Nagini strict VGCR one-click script example:
 
 ```bash
 PIPELINE_VARIANT=enhanced \
-ENABLE_CONSTRAINT_EXTRACTION=false \
+ENABLE_CGS=false \
 ENABLE_CODE_REPAIR=true \
-CODE_REPAIR_STRATEGY=wybecoder \
-WYBECODER_CANDIDATES=3 \
+CODE_REPAIR_STRATEGY=vgcr \
+VGCR_CANDIDATES=3 \
 CODE_REPAIR_MAX_ITER=3 \
 REUSE_ARTIFACTS_FROM=outputs/python-nagini-base-0627 \
 REQUEST_TIMEOUT=120 \
 LLM_RETRIES=3 \
 LLM_RETRY_DELAY=15 \
 RESUME=true \
-OUTPUT_DIR=outputs/python-nagini-base-wybecoder-0627 \
+OUTPUT_DIR=outputs/python-nagini-base-vgcr-0627 \
 ./scripts/run_openrouter_python_nagini_requirement_pipeline.sh
 ```
 
-Python/Nagini 严格 `base+ce+repair` 一键脚本示例：
+Python/Nagini strict CodeNova (simple repair) one-click script example:
 
 ```bash
 PIPELINE_VARIANT=enhanced \
-ENABLE_CONSTRAINT_EXTRACTION=false \
+ENABLE_CGS=false \
 ENABLE_CODE_REPAIR=true \
 CODE_REPAIR_STRATEGY=simple \
 CODE_REPAIR_MAX_ITER=3 \
-REUSE_ARTIFACTS_FROM=outputs/python-nagini-ce-0627 \
+REUSE_ARTIFACTS_FROM=outputs/python-nagini-cgs-0627 \
 REQUEST_TIMEOUT=120 \
 LLM_RETRIES=3 \
 LLM_RETRY_DELAY=15 \
 RESUME=true \
-OUTPUT_DIR=outputs/python-nagini-ce-repair-0627 \
+OUTPUT_DIR=outputs/python-nagini-cgs-repair-0627 \
 ./scripts/run_openrouter_python_nagini_requirement_pipeline.sh
 ```
 
-Python/Nagini 严格 `base+ce+wybecoder` 一键脚本示例：
+Python/Nagini strict CodeNova (candidate repair) one-click script example:
 
 ```bash
 PIPELINE_VARIANT=enhanced \
-ENABLE_CONSTRAINT_EXTRACTION=false \
+ENABLE_CGS=false \
 ENABLE_CODE_REPAIR=true \
-CODE_REPAIR_STRATEGY=wybecoder \
-WYBECODER_CANDIDATES=3 \
+CODE_REPAIR_STRATEGY=vgcr \
+VGCR_CANDIDATES=3 \
 CODE_REPAIR_MAX_ITER=3 \
-REUSE_ARTIFACTS_FROM=outputs/python-nagini-ce-0627 \
+REUSE_ARTIFACTS_FROM=outputs/python-nagini-cgs-0627 \
 REQUEST_TIMEOUT=120 \
 LLM_RETRIES=3 \
 LLM_RETRY_DELAY=15 \
 RESUME=true \
-OUTPUT_DIR=outputs/python-nagini-ce-wybecoder-0627 \
+OUTPUT_DIR=outputs/python-nagini-cgs-vgcr-0627 \
 ./scripts/run_openrouter_python_nagini_requirement_pipeline.sh
 ```
 
-Rust/Python ablation 可通过 `PIPELINE_VARIANT=base`，或
-`PIPELINE_VARIANT=enhanced ENHANCEMENT_METHOD=ce|repair|both` 选择。严格 repair /
-wybecoder ablation 使用 `REUSE_ARTIFACTS_FROM` 复用 base 或 base+ce 输出。
+Rust/Python ablations can be selected via `PIPELINE_VARIANT=base`, or
+`PIPELINE_VARIANT=enhanced ENHANCEMENT_METHOD=cgs|repair|both`. Strict repair / VGCR ablations use
+`REUSE_ARTIFACTS_FROM` to reuse the Direct or CGS outputs.
 
-后评估脚本（只评估已有输出，不重新生成）：
+Post-evaluation scripts (evaluate existing outputs only, no regeneration):
 
 - `scripts/run_constraint_entailment_evaluation.sh`
-  - 输入：`OUTPUT_DIR/specs/*.json` + 固定 manual ground-truth spec 文件
-  - 输出：`OUTPUT_DIR/reports/constraint_entailment.json`
-  - 评估指标：ground-truth spec coverage、post/frame coverage、pre over-constraint
+  - input: `OUTPUT_DIR/specs/*.json` + fixed manual ground-truth spec file
+  - output: `OUTPUT_DIR/reports/cef.json`
+  - metrics: ground-truth spec coverage, post/frame coverage, pre over-constraint
 
-示例：
+Example:
 
 ```bash
 OUTPUT_DIR=outputs/req2code-openrouter-enhanced \
 ./scripts/run_constraint_entailment_evaluation.sh
 ```
 
-Java/JML 对应命令：
+The corresponding Java/JML command:
 
 ```bash
 OUTPUT_DIR=outputs/java-req2code-openrouter \
 ./scripts/run_java_constraint_entailment_evaluation.sh
 ```
 
-Rust/Verus 对应命令：
+The corresponding Rust/Verus command:
 
 ```bash
 OUTPUT_DIR=outputs/rust-req2code-openrouter \
 ./scripts/run_rust_constraint_entailment_evaluation.sh
 ```
 
-Python/Nagini 对应命令：
+The corresponding Python/Nagini command:
 
 ```bash
 OUTPUT_DIR=outputs/python-nagini-req2code-openrouter \
 ./scripts/run_python_nagini_constraint_entailment_evaluation.sh
 ```
 
-生成最终 benchmark summary：
+Generate the final benchmark summary:
 
 ```bash
 OUTPUT_DIR=outputs/req2code-openrouter-enhanced \
 ./scripts/run_req2code_benchmark_summary.sh
 ```
 
-Java/JML 对应命令：
+The corresponding Java/JML command:
 
 ```bash
 OUTPUT_DIR=outputs/java-req2code-openrouter \
 ./scripts/run_req2code_benchmark_summary.sh
 ```
 
-Rust/Verus 对应命令同样使用统一 summary：
+The corresponding Rust/Verus command also uses the unified summary:
 
 ```bash
 OUTPUT_DIR=outputs/rust-req2code-openrouter \
 ./scripts/run_req2code_benchmark_summary.sh
 ```
 
-Python/Nagini 对应命令同样使用统一 summary：
+The corresponding Python/Nagini command also uses the unified summary:
 
 ```bash
 OUTPUT_DIR=outputs/python-nagini-req2code-openrouter \
 ./scripts/run_req2code_benchmark_summary.sh
 ```
 
-## 9. 实验与对比建议（论文友好）
+## 9. Experimental and Comparison Recommendations (paper-friendly)
 
-建议至少报告四组：
+It is recommended to report at least four groups:
 
-1. `base`
-2. `base+ce`（只开 constraint extraction / spec self-check）
-3. `base+repair`（复用 base artifacts，只开 code repair）
-4. `base+ce+repair`（复用 base+ce artifacts，只开 code repair）
+1. Direct
+2. CGS (only constraint extraction / spec self-check enabled)
+3. VGCR (reuse Direct artifacts, only code repair enabled)
+4. CodeNova (reuse CGS artifacts, only code repair enabled)
 
-其中 `base+repair` 必须继承 `base` 的 `specs/` 与 `code/`；`base+ce+repair` 必须继承
-`base+ce` 的 `specs/` 与 `code/`。独立重跑可以作为随机性/鲁棒性补充实验，但不作为主
-ablation 的边际贡献依据。
+VGCR must inherit the `specs/` and `code/` of Direct; CodeNova must inherit the `specs/` and `code/`
+of CGS. Independent reruns may serve as supplementary randomness/robustness experiments, but not as
+the basis for the marginal contribution of the main ablation.
 
-关键指标：
+Key metrics:
 
 - verify pass rate
-- 平均修复轮数
-- requirement-spec 缺失约束数（来自 `alignment_check`）
-- requirement coverage micro/macro（来自 `benchmark_summary.json`）
-- joint success（来自 `benchmark_summary.json`）
-- 每题 token/时延成本（可选）
+- average number of repair rounds
+- number of missing requirement-spec constraints (from `alignment_check`)
+- requirement coverage micro/macro (from `benchmark_summary.json`)
+- joint success (from `benchmark_summary.json`)
+- per-task token/latency cost (optional)
 
-## 10. 当前边界与后续可选增强
+## 10. Current Boundaries and Optional Future Enhancements
 
-当前增强仍保持“轻量改造”原则，尚未做：
+The current enhancement still follows the "lightweight modification" principle and does not yet
+include:
 
-- spec-aware code skeleton（如 `requires` -> 显式检查模板）
-- requirement 与 spec 的 embedding 匹配（方法 B，可作为后续增强）
-- 更细粒度的约束类型标签（安全性、边界、单调性等）
+- spec-aware code skeleton (e.g. `requires` -> explicit check template)
+- embedding matching between requirement and spec (method B, a possible future enhancement)
+- finer-grained constraint type labels (safety, bounds, monotonicity, etc.)
 
-这些可以作为下一阶段增量，不影响现有 base/enhanced 可比性。
+These can be added as next-stage increments without affecting the comparability of the existing
+Direct/enhanced variants.
 
-## 11. C/ACSL 阶段总结与多语言迁移基线
+## 11. C/ACSL Stage Summary and Multi-Language Migration Baseline
 
-C 语言 track 已完成从数据、解析、评估到 pipeline 的闭环，后续 Java、Rust、Python 应以本节
-约束作为迁移基线。
+The C language track has completed the closed loop from data, parsing, and evaluation to pipeline;
+subsequent Java, Rust, and Python should use the constraints in this section as the migration
+baseline.
 
-### 11.1 已完成事项
+### 11.1 Completed Items
 
-- **Ground truth 审计**：修订 23 个题目的截断量词、参数名、数组下标、behavior、assigns 和表达式错误；修订由 `scripts/fix_c_ground_truth_clauses.py` 保留为可重放脚本。
-- **ACSL/C 解析**：entailment evaluator 已处理量词绑定分号、行内注释、链式比较、`\result`/`result`、ACSL label、指针解引用和复杂等式规范化。解析失败不能直接记为 coverage failure。
-- **Code-only oracle**：100 道 C 题拥有独立 canonical `code_only_contract`，只包含接口级 requires/assigns/ensures，不泄漏 loop invariant、variant 或其他实现级证明注解。
-- **合同保持**：初始生成和每轮 repair 前后都会恢复 canonical 合同，并记录 `contract_enforcement`；simple repair 和 WybeCoder repair 复用同一批 initial artifacts。
-- **统一评估**：完整链路报告 code validity、requirement coverage（micro/macro）和 joint success；code-only 另用 `oracle_contract_consistency.json` 检查合同是否被篡改。
+- **Ground-truth audit**: fixed truncated quantifiers, parameter names, array indices, behaviors, assigns, and expression errors in 23 tasks; the revisions are preserved as a replayable script by `scripts/fix_c_ground_truth_clauses.py`.
+- **ACSL/C parsing**: the CEF evaluator now handles quantifier-binding semicolons, inline comments, chained comparisons, `\result`/`result`, ACSL labels, pointer dereferences, and complex equality normalization. A parse failure must not be recorded directly as a coverage failure.
+- **Code-only oracle**: 100 C tasks have an independent canonical `code_only_contract` containing only interface-level requires/assigns/ensures, without leaking loop invariants, variants, or other implementation-level proof annotations.
+- **Contract preservation**: the canonical contract is restored before and after initial generation and each repair round, and `contract_enforcement` is recorded; simple repair and VGCR reuse the same batch of initial artifacts.
+- **Unified evaluation**: the full pipeline reports code validity, requirement coverage (micro/macro), and joint success; code-only additionally uses `oracle_contract_consistency.json` to check whether the contract has been tampered with.
 
-### 11.2 当前 C 结果与数据边界
+### 11.2 Current C Results and Data Boundaries
 
-重评估使用修订后的 ground truth、解析器和评估方向。DeepSeek default 的 Direct 基线为
-`outputs/req2code-base-0622`；四模型四范式汇总写入 `outputs/c_re_evaluation_current.json`。
-100% 只适用于通过审计且未被改写的 code-only oracle 一致性检查；完整链路 coverage 仍真实反映
-模型生成 spec 与人工 semantic targets 的对齐程度。
+The re-evaluation uses the revised ground truth, parser, and evaluation directions. The Direct
+baseline for DeepSeek default is `outputs/req2code-base-0622`; the four-model four-paradigm summary
+is written to `outputs/c_re_evaluation_current.json`.
+100% applies only to the code-only oracle consistency check on audited and unmodified contracts;
+full-pipeline coverage still faithfully reflects how well the model-generated spec aligns with the
+manual semantic targets.
 
-task 42（GCD）的 divisibility semantic target 已保留，但 reference WP 证明目前超时。它应标记
-为 oracle validation/proof issue 并单独跟踪，不能删除 target、削弱合同或增加不合理前置条件。
+The divisibility semantic target of task 42 (GCD) has been retained, but the reference WP proof
+currently times out. It should be marked as an oracle validation/proof issue and tracked separately;
+the target must not be deleted, the contract must not be weakened, and unreasonable preconditions
+must not be added.
 
-当前重评估汇总（`Code Valid`、`Coverage`、`Joint` 分别为通过题数/100、macro coverage、通过题数/100）：
+Current re-evaluation summary (`Code Valid`, `Coverage`, and `Joint` are respectively passing
+tasks/100, macro coverage, and passing tasks/100):
 
-| Model | Direct | Direct + CE | Direct + repair | Direct + CE + repair |
+| Model | Direct | CGS | VGCR | CodeNova |
 | --- | --- | --- | --- | --- |
 | DeepSeek default | 34 / 0.4327 / 14 | 30 / 0.6047 / 17 | 60 / 0.4327 / 21 | 54 / 0.6047 / 24 |
 | Kimi-k2.7-code | 68 / 0.6831 / 26 | 71 / 0.7350 / 31 | 86 / 0.6831 / 30 | 86 / 0.7350 / 35 |
 | Qwen3.6-plus | 50 / 0.5233 / 21 | 39 / 0.7131 / 23 | 64 / 0.5233 / 25 | 66 / 0.7131 / 29 |
 | Claude-Sonnet-5 | 73 / 0.7826 / 39 | 56 / 0.7879 / 34 | 80 / 0.7826 / 41 | 77 / 0.7879 / 40 |
 
-该表只代表当前 C 数据和评估规则下的结果；迁移到其他语言时应保留字段含义，不直接比较不同
-验证器的绝对难度。
+This table represents only results under the current C data and evaluation rules; when migrating to
+other languages, field meanings should be preserved and absolute difficulty across different
+verifiers should not be compared directly.
 
-### 11.3 Java/Rust/Python 迁移要求
+### 11.3 Java/Rust/Python Migration Requirements
 
-每种语言都应提供独立的 requirement/signature/ground-truth、canonical code-only contract、
-reference validation、生成/合同恢复/verifier/repair/summary pipeline，并使用语言专属 parser
-和 verifier auxiliary-condition 规则。spec-only 条件天然满足时无需另造 spec-only track；
-code-only 不得把 verifier 辅助条件当成需求覆盖；repair 只能修改实现和实现级注解；缺失输出、
-解析失败、验证错误和 timeout 使用固定分母计入报告。语言特有题目先分别报告，不在语义统一前
-合并成跨语言总分。
+Each language should provide independent requirement/signature/ground-truth, a canonical code-only
+contract, reference validation, and generation/contract-restoration/verifier/repair/summary
+pipelines, and should use language-specific parsers and verifier auxiliary-condition rules. When
+spec-only conditions are naturally satisfied, there is no need to create a separate spec-only track;
+code-only must not treat verifier auxiliary conditions as requirement coverage; repair may only
+modify the implementation and implementation-level annotations; missing output, parse failures,
+verification errors, and timeouts are counted in the report using a fixed denominator.
+Language-specific tasks should be reported separately first, and not merged into a cross-language
+total score before semantics are unified.

@@ -1,61 +1,61 @@
-# CE 与 Joint Success：典型成败案例集
+# CGS Joint Success Case Studies
 
-本文基于各语言容器中的 Claude run 产物，选取 `base`、`base+ce`、`base+ce+wybecoder`
-三档的代表性题目，说明“CE 增强 spec”对 `code_valid` 与 `joint_success` 的双向影响。
+Based on the Claude run artifacts in each language container, this document selects representative problems from the three configurations Direct, CGS, and CodeNova to illustrate the bidirectional impact of the Constraint-Guided Specification (CGS)-enhanced spec on `code_valid` and `joint_success`.
 
-- 判定口径来自 `<run>/reports/benchmark_summary.json` 的 `per_problem`
-  （`code_valid`、`requirement_coverage_x/n`、`joint_success`）。
-- 失败原因来自 `<run>/reports/results.json` 的 `verification` 及同名 `*.verify.log`。
-- `joint_success = code_valid && requirement_coverage_x == requirement_coverage_n`。
-- 数据集：各语言 100 题。CE = constraint extraction + spec self-check；
-  `+both` = 在 CE spec 冻结的前提下由 WybeCoder 做代码修复。
+- Judgment criteria come from `per_problem` in `<run>/reports/benchmark_summary.json`
+  (`code_valid`, `requirement_coverage_x/n`, `joint_success`).
+- Failure causes come from `verification` in `<run>/reports/results.json` and the same-named `*.verify.log`.
+- `joint_success = code_valid && requirement_coverage_x == requirement_coverage_n`.
+- Dataset: 100 problems per language. CGS = constraint extraction + spec self-check;
+  CodeNova = code repair by Verifier-Guided Candidate Repair (VGCR) on top of the frozen CGS spec.
 
-## 使用的 run 目录
+## Run Directories Used
 
-| 语言 | 容器 | base | +ce | +both |
+| Language | Container | Direct | CGS | CodeNova |
 | --- | --- | --- | --- | --- |
-| C | `Spec`（根 `/workspace`） | `outputs/C-base-claude-0706` | `outputs/C-ce-claude-0706` | `outputs/C-ce-wybecoder-claude-0706` |
-| Java | `spec-java`（根 `/workspace`） | `outputs/java-base-claude-0706` | `outputs/java-ce-claude-0707` | `outputs/java-ce-wybecoder-claude-0707` |
-| Rust | `spec-rust` | `outputs/rust-base-rust-0707` | `outputs/rust-ce-claude-0707` | `outputs/rust-ce-wybecoder-claude-0709` |
-| Python | `spec-python` | `outputs/python-base-claude-0714` | `outputs/python-ce-claude-0714` | `outputs/python-ce-wybecoder-claude-0715`\* |
+| C | `Spec` (root `/workspace`) | `outputs/C-base-claude-0706` | `outputs/C-cgs-claude-0706` | `outputs/C-cgs-vgcr-claude-0706` |
+| Java | `spec-java` (root `/workspace`) | `outputs/java-base-claude-0706` | `outputs/java-cgs-claude-0707` | `outputs/java-cgs-vgcr-claude-0707` |
+| Rust | `spec-rust` | `outputs/rust-base-rust-0707` | `outputs/rust-cgs-claude-0707` | `outputs/rust-cgs-vgcr-claude-0709` |
+| Python | `spec-python` | `outputs/python-base-claude-0714` | `outputs/python-cgs-claude-0714` | `outputs/python-cgs-vgcr-claude-0715`\* |
 
-\* Python 的 `+both` 只有 `*-offline-repaired` 目录带完整评测报告，故 Python 的
-`+both` 数字取自 `outputs/python-ce-wybecoder-claude-0715-offline-repaired`；
-为可比，`base/+ce` 也取同源的 `*-offline-repaired`。
+\* For Python, only the `*-offline-repaired` directories of CodeNova have complete evaluation reports, so Python's
+CodeNova numbers come from `outputs/python-cgs-vgcr-claude-0715-offline-repaired`;
+for comparability, Direct/CGS also use the same-source `*-offline-repaired`.
 
-## 总体指标
+## Overall Metrics
 
-| 语言 | base (valid/joint/cov) | +ce | +both |
+| Language | Direct (valid/joint/cov) | CGS | CodeNova |
 | --- | --- | --- | --- |
 | C | 73 / 39 / .749 | 56 / 34 / .768 | 77 / 40 / .768 |
 | Java | 90 / 65 / .908 | 82 / 63 / .911 | 97 / 73 / .911 |
 | Rust | 72 / 51 / .692 | 71 / 49 / .706 | 98 / 55 / .706 |
 | Python (repaired) | 79 / 76 / .937 | 90 / 85 / .963 | 90 / 85 / .963 |
 
-C/Java/Rust 呈现同一模式：**coverage 上升、valid 下降、joint 下降；`+both` 再把
-valid/joint 拉起**。Python 的 repaired 集是例外（见文末备注）。
+C/Java/Rust show the same pattern: **coverage goes up, valid goes down, joint goes down; CodeNova then raises
+valid/joint back up**. Python's repaired set is the exception (see the note at the end).
 
 ---
 
-## 1. CE 把原本 joint success 的题弄坏（逻辑变难，非纯语法）
+## 1. CGS Breaks Problems That Were Originally Joint Successes (Harder Logic, Not Just Syntax)
 
-筛选条件：`base.joint_success=True`、`ce.joint_success=False`、`ce.code_valid=False`，
-且失败来自证明/验证难度，而非解析或类型语法错误。
+Filter: `Direct.joint_success=True`, `CGS.joint_success=False`, `CGS.code_valid=False`,
+and the failure comes from proof/verification difficulty rather than parsing or type-syntax errors.
 
-### 1.1 C id 5 `pointers/incr_a_by_b.c` —— 别名 frame 子句导致证明超时
+### 1.1 C id 5 `pointers/incr_a_by_b.c` — Aliased frame clause causes proof timeout
 
-- base：`code_valid=True`，coverage `2/2`，joint success。
-- +ce：coverage 仍为 `2/2`，但 `code_valid=False`。
+- Direct: `code_valid=True`, coverage `2/2`, joint success.
+- CGS: coverage is still `2/2`, but `code_valid=False`.
 
-CE 为读指针补了 frame 事实：
+CGS added a frame fact for the read pointer:
 
 ```c
 ensures *a == \old(*a) + \old(*b);
-ensures *b == \old(*b);      // CE 新增
+ensures *b == \old(*b);      // added by CGS
 ```
 
-证明器需要证明 `*a = *a + *b;` 之后 `b` 的指向内容未变，即要排除 `a` 与 `b` 别名，
-于是新增目标无法在时限内完成：
+The prover needs to show that after `*a = *a + *b;` the contents pointed to by `b` are unchanged,
+i.e., it must rule out aliasing between `a` and `b`; consequently the new goal cannot be completed
+within the time limit:
 
 ```text
 [wp] 5 goals scheduled
@@ -63,14 +63,15 @@ ensures *b == \old(*b);      // CE 新增
 [wp] Proved goals:   4 / 5   (Timeout: 1)
 ```
 
-base 为 `4/4`。这是“更强的契约本身没错，但把证明义务变难”的典型。
+Direct is `4/4`. This is a typical case where "the stronger contract itself is not wrong, but it
+makes the proof obligation harder".
 
-### 1.2 Java id 16 `array_extrema/Problem016_ArrayMin.java` —— 存在性循环不变式不可证
+### 1.2 Java id 16 `array_extrema/Problem016_ArrayMin.java` — Existential loop invariant is unprovable
 
-- base：`code_valid=True`，coverage `5/5`，joint success。
-- +ce：coverage 仍为 `5/5`，但 `code_valid=False`。
+- Direct: `code_valid=True`, coverage `5/5`, joint success.
+- CGS: coverage is still `5/5`, but `code_valid=False`.
 
-CE 在循环不变式中引入了存在量词：
+CGS introduced an existential quantifier in the loop invariant:
 
 ```java
 /*@ loop_invariant (\exists int k; 0 <= k && k < i; a[k] == min) || i == 0;
@@ -81,30 +82,30 @@ CE 在循环不变式中引入了存在量词：
 while (i < a.length) { ... }
 ```
 
-OpenJML 无法建立该不变式的保持：
+OpenJML cannot establish preservation of this invariant:
 
 ```text
 verify: The prover cannot establish an assertion (LoopInvariant) in method min
   @ loop_invariant (\exists int k; 0 <= k && k < i; a[k] == min) || i == 0;
 ```
 
-base 的 `\exists int k; 0 <= k && k < i; min == a[k]`（无 `|| i == 0`）与循环体配合
-可证，CE 的加强版本反而不可证。
+Direct's `\exists int k; 0 <= k && k < i; min == a[k]` (without `|| i == 0`) is provable together
+with the loop body, whereas CGS's strengthened version is instead unprovable.
 
-### 1.3 Python id 94 `dict_apis_ext/Problem094_DictKeyMapsToSelf.py` —— 更强的析取后置不可证
+### 1.3 Python id 94 `dict_apis_ext/Problem094_DictKeyMapsToSelf.py` — Stronger disjunctive postcondition is unprovable
 
-- base：`code_valid=True`，coverage `4/4`，joint success。
-- +ce：coverage 仍为 `4/4`，但 `code_valid=False`。
+- Direct: `code_valid=True`, coverage `4/4`, joint success.
+- CGS: coverage is still `4/4`, but `code_valid=False`.
 
-CE 追加了长度析取子句：
+CGS appended a length disjunction clause:
 
 ```python
 Ensures(key in d)
-Ensures(len(d) == Old(len(d)) or (key not in Old(d) and len(d) == Old(len(d)) + 1))  # CE 新增
+Ensures(len(d) == Old(len(d)) or (key not in Old(d) and len(d) == Old(len(d)) + 1))  # added by CGS
 Ensures(d[key] == key)
 ```
 
-Nagini 对同一实现无法证明该析取：
+Nagini cannot prove this disjunction for the same implementation:
 
 ```text
 Postcondition of dict_key_maps_to_self might not hold.
@@ -112,33 +113,34 @@ Assertion ((len(d) == Old(len(d))) or
           ((key not in Old(d)) and (len(d) == (Old(len(d)) + 1)))) might not hold.
 ```
 
-base 只要求 `key in d` 与 `d[key] == key`，因此可过；CE 加强后 code validity 丢失。
+Direct only requires `key in d` and `d[key] == key`, so it passes; after CGS strengthening, code
+validity is lost.
 
-> 同类（可作补充）：Java id 3 `array_basics/Problem003_FirstElement.java`
-> 因 CE 增加 `normal_behavior` + 两个 `exceptional_behavior` 与数组帧事实，使
-> `return a[0];` 触发 `PossiblyTooLargeIndex`。
+> Similar case (as a supplement): Java id 3 `array_basics/Problem003_FirstElement.java`
+> because CGS adds `normal_behavior` + two `exceptional_behavior` clauses and an array frame fact,
+> making `return a[0];` trigger `PossiblyTooLargeIndex`.
 
 ---
 
-## 2. CE 直接修好 coverage，从而达成 joint success
+## 2. CGS Directly Fixes Coverage, Thereby Achieving Joint Success
 
-筛选条件：`base.code_valid=True` 但 coverage 不满（`joint_success=False`），
-`ce.code_valid=True` 且 coverage 补齐（`joint_success=True`）。即 CE 补上了
-ground-truth 漏掉、但 base spec 没有表达的契约目标。
+Filter: `Direct.code_valid=True` but coverage is not full (`joint_success=False`),
+`CGS.code_valid=True` and coverage is completed (`joint_success=True`). That is, CGS supplies the
+contract goals that ground truth missed but the Direct spec did not express.
 
-### 2.1 C id 13 `more_arrays/equal_arrays.c` —— 由“双条件”细化为分行为契约
+### 2.1 C id 13 `more_arrays/equal_arrays.c` — Refined from a "two-condition" form into per-behavior contracts
 
-- base：coverage `4/6`，不 joint。
-- +ce：coverage `6/6`，joint success。
+- Direct: coverage `4/6`, not joint.
+- CGS: coverage `6/6`, joint success.
 
-base 只给出一个双向蕴含：
+Direct only gives a single biconditional:
 
 ```c
 ensures \result == 1 <==> (\forall integer i; 0 <= i < n ==> a[i] == b[i]);
 ensures \result == 0 || \result == 1;
 ```
 
-CE 显式拆成两个覆盖目标一致的行为：
+CGS explicitly splits it into two behaviors that match the coverage targets:
 
 ```c
 behavior all_equal:
@@ -151,72 +153,74 @@ complete behaviors;
 disjoint behaviors;
 ```
 
-覆盖数从 4/6 升到 6/6，同时保持可验证。
+The coverage count rises from 4/6 to 6/6 while remaining verifiable.
 
-### 2.2 Rust id 36 `vec_mutation/Problem036_VecPop.rs` —— 序列效应拆分成长度 + 逐点 frame
+### 2.2 Rust id 36 `vec_mutation/Problem036_VecPop.rs` — Sequence effect split into length + pointwise frame
 
-- base：coverage `2/3`，不 joint。
-- +ce：coverage `3/3`，joint success。
+- Direct: coverage `2/3`, not joint.
+- CGS: coverage `3/3`, joint success.
 
-base 用单条 subrange 事实表达整个序列效应：
+Direct expresses the whole sequence effect with a single subrange fact:
 
 ```rust
 ensures v@ == old(v)@.subrange(0, old(v).len() as int - 1)
 ```
 
-CE 拆成“长度变化 + 逐点相等”两个可独立核对的单位：
+CGS splits it into two independently checkable units, "length change + pointwise equality":
 
 ```rust
 ensures v.len() == old(v).len() - 1
 ensures forall|i: int| 0 <= i < v.len() ==> v[i] == old(v)[i]
 ```
 
-覆盖器要求序列效应同时具备长度、变更元素、未变更区域三类事实，base 的整合写法
-只能算部分覆盖（2/3），CE 的拆分写法补齐为 3/3。
+The coverage checker requires a sequence effect to have all three kinds of facts — length, changed
+elements, and unchanged regions; Direct's combined formulation counts as only partial coverage
+(2/3), while CGS's split formulation completes it to 3/3.
 
-### 2.3 Python id 57 `scalar_arithmetic_ext/Problem057_ChooseIf.py` —— 补上另一分支
+### 2.3 Python id 57 `scalar_arithmetic_ext/Problem057_ChooseIf.py` — Fills in the other branch
 
-- base：coverage `1/2`，不 joint。
-- +ce：coverage `2/2`，joint success。
+- Direct: coverage `1/2`, not joint.
+- CGS: coverage `2/2`, joint success.
 
-base 只约束了 `flag` 为真的一支：
+Direct only constrains the branch where `flag` is true:
 
 ```python
 Ensures(Implies(flag, Result() == x))
 ```
 
-CE 补上互补分支：
+CGS adds the complementary branch:
 
 ```python
 Ensures(Implies(flag, Result() == x))
 Ensures(Implies(not flag, Result() == y))
 ```
 
-覆盖数 1/2 → 2/2，joint success。
+Coverage 1/2 → 2/2, joint success.
 
-> 可作补充：Java id 49 `scalar_arithmetic/Problem049_SameSignNonzero.java`
-> 由 `\result <==> ((x > 0) == (y > 0))` 展开为
-> `\result == ((x > 0 && y > 0) || (x < 0 && y < 0))`，coverage 2/3 → 3/3。
+> As a supplement: Java id 49 `scalar_arithmetic/Problem049_SameSignNonzero.java`
+> expands `\result <==> ((x > 0) == (y > 0))` into
+> `\result == ((x > 0 && y > 0) || (x < 0 && y < 0))`, coverage 2/3 → 3/3.
 
 ---
 
-## 3. CE 单独把可过的题弄坏，`+both` 又修回来
+## 3. CGS Alone Breaks Passing Problems, and CodeNova Fixes Them Back
 
-筛选条件：`base.joint_success=True`、`ce.joint_success=False`、`both.joint_success=True`
-（且 coverage 保持一致）。这体现 WybeCoder 修复在“更强的 spec 让代码更难写”时的补偿价值。
+Filter: `Direct.joint_success=True`, `CGS.joint_success=False`, `CodeNova.joint_success=True`
+(and coverage stays consistent). This shows the compensating value of VGCR repair when "a stronger
+spec makes the code harder to write".
 
-### 3.1 Java id 16 `array_extrema/Problem016_ArrayMin.java` —— 用见证变量替换存在量词
+### 3.1 Java id 16 `array_extrema/Problem016_ArrayMin.java` — Replacing the existential quantifier with a witness variable
 
-- base：joint success（`5/5`）。
-- +ce：`code_valid=False`（存在性循环不变式不可证，见 1.2）。
-- +both：`code_valid=True`，coverage `5/5`，joint success。
+- Direct: joint success (`5/5`).
+- CGS: `code_valid=False` (existential loop invariant unprovable, see 1.2).
+- CodeNova: `code_valid=True`, coverage `5/5`, joint success.
 
-WybeCoder 没有削弱契约，而是在实现中引入显式见证变量 `minIdx`，把不可证的存在量词
-换成具体等式：
+VGCR does not weaken the contract; instead it introduces an explicit witness variable `minIdx` in
+the implementation, replacing the unprovable existential quantifier with a concrete equality:
 
 ```java
 int min = a[0];
-int minIdx = 0;                 // 新增见证
+int minIdx = 0;                 // new witness
 int i = 1;
 /*@ loop_invariant 0 <= minIdx && minIdx < i;
   @ loop_invariant a[minIdx] == min;
@@ -230,14 +234,15 @@ while (i < a.length) {
 }
 ```
 
-### 3.2 Java id 3 `array_basics/Problem003_FirstElement.java` —— 补前置守卫使索引义务可证
+### 3.2 Java id 3 `array_basics/Problem003_FirstElement.java` — Adding precondition guards to make the index obligation provable
 
-- base：joint success（`4/4`）。
-- +ce：`code_valid=False`（`PossiblyTooLargeIndex` at `return a[0];`）。
-- +both：`code_valid=True`，coverage `4/4`，joint success。
+- Direct: joint success (`4/4`).
+- CGS: `code_valid=False` (`PossiblyTooLargeIndex` at `return a[0];`).
+- CodeNova: `code_valid=True`, coverage `4/4`, joint success.
 
-CE 契约包含 `a == null` 与 `a.length == 0` 的 `exceptional_behavior`。WybeCoder
-在实现里显式抛出对应异常，从而让 `a[0]` 的数组越界义务消失：
+The CGS contract includes `exceptional_behavior` for `a == null` and `a.length == 0`. VGCR
+explicitly throws the corresponding exceptions in the implementation, so the array-out-of-bounds
+obligation for `a[0]` disappears:
 
 ```java
 int first(int[] a) {
@@ -251,45 +256,46 @@ int first(int[] a) {
 }
 ```
 
-### 3.3 C id 21 `loops/mult.c` —— 恢复溢出常量依赖
+### 3.3 C id 21 `loops/mult.c` — Restoring the overflow-constant dependency
 
-- base：joint success（`2/2`）。
-- +ce：`code_valid=False`（Frama-C 解析阶段中止）。
-- +both：`code_valid=True`，coverage `2/2`，joint success。
+- Direct: joint success (`2/2`).
+- CGS: `code_valid=False` (Frama-C parsing phase aborts).
+- CodeNova: `code_valid=True`, coverage `2/2`, joint success.
 
-CE 前置条件引用了溢出常量：
+The CGS precondition references overflow constants:
 
 ```c
 requires a >= 0;
 requires a == 0 || (INT_MIN <= a * b && a * b <= INT_MAX);
 ```
 
-CE 生成的代码缺少 `#include <limits.h>`，Frama-C 报
-`unbound logic variable INT_MAX ... treated as fatal error`；WybeCoder 修复补回了
-`#include <limits.h>`，契约与覆盖均保持不变。
+The CGS-generated code lacks `#include <limits.h>`, and Frama-C reports
+`unbound logic variable INT_MAX ... treated as fatal error`; the VGCR repair restores
+`#include <limits.h>`, keeping both the contract and coverage unchanged.
 
-> 同类：C id 35 `wp1.c`、43 `diff.c`、45 `add.c`、46 `absolute_value.c`；
-> 题目归属相同模式（CE 引入 `INT_MIN/INT_MAX` 约束但代码未引入头文件）。
-> Rust 侧对应现象见 id 23 `vec_immutable/Problem023_VecFirst.rs`
-> （CE 增加 `ensures *v == *old(v)` → `E0308` 可变性类型错，`+both` 修复后 joint）。
+> Similar: C id 35 `wp1.c`, 43 `diff.c`, 45 `add.c`, 46 `absolute_value.c`;
+> these problems follow the same pattern (CGS introduces `INT_MIN/INT_MAX` constraints but the code does not include the header).
+> The corresponding Rust phenomenon is id 23 `vec_immutable/Problem023_VecFirst.rs`
+> (CGS adds `ensures *v == *old(v)` → `E0308` mutability type error; CodeNova repairs it to become joint).
 
 ---
 
-## 结论
+## Conclusion
 
-- **CE 的收益在 coverage**：它能把 ground-truth 目标表达得更完整（分类 2），
-  这也是总体 coverage micro 在四语言上一致上升的原因。
-- **CE 的代价在 code validity**：更强的 pre/post/loop 义务会引入
-  别名、存在量词、析取等更难（甚至超出自动证明器能力）的证明目标（分类 1）。
-- **WybeCoder 的价值在于补偿**：在不改动 CE 契约、不牺牲 coverage 的前提下，
-  通过实现层的守卫、见证变量、frame/头文件补齐等修复，把 CE 造成的
-  validity 损失救回来（分类 3），最终使 `+both` 的 valid 与 joint success
-  高于 base 与 `+ce`。
+- **CGS's benefit is in coverage**: it can express ground-truth goals more completely (category 2),
+  which is also why the overall coverage micro consistently rises across the four languages.
+- **CGS's cost is in code validity**: stronger pre/post/loop obligations introduce harder proof
+  goals such as aliasing, existential quantifiers, and disjunctions (even beyond the capability of
+  automatic provers) (category 1).
+- **VGCR's value is compensation**: without changing the CGS contract or sacrificing coverage, it
+  rescues the validity loss caused by CGS (category 3) through implementation-level guards, witness
+  variables, and frame/header fixes, ultimately making CodeNova's valid and joint success higher
+  than Direct and CGS.
 
-## 备注：Python 的差异
+## Note: The Python Difference
 
-Python/Nagini 的 `base/+ce` 在未经 offline repair 的裸产物上同样呈现
-`valid 63→35、coverage .934→.963、joint 61→31` 的下降；但该批产物存在
-已知的契约规范化缺陷，`*-offline-repaired` 是修复后的可比结果，此时
-CE 反而是净收益（79/76 → 90/85）。因此 Python 的 CLI 结论与
-C/Java/Rust 不完全一致，正文因此以 repaired 集为准并单独标注。
+Python/Nagini's `Direct/CGS` also shows on the raw artifacts without offline repair a decline of
+`valid 63→35, coverage .934→.963, joint 61→31`; but that batch of artifacts has a known
+contract-normalization defect, and `*-offline-repaired` is the repaired, comparable result, in
+which CGS is instead a net benefit (79/76 → 90/85). Therefore Python's CLI conclusion is not fully
+consistent with C/Java/Rust, so the main text uses the repaired set and marks it separately.

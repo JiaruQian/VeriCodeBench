@@ -57,7 +57,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--app-name",
         type=str,
-        default=os.getenv("OPENROUTER_APP_NAME", "AutoSpec-Rust-Verus"),
+        default=os.getenv("OPENROUTER_APP_NAME", "CodeNova-Rust-Verus"),
     )
     parser.add_argument("--temperature", type=float, default=0.1)
     parser.add_argument("--max-tokens", type=int, default=4096)
@@ -72,55 +72,55 @@ def parse_args() -> argparse.Namespace:
         choices=["base", "enhanced"],
         default="base",
         help=(
-            "Pipeline variant for ablation. base disables constraint extraction "
+            "Pipeline variant for ablation. base disables constraint-guided specification (CGS) "
             "and code repair; enhanced enables the selected enhancement method."
         ),
     )
     parser.add_argument(
         "--enhancement-method",
-        choices=["ce", "repair", "both"],
+        choices=["cgs", "vgcr", "both"],
         default=None,
         help=(
-            "Enhanced-only shorthand: ce enables constraint extraction/spec self-check, "
-            "repair enables verification-guided repair, both enables both modules."
+            "Enhanced-only shorthand: cgs enables constraint-guided specification (CGS)/spec self-check, "
+            "vgcr enables Verifier-Guided Candidate Repair (VGCR), both enables CodeNova (CGS + VGCR)."
         ),
     )
     parser.add_argument(
-        "--enable-constraint-extraction",
-        dest="enable_constraint_extraction",
+        "--enable-cgs",
+        dest="enable_cgs",
         action="store_true",
         default=None,
-        help="Enable Rust requirement constraint extraction + constraint-to-Verus mapping.",
+        help="Enable Rust requirement constraint-guided specification (CGS) + constraint-to-Verus mapping.",
     )
     parser.add_argument(
-        "--disable-constraint-extraction",
-        dest="enable_constraint_extraction",
+        "--disable-cgs",
+        dest="enable_cgs",
         action="store_false",
-        help="Disable constraint extraction and use direct requirement-to-Verus generation.",
+        help="Disable constraint-guided specification (CGS) and use direct requirement-to-Verus generation.",
     )
     parser.add_argument(
         "--spec-self-check-rounds",
         type=int,
         default=1,
-        help="Rounds for Rust spec self-check/refinement when constraint extraction is enabled.",
+        help="Rounds for Rust spec self-check/refinement when constraint-guided specification (CGS) is enabled.",
     )
     parser.add_argument("--enable-code-repair", dest="enable_code_repair", action="store_true", default=None)
     parser.add_argument("--disable-code-repair", dest="enable_code_repair", action="store_false")
     parser.add_argument("--code-repair-max-iter", type=int, default=3)
     parser.add_argument(
         "--code-repair-strategy",
-        choices=["simple", "wybecoder"],
+        choices=["simple", "vgcr"],
         default="simple",
         help=(
             "'simple' feeds Verus output directly into one repair prompt; "
-            "'wybecoder' uses verifier-subgoal planning plus multiple repair candidates."
+            "'vgcr' uses verifier-subgoal planning plus multiple repair candidates."
         ),
     )
     parser.add_argument(
-        "--wybecoder-candidates",
+        "--vgcr-candidates",
         type=int,
         default=3,
-        help="Number of focused repair candidates per WybeCoder-style repair iteration.",
+        help="Number of focused repair candidates per VGCR-style repair iteration.",
     )
     parser.add_argument(
         "--reuse-artifacts-from",
@@ -140,27 +140,27 @@ def _effective_enhancement_config(args: argparse.Namespace) -> tuple[bool, int, 
     if args.pipeline_variant == "base":
         return False, 0, False, 0
 
-    if args.enhancement_method == "ce":
-        enable_constraint_extraction = True
+    if args.enhancement_method == "cgs":
+        enable_cgs = True
         enable_code_repair = False
-    elif args.enhancement_method == "repair":
-        enable_constraint_extraction = False
+    elif args.enhancement_method == "vgcr":
+        enable_cgs = False
         enable_code_repair = True
     elif args.enhancement_method == "both":
-        enable_constraint_extraction = True
+        enable_cgs = True
         enable_code_repair = True
     else:
-        enable_constraint_extraction = (
+        enable_cgs = (
             True
-            if args.enable_constraint_extraction is None
-            else args.enable_constraint_extraction
+            if args.enable_cgs is None
+            else args.enable_cgs
         )
         enable_code_repair = True if args.enable_code_repair is None else args.enable_code_repair
 
-    spec_self_check_rounds = args.spec_self_check_rounds if enable_constraint_extraction else 0
+    spec_self_check_rounds = args.spec_self_check_rounds if enable_cgs else 0
     code_repair_max_iter = args.code_repair_max_iter if enable_code_repair else 0
     return (
-        enable_constraint_extraction,
+        enable_cgs,
         spec_self_check_rounds,
         enable_code_repair,
         code_repair_max_iter,
@@ -198,7 +198,7 @@ def main() -> None:
         )
     )
     (
-        enable_constraint_extraction,
+        enable_cgs,
         spec_self_check_rounds,
         enable_code_repair,
         code_repair_max_iter,
@@ -207,7 +207,7 @@ def main() -> None:
         "[INFO] Rust pipeline config: "
         f"variant={args.pipeline_variant}, "
         f"enhancement_method={args.enhancement_method or 'manual'}, "
-        f"constraint_extraction={enable_constraint_extraction}, "
+        f"cgs={enable_cgs}, "
         f"spec_self_check_rounds={spec_self_check_rounds}, "
         f"code_repair={enable_code_repair}, "
         f"code_repair_max_iter={code_repair_max_iter}"
@@ -219,12 +219,12 @@ def main() -> None:
         skip_verify=args.skip_verify,
         logger=lambda msg: print(msg, flush=True),
         verus_bin=args.verus_bin,
-        enable_constraint_extraction=enable_constraint_extraction,
+        enable_cgs=enable_cgs,
         spec_self_check_rounds=spec_self_check_rounds,
         enable_code_repair=enable_code_repair,
         code_repair_max_iter=code_repair_max_iter,
         code_repair_strategy=args.code_repair_strategy,
-        wybecoder_candidates=args.wybecoder_candidates,
+        vgcr_candidates=args.vgcr_candidates,
         reuse_artifacts_from=args.reuse_artifacts_from,
         pipeline_variant=args.pipeline_variant,
         enhancement_method=args.enhancement_method,

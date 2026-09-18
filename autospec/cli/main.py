@@ -1,15 +1,15 @@
-"""AutoSpec CLI entry point"""
+"""CodeNova CLI entry point"""
 import sys
 import click
 from pathlib import Path
-from ..pipeline.autospec_runner import AutoSpecRunner
+from ..pipeline.autospec_runner import CodeNovaRunner
 from ..config import FRAMA_C_TIMEOUT
 
 
 @click.group()
 @click.version_option(version="0.1.0")
 def cli():
-    """AutoSpec - Automated Specification Generation for C Programs"""
+    """CodeNova - Automated Specification Generation for C Programs"""
     pass
 
 
@@ -21,7 +21,7 @@ def verify(c_file: Path, timeout: int, verbose: bool):
     """Verify a C file with Frama-C WP"""
     click.echo(f"Verifying {c_file}...")
     
-    runner = AutoSpecRunner(timeout=timeout)
+    runner = CodeNovaRunner(timeout=timeout)
     verdict = runner.run(c_file)
     
     if verbose and verdict.details:

@@ -1,119 +1,126 @@
-# Requirement->Spec->Code Benchmark 设计（Manual Ground-Truth Spec Entailment）
+# Constraint Entailment Framework (CEF) Benchmark: Requirement->Spec->Code Design (Manual Ground-Truth Spec Entailment)
 
-本文档记录 `requirement -> specification -> code -> verify` benchmark 的当前统一评估方式，重点解决：
+This document records the current unified evaluation method for the `requirement -> specification -> code -> verify` benchmark, focusing on:
 
-- `code` 是否符合生成的 `spec`（由 Frama-C/WP 验证）
-- 生成的 `spec` 是否覆盖人工构造的 ground-truth `spec`
+- Whether `code` conforms to the generated `spec` (verified by Frama-C/WP)
+- Whether the generated `spec` covers the manually constructed ground-truth `spec`
 
 ---
 
-## 1. 核心思想
+## 1. Core Idea
 
-100 道题统一使用一个 manual ground-truth spec 文件作为覆盖目标：
+All 100 problems use the same manual ground-truth spec file as the coverage target:
 
 - `benchmarks/frama-c-problems/requirements/requirements_100_ground_truth_specs.json`
 
-这个文件中的 ACSL 子句来自人工构造的规格：有些子句可直接从 requirement 语义抽取，有些子句参考了原 Frama-C 数据集的 ground-truth ACSL。二者在 benchmark 中都视为同一种 manual ground truth。
+The ACSL clauses in this file come from manually constructed specifications: some clauses can be
+extracted directly from the requirement semantics, while others reference the ground-truth ACSL of
+the original Frama-C dataset. Both are treated as the same kind of manual ground truth in the
+benchmark.
 
-评估时：
+During evaluation:
 
-- 生成的 ACSL block 被抽取为子句集合 `S`
-- manual ground-truth ACSL 被抽取为目标子句集合 `G`
-- 对每个 `g_i in G`，按子句类型决定蕴含方向
-  - `requires`：检查 `g_i ⊨ generated_requires`
-  - `ensures/assigns`：检查 `generated_clause(s) ⊨ g_i`
+- The generated ACSL block is extracted as a clause set `S`
+- The manual ground-truth ACSL is extracted as the target clause set `G`
+- For each `g_i in G`, the entailment direction is determined by clause type
+  - `requires`: check `g_i ⊨ generated_requires`
+  - `ensures/assigns`: check `generated_clause(s) ⊨ g_i`
 
-直观含义：
+Intuitive meaning:
 
-- 对前置条件，生成 spec 不能比 manual ground truth 更强，否则会过度约束输入
-- 对后置条件和 frame，生成 spec 必须足够强，能推出 manual ground truth 要求的行为
+- For preconditions, the generated spec must not be stronger than the manual ground truth, otherwise it over-constrains the input
+- For postconditions and frames, the generated spec must be strong enough to entail the behavior required by the manual ground truth
 
 ---
 
-## 2. 数据构造
+## 2. Data Construction
 
 ### 2.1 Manual Ground Truth Spec
 
-主文件：
+Main file:
 
 - `benchmarks/frama-c-problems/requirements/requirements_100_ground_truth_specs.json`
 
-每条样例包含：
+Each sample contains:
 
 - `id`, `path`
 - `ground_truth_file`
 - `ground_truth_source`
 - `function_signature`
 - `ground_truth_clauses[]`
-  - `type`：`requires` / `ensures` / `assigns`
-  - `expr`：ACSL 子句表达式
+  - `type`: `requires` / `ensures` / `assigns`
+  - `expr`: ACSL clause expression
 - `ground_truth_contract`
 
-校验脚本：
+Validation script:
 
 ```bash
 python3 scripts/generate_ground_truth_specs.py
 ```
 
-该脚本只校验并格式化已维护的 manual ground-truth 文件，不会从参考 C 文件重新抽取全部 ACSL 合同；否则会把验证辅助条件误加入评估目标。
+This script only validates and formats the maintained manual ground-truth file; it does not
+re-extract all ACSL contracts from the reference C files, otherwise verification-helper conditions
+would be mistakenly added to the evaluation targets.
 
-## 3. 评估流程
+## 3. Evaluation Pipeline
 
-脚本：
+Script:
 
 - `scripts/evaluate_constraint_entailment.py`
 
-输入：
+Inputs:
 
 - `--ground-truth-spec-file`
 - `OUTPUT_DIR/specs/*.json`
 
-输出：
+Outputs:
 
-- `OUTPUT_DIR/reports/constraint_entailment.json`
+- `OUTPUT_DIR/reports/cef.json`
 
-### 3.1 子句抽取
+### 3.1 Clause Extraction
 
-从生成 spec 和 manual ground truth 中统一抽取：
+Uniformly extract from the generated spec and the manual ground truth:
 
 - `requires ...;`
 - `ensures ...;`
 - `assigns ...;`
 
-### 3.2 蕴含判定
+### 3.2 Entailment Decision
 
-对每个 ground-truth 子句：
+For each ground-truth clause:
 
-1. 按 `requires/ensures/assigns` 选择候选生成子句
-2. 做 exact match 和顶层合取子句匹配
-3. 搜索生成子句组合，最多由 `--max-combo-size` 控制
-4. 若安装了 `z3-solver`，尝试 SMT 蕴含判定
+1. Select candidate generated clauses by `requires/ensures/assigns`
+2. Perform exact match and top-level conjunctive clause matching
+3. Search generated clause combinations, capped by `--max-combo-size`
+4. If `z3-solver` is installed, attempt SMT entailment decision
 
-评估前会基于函数签名做参数位置 canonicalization，例如 `x,y` 和 `a,b` 都映射成 `arg0,arg1`，降低变量命名差异带来的误判。
+Before evaluation, parameter positions are canonicalized based on the function signature, e.g., both
+`x,y` and `a,b` are mapped to `arg0,arg1`, reducing false judgments caused by variable naming
+differences.
 
-### 3.3 指标
+### 3.3 Metrics
 
-主指标：
+Primary metrics:
 
 - `ground_truth_spec_micro_coverage`
 - `macro_avg_requirement_coverage`
-- 每题 `requirement_coverage_x / requirement_coverage_n`
+- `requirement_coverage_x / requirement_coverage_n` per problem
 
-辅助指标：
+Auxiliary metrics:
 
 - `pre_admissibility`
 - `pre_overconstraint`
 - `post_frame_coverage`
 
-最终 summary 仍使用：
+The final summary still uses:
 
 - code validity rate
 - requirement coverage micro/macro
-- joint success：code valid 且 manual ground-truth spec coverage full
+- joint success: code valid and manual ground-truth spec coverage full
 
 ---
 
-## 4. 一键运行
+## 4. One-Click Run
 
 ```bash
 OUTPUT_DIR=outputs/req2code-openrouter-enhanced \
@@ -123,7 +130,7 @@ OUTPUT_DIR=outputs/req2code-openrouter-enhanced \
 ./scripts/run_req2code_benchmark_summary.sh
 ```
 
-Java/JML/OpenJML 对应命令：
+Corresponding commands for Java/JML/OpenJML:
 
 ```bash
 OUTPUT_DIR=outputs/java-req2code-openrouter \
@@ -133,7 +140,7 @@ OUTPUT_DIR=outputs/java-req2code-openrouter \
 ./scripts/run_req2code_benchmark_summary.sh
 ```
 
-Rust/Verus 对应命令：
+Corresponding commands for Rust/Verus:
 
 ```bash
 OUTPUT_DIR=outputs/rust-req2code-openrouter \
@@ -143,24 +150,24 @@ OUTPUT_DIR=outputs/rust-req2code-openrouter \
 ./scripts/run_req2code_benchmark_summary.sh
 ```
 
-也可以直接调用：
+You can also invoke it directly:
 
 ```bash
 PYTHONPATH=. python3 scripts/evaluate_constraint_entailment.py \
   --ground-truth-spec-file benchmarks/frama-c-problems/requirements/requirements_100_ground_truth_specs.json \
-  --output-dir outputs/java-ce-0624
+  --output-dir outputs/java-cgs-0624
 ```
 
-Java/JML 直接调用：
+Direct invocation for Java/JML:
 
 ```bash
 PYTHONPATH=. python3 scripts/evaluate_constraint_entailment.py \
   --language java \
   --ground-truth-spec-file benchmarks/java-problems/requirements/requirements_100_ground_truth_specs.json \
-  --output-dir outputs/java-req2code-ce-only-0602-tem0
+  --output-dir outputs/java-req2code-cgs-only-0602-tem0
 ```
 
-Rust/Verus 直接调用：
+Direct invocation for Rust/Verus:
 
 ```bash
 PYTHONPATH=. python3 scripts/evaluate_constraint_entailment.py \
@@ -169,44 +176,47 @@ PYTHONPATH=. python3 scripts/evaluate_constraint_entailment.py \
   --output-dir outputs/rust-req2code-both-0608-tem0
 ```
 
-所有语言的 coverage denominator 都按 manual ground truth 固定：
+The coverage denominator for all languages is fixed by the manual ground truth:
 
-- 缺失或无法解析的 generated spec 会按该题 ground-truth clause 数计入分母，并计为 `0/n`。
-  这样 LLM 请求失败或生成失败不会让 coverage denominator 变小。
-- C/ACSL、Java/JML、Rust/Verus 都使用这个规则，保证 ablation 间 requirement coverage
-  的分母一致。
+- A missing or unparsable generated spec is counted into the denominator according to that problem's
+  number of ground-truth clauses and recorded as `0/n`. This way, an LLM request failure or a
+  generation failure does not shrink the coverage denominator.
+- C/ACSL, Java/JML, and Rust/Verus all use this rule, ensuring the requirement coverage denominator
+  is consistent across ablations.
 
-Java/JML 评估还有一个额外约束：
+The Java/JML evaluation has an additional constraint:
 
-- `benchmark_summary.json` 会检查 Java 源码中的 JML clauses 是否和 `specs/*.json`
-  中的 canonical `jml_block` 一致。不一致说明 OpenJML 验证的 contract 和 requirement
-  coverage 评估的 contract 不是同一个 contract，该题 code validity 计为失败。
+- `benchmark_summary.json` checks whether the JML clauses in the Java source match the canonical
+  `jml_block` in `specs/*.json`. A mismatch means the contract verified by OpenJML and the contract
+  used for requirement coverage evaluation are not the same contract, and that problem's code
+  validity is counted as a failure.
 
-Java/JML 表达式在 entailment 前还会做保守的表面规范化：
+Java/JML expressions also undergo conservative surface normalization before CEF:
 
-- 将 `requires P && Q` 等顶层合取展开为原子候选，同时保留原复合子句；
-- 去除跨行 JML 的行首 `@`，统一 Java widening cast、字符常量、字符串 `length()`、
-  布尔返回值和对象字段写法；
-- 只在 generated `helper_declarations` 明确给出 `getX(){ return x; }` 时，才把 getter
-  读取与对应字段读取视为同一表达；
-- 对量词绑定变量做 alpha-renaming，并规范化 `==`/`!=` 两侧顺序。
+- Expand top-level conjunctions such as `requires P && Q` into atomic candidates while retaining the original compound clause;
+- Strip the leading `@` from multi-line JML, and normalize Java widening casts, character constants, string `length()`,
+  boolean return values, and object-field notation;
+- Treat a getter read and the corresponding field read as the same expression only when the generated `helper_declarations` explicitly provides `getX(){ return x; }`;
+- Alpha-rename quantifier-bound variables and normalize the order of the two sides of `==`/`!=`.
 
-这些规则不会把 `a[*]` 当作精确的 `a[i], a[j]` frame，也不会把 `Range.min/max`
-当作 `Range.low/high`；真实的 frame 扩大或接口字段漂移仍会扣分。
+These rules do not treat `a[*]` as an exact `a[i], a[j]` frame, nor treat `Range.min/max` as
+`Range.low/high`; genuine frame widening or interface field drift is still penalized.
 
-Rust/Verus 评估复用同一个 entailment 框架，但 generated spec 从 `specs/*.json` 中的
-canonical `verus_clauses` 读取；若旧 artifact 缺少该字段，才回退解析 `verus_contract`。
-Rust 签名使用 Rust-only parser，支持 `Result<u64, ()>` 这类参数类型中的逗号，并将
-`r`、`result` 和 named return 统一映射为同一返回值别名，避免返回值命名差异造成
-coverage 误判。
+The Rust/Verus evaluation reuses the same CEF, but the generated spec is read from the canonical
+`verus_clauses` in `specs/*.json`; only if an old artifact lacks that field does it fall back to
+parsing `verus_contract`. The Rust signature uses a Rust-only parser that supports commas within
+parameter types such as `Result<u64, ()>`, and maps `r`, `result`, and a named return uniformly to
+the same return-value alias, avoiding coverage misjudgments caused by return-value naming
+differences.
 
-Python/Nagini 表达式在 SMT 判定前会做语言专属规范化：
+Python/Nagini expressions undergo language-specific normalization before SMT decision:
 
-- 从函数签名保留 `bool` 参数和 `bool` 返回值的布尔类型，避免把它们错误建模成整数；
-- 将 `len(...)`、`Old(...)`、list/dict 索引、成员关系和 `is`/`is not` 转为稳定的求解器表达；
-- 递归支持 `Implies(p, q)`、`p ==> q` 和普通布尔析取之间的等价判定，包括多条 clauses 合取后的组合表达式；
-- 支持将拆成多条的原子 `Requires` 重新合取后，与 ground truth 的复合前置条件比较。
+- Preserve the boolean type of `bool` parameters and `bool` return values from the function signature, avoiding incorrectly modeling them as integers;
+- Convert `len(...)`, `Old(...)`, list/dict indexing, membership tests, and `is`/`is not` into stable solver expressions;
+- Recursively support equivalence decisions among `Implies(p, q)`, `p ==> q`, and ordinary boolean disjunctions, including composite expressions formed by conjoining multiple clauses;
+- Support re-conjoining atomic `Requires` split into multiple entries and comparing them against the ground truth's compound precondition.
 
-这些规则只消除语法形态造成的假阴性，不把 post-state 容器读取等同于 `Old(...)`；若生成
-spec 遗漏了 pre-state 语义，仍会按真实 coverage 缺失计分。该版本在报告中标记为
-`manual_ground_truth_spec_entailment_v3`。
+These rules only eliminate false negatives caused by surface syntax and do not equate post-state
+container reads with `Old(...)`; if the generated spec omits pre-state semantics, it is still scored
+as a genuine coverage miss. This version is marked in reports as
+`manual_ground_truth_spec_entailment_v3`.

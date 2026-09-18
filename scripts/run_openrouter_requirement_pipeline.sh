@@ -54,12 +54,12 @@ MAX_TOKENS="${MAX_TOKENS:-2048}"
 SKIP_VERIFY="${SKIP_VERIFY:-false}" # true/false
 TASK_ID="${TASK_ID:-}"              # optional single task id
 PIPELINE_VARIANT="${PIPELINE_VARIANT:-enhanced}" # base/enhanced
-ENABLE_CONSTRAINT_EXTRACTION="${ENABLE_CONSTRAINT_EXTRACTION:-true}" # true/false
+ENABLE_CGS="${ENABLE_CGS:-true}" # true/false
 SPEC_SELF_CHECK_ROUNDS="${SPEC_SELF_CHECK_ROUNDS:-1}"
 ENABLE_CODE_REPAIR="${ENABLE_CODE_REPAIR:-true}" # true/false
 CODE_REPAIR_MAX_ITER="${CODE_REPAIR_MAX_ITER:-3}"
-CODE_REPAIR_STRATEGY="${CODE_REPAIR_STRATEGY:-simple}" # simple/wybecoder
-WYBECODER_CANDIDATES="${WYBECODER_CANDIDATES:-3}"
+CODE_REPAIR_STRATEGY="${CODE_REPAIR_STRATEGY:-simple}" # simple/vgcr
+VGCR_CANDIDATES="${VGCR_CANDIDATES:-3}"
 ENABLE_SPEC_EVALUATION="${ENABLE_SPEC_EVALUATION:-false}" # true/false
 REUSE_ARTIFACTS_FROM="${REUSE_ARTIFACTS_FROM:-}" # optional existing output dir for strict incremental ablations
 RESUME="${RESUME:-false}" # true/false; skip completed ok tasks from existing report
@@ -102,10 +102,10 @@ if [[ "${RESUME,,}" == "true" ]]; then
 fi
 
 if [[ "$PIPELINE_VARIANT" == "enhanced" ]]; then
-  if [[ "${ENABLE_CONSTRAINT_EXTRACTION,,}" == "true" ]]; then
-    CMD+=(--enable-constraint-extraction)
+  if [[ "${ENABLE_CGS,,}" == "true" ]]; then
+    CMD+=(--enable-cgs)
   else
-    CMD+=(--disable-constraint-extraction)
+    CMD+=(--disable-cgs)
   fi
   CMD+=(--spec-self-check-rounds "$SPEC_SELF_CHECK_ROUNDS")
 
@@ -116,7 +116,7 @@ if [[ "$PIPELINE_VARIANT" == "enhanced" ]]; then
   fi
   CMD+=(--code-repair-max-iter "$CODE_REPAIR_MAX_ITER")
   CMD+=(--code-repair-strategy "$CODE_REPAIR_STRATEGY")
-  CMD+=(--wybecoder-candidates "$WYBECODER_CANDIDATES")
+  CMD+=(--vgcr-candidates "$VGCR_CANDIDATES")
 
   if [[ "${ENABLE_SPEC_EVALUATION,,}" == "true" ]]; then
     CMD+=(--enable-spec-evaluation)
@@ -136,10 +136,10 @@ echo "[INFO] REQUEST_TIMEOUT=$REQUEST_TIMEOUT"
 echo "[INFO] LLM_RETRIES=$LLM_RETRIES"
 echo "[INFO] LLM_RETRY_DELAY=$LLM_RETRY_DELAY"
 echo "[INFO] PIPELINE_VARIANT=$PIPELINE_VARIANT"
-echo "[INFO] ENABLE_CONSTRAINT_EXTRACTION=$ENABLE_CONSTRAINT_EXTRACTION"
+echo "[INFO] ENABLE_CGS=$ENABLE_CGS"
 echo "[INFO] ENABLE_CODE_REPAIR=$ENABLE_CODE_REPAIR"
 echo "[INFO] CODE_REPAIR_STRATEGY=$CODE_REPAIR_STRATEGY"
-echo "[INFO] WYBECODER_CANDIDATES=$WYBECODER_CANDIDATES"
+echo "[INFO] VGCR_CANDIDATES=$VGCR_CANDIDATES"
 echo "[INFO] ENABLE_SPEC_EVALUATION=$ENABLE_SPEC_EVALUATION"
 echo "[INFO] RESUME=$RESUME"
 if [[ -n "$REUSE_ARTIFACTS_FROM" ]]; then

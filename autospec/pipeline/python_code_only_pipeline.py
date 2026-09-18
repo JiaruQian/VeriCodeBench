@@ -63,7 +63,7 @@ def extract_reference_contract(source: str, signature: str) -> tuple[str, list[d
 
 class PythonCodeOnlyContractPipeline(PythonNaginiRequirementToCodePipeline):
     def __init__(self, *, contracts: list[PythonCodeOnlyItem], **kwargs: Any):
-        super().__init__(spec_self_check_rounds=0, enable_constraint_extraction=False, **kwargs); self.contracts = {x.id: x for x in contracts}
+        super().__init__(spec_self_check_rounds=0, enable_cgs=False, **kwargs); self.contracts = {x.id: x for x in contracts}
     def _build_report(self, results: list[dict[str, Any]], total: int, processed: int) -> dict[str, Any]:
         report = super()._build_report(results, total, processed); report["task_type"] = "code_only_oracle_contract"; report["contract_mismatch_count"] = sum(not x.get("contract_enforcement", {}).get("contract_match", True) for x in results); report["initial_passed"] = sum(x.get("verification", {}).get("initial_valid") is True for x in results); return report
     def _run_one(self, item: PythonNaginiRequirementItem, specs_dir: Path, code_dir: Path) -> dict[str, Any]:

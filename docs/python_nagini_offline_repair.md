@@ -28,8 +28,8 @@ Run it on failed artifacts only:
 
 ```bash
 PYTHONPATH=. python3 scripts/repair_python_nagini_artifacts.py \
-  --source-output-dir outputs/python-ce-kimi-0713 \
-  --output-dir outputs/python-ce-kimi-0713-offline-repaired \
+  --source-output-dir outputs/python-cgs-kimi-0713 \
+  --output-dir outputs/python-cgs-kimi-0713-offline-repaired \
   --verify failed \
   --verify-timeout 120
 ```
@@ -37,9 +37,9 @@ PYTHONPATH=. python3 scripts/repair_python_nagini_artifacts.py \
 Then refresh coverage and the benchmark summary:
 
 ```bash
-OUTPUT_DIR=outputs/python-ce-kimi-0713-offline-repaired \
+OUTPUT_DIR=outputs/python-cgs-kimi-0713-offline-repaired \
   ./scripts/run_python_nagini_constraint_entailment_evaluation.sh
-OUTPUT_DIR=outputs/python-ce-kimi-0713-offline-repaired \
+OUTPUT_DIR=outputs/python-cgs-kimi-0713-offline-repaired \
   ./scripts/run_req2code_benchmark_summary.sh
 ```
 
@@ -47,7 +47,7 @@ The Python coverage wrapper can run the complete repair, verification,
 coverage, and summary workflow directly:
 
 ```bash
-OUTPUT_DIR=outputs/python-ce-kimi-0713 \
+OUTPUT_DIR=outputs/python-cgs-kimi-0713 \
 OFFLINE_REPAIR=true \
 OFFLINE_REPAIR_VERIFY=failed \
 ./scripts/run_python_nagini_constraint_entailment_evaluation.sh

@@ -65,7 +65,4 @@ temp/
 
 # Outputs
 outputs/
-wybecoder/runs/
-wybecoder/docs/viewer_data/
-wybecoder/docs/viewer_data.json
 *.pdf

@@ -12,7 +12,7 @@ from .java_code_only_pipeline import JavaCodeOnlyItem, load_java_code_only_contr
 
 class JavaCodeOnlyContractPipeline(JavaRequirementToCodePipeline):
     def __init__(self, *, contracts: list[JavaCodeOnlyItem], **kwargs: Any):
-        super().__init__(spec_self_check_rounds=0, enable_constraint_extraction=False, **kwargs)
+        super().__init__(spec_self_check_rounds=0, enable_cgs=False, **kwargs)
         self.contracts = {item.id: item for item in contracts}
 
     def _build_report(self, results: list[dict[str, Any]], total: int, processed: int) -> dict[str, Any]:

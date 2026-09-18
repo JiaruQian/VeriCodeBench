@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
-OUTPUT_DIR="${OUTPUT_DIR:-outputs/python-ce-claude-0714}"
+OUTPUT_DIR="${OUTPUT_DIR:-outputs/python-cgs-claude-0714}"
 GROUND_TRUTH_SPEC_FILE="${GROUND_TRUTH_SPEC_FILE:-benchmarks/python-nagini-problems/requirements/requirements_100_ground_truth_specs.json}"
 TASK_ID="${TASK_ID:-}"
 OFFLINE_REPAIR="${OFFLINE_REPAIR:-false}"

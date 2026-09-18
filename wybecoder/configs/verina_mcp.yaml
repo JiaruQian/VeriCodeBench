@@ -1,7 +1,0 @@
-config:
-  task: "verina_proof"
-  problems: "data/verina.jsonl"
-  n_attempts: 4
-  max_turns: 16
-  n_worker_threads: 40
-  use_mcp: true

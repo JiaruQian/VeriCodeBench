@@ -1,5 +1,5 @@
 #!/bin/bash
-# Run AutoSpec generation with OpenRouter (OpenAI-compatible API).
+# Run CodeNova generation with OpenRouter (OpenAI-compatible API).
 
 set -euo pipefail
 

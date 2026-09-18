@@ -8,7 +8,7 @@ Workflow:
 2) For the next node that lacks a preceding ACSL block, wrap it with CURRENT NODE markers,
    build the few-shot prompt (from README), and call the LLM.
 3) Insert the returned ACSL block immediately before the target node.
-4) Repeat until all nodes are annotated, then optionally verify with AutoSpec CLI.
+4) Repeat until all nodes are annotated, then optionally verify with CodeNova CLI.
 """
 
 import argparse
@@ -401,7 +401,7 @@ def main():
     parser.add_argument(
         "--app-name",
         type=str,
-        default=os.getenv("OPENROUTER_APP_NAME", "AutoSpec"),
+        default=os.getenv("OPENROUTER_APP_NAME", "CodeNova"),
         help="Optional X-Title header value (recommended by OpenRouter).",
     )
     parser.add_argument("--temperature", type=float, default=0.2)

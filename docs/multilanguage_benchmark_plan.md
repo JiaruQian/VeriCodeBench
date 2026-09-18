@@ -1,30 +1,26 @@
 # Multi-language Requirement-to-Code Verification Benchmark Plan
 
-本文档记录将当前 C/ACSL/Frama-C benchmark 扩展到 Java、Rust、Python 的设计思路、容器策略和验证器环境建议。
+This document records the design rationale, container strategy, and verifier-environment recommendations for extending the current C/ACSL/Frama-C benchmark to Java, Rust, and Python.
 
-当前仓库的核心任务是：
+The core task of the current repository is:
 
 ```text
 Requirement -> ACSL Spec -> C Code -> Frama-C/WP Verification
 ```
 
-多语言扩展后，不应把任务理解为简单替换语法，而应抽象为：
+After the multilingual extension, the task should not be understood as a simple syntax substitution but should be abstracted as:
 
 ```text
 Requirement -> Language-specific Spec -> Code -> Verifier -> Spec Coverage
 ```
 
-其中 `ACSL + Frama-C` 是 C 后端；Java、Rust、Python 分别引入自己的规格语言和验证器后端。
+Here `ACSL + Frama-C` is the C backend; Java, Rust, and Python each introduce their own specification language and verifier backend.
 
-截至当前里程碑，C/ACSL/Frama-C track 已完成并作为迁移基线：ground-truth clauses 已审计，
-ACSL entailment parser 已覆盖主要语法边界，100 道题的 code-only oracle contracts、合同强制
-恢复、reference validation 和 full-chain 重评估均已落地。后续语言必须保持相同的 artifact
-链路和指标语义，同时实现语言专属的 contract parser、verifier adapter 与 oracle 数据；不能
-假设 ACSL 文本或 Frama-C 的证明规则可以直接复用。
+As of the current milestone, the C/ACSL/Frama-C track has been completed and serves as the migration baseline: the ground-truth clauses have been audited, the ACSL entailment parser covers the main syntactic boundaries, and for 100 problems the code-only oracle contracts, contract-forced restoration, reference validation, and full-chain re-evaluation have all been implemented. Subsequent languages must maintain the same artifact chain and metric semantics while implementing language-specific contract parsers, verifier adapters, and oracle data; one cannot assume that ACSL text or Frama-C's proof rules can be reused directly.
 
-## 1. 总体判断
+## 1. Overall Assessment
 
-当前 benchmark 可以扩展到 Java、Rust 和 Python，但三者成熟度不同：
+The current benchmark can be extended to Java, Rust, and Python, but the three differ in maturity:
 
 | Language | Recommended stage | Spec ecosystem | Verifier candidates | Fit with current paradigm |
 | --- | --- | --- | --- | --- |
@@ -33,21 +29,15 @@ ACSL entailment parser 已覆盖主要语法边界，100 道题的 code-only ora
 | Rust | stage 2 / active Verus track | Verus contracts | Verus | strong but verifier-specific |
 | Python | stage 3 / separate track | Nagini contracts, CrossHair contracts | Nagini, CrossHair | useful but not equivalent |
 
-Java 是最自然的第一扩展对象。JML 和 ACSL 都是源代码旁边的契约式规格，OpenJML 可以直接检查 Java 程序中的 JML 注解。
+Java is the most natural first extension target. JML and ACSL are both contract-style specifications next to the source code, and OpenJML can directly check JML annotations in Java programs.
 
-Rust 很有研究价值，因为它能体现 C 和 Rust 在内存安全、aliasing、ownership、panic freedom 上的差异。但 Rust 没有统一的 ACSL 等价物，不同验证器的规格语言和受支持 Rust 子集差别较大。本仓库当前 Rust track 选用 Verus，数据集位于 `benchmarks/rust-verus-problems`，pipeline 入口为 `scripts/run_rust_requirement_pipeline.py` 和 `scripts/run_openrouter_rust_requirement_pipeline.sh`。
+Rust is well worth studying because it can showcase the differences between C and Rust in memory safety, aliasing, ownership, and panic freedom. However, Rust has no unified ACSL equivalent, and different verifiers differ considerably in their specification languages and supported Rust subsets. The current Rust track in this repository uses Verus; the dataset is located at `benchmarks/rust-verus-problems`, and the pipeline entry points are `scripts/run_rust_requirement_pipeline.py` and `scripts/run_openrouter_rust_requirement_pipeline.sh`.
 
-Python 更适合作为 dynamic-language contract verification track。当前 Python track 选用 Nagini，
-数据集位于 `benchmarks/python-nagini-problems`，pipeline 入口为
-`scripts/run_python_nagini_requirement_pipeline.py` 和
-`scripts/run_openrouter_python_nagini_requirement_pipeline.sh`，coverage 入口为
-`scripts/run_python_nagini_constraint_entailment_evaluation.sh`。Nagini 更接近静态验证，
-CrossHair 更接近符号执行下的 contract checking。它们的结果不应和
-Frama-C/OpenJML/Verus 直接混成一个总分。
+Python is better suited as a dynamic-language contract verification track. The current Python track uses Nagini; the dataset is located at `benchmarks/python-nagini-problems`, the pipeline entry points are `scripts/run_python_nagini_requirement_pipeline.py` and `scripts/run_openrouter_python_nagini_requirement_pipeline.sh`, and the coverage entry point is `scripts/run_python_nagini_constraint_entailment_evaluation.sh`. Nagini is closer to static verification, while CrossHair is closer to contract checking under symbolic execution. Their results should not be directly merged with Frama-C/OpenJML/Verus into a single total score.
 
-## 2. Benchmark 架构抽象
+## 2. Benchmark Architecture Abstraction
 
-建议把现有 pipeline 中和 C 强绑定的部分拆成三个后端接口。第一阶段不要求不同语言共享同一道题，也不要求维护统一的语言无关语义 IR；每种语言可以先使用最适合自身验证生态的题目和 ground truth。
+It is suggested to split the parts of the existing pipeline that are strongly bound to C into three backend interfaces. The first stage does not require different languages to share the same problem or to maintain a unified language-independent semantic IR; each language can first use the problems and ground truth that best fit its own verification ecosystem.
 
 ```text
 SpecBackend
@@ -66,7 +56,7 @@ DatasetBackend
   - choose language-specific problem set
 ```
 
-推荐目录形态：
+Recommended directory layout:
 
 ```text
 benchmarks/
@@ -104,30 +94,30 @@ benchmarks/
           ground_truth_spec.json
 ```
 
-如果后期确实需要严格比较同一需求在不同语言上的表现，可以在 `cross_language_core_optional/` 中维护小规模重合题。这个子集可以再引入 `semantic_targets.json` 或其他语言无关 IR，但它不应成为第一阶段的必要条件。
+If a strict comparison of the same requirement across different languages is genuinely needed later, a small overlapping problem set can be maintained in `cross_language_core_optional/`. This subset may further introduce `semantic_targets.json` or another language-independent IR, but it should not become a requirement of the first stage.
 
-## 3. 数据集扩容策略
+## 3. Dataset Expansion Strategy
 
-建议第一阶段采用 language-specific 题库。也就是说，C 的 legacy 51 道题和当前 100 道题都不必全部移植到 Java、Rust、Python；不同语言应优先选择最适合自身验证生态的题目。
+It is suggested that the first stage adopt language-specific problem sets. That is, neither C's legacy 51 problems nor the current 100 problems need to be fully ported to Java, Rust, and Python; each language should prioritize problems that best fit its own verification ecosystem.
 
 ### 3.1 Why not directly port all 51 C problems
 
-C 的题库里有一部分适合迁移到 Java/Rust/Python，例如数组遍历、查找、最大值、排序性、算术约束等。但并不是全部都适合作为多语言共享题。
+Some of C's problem set is suitable for migration to Java/Rust/Python, such as array traversal, search, maximum, sortedness, and arithmetic constraints. But not all of them are suitable as shared multilingual problems.
 
-不适合直接共享的原因：
+Reasons they are not suitable for direct sharing:
 
-- C 的很多题目围绕 pointer validity、aliasing、`\valid`、`\separated`、buffer bounds 和手动 frame condition，这些是 C/ACSL/Frama-C 的核心语义。
-- Java 没有裸指针，内存安全问题更多体现为 nullability、object invariant、field frame、exception behavior。
-- Rust 的 safe subset 已经通过 ownership/borrowing 排除了大量 C 前置条件，直接照搬 C 题会让 Rust 题目变得不自然。
-- Python 的验证生态更适合 typed contracts、list/dict 行为和符号执行友好的函数，直接移植 C 指针题没有意义。
+- Many C problems revolve around pointer validity, aliasing, `\valid`, `\separated`, buffer bounds, and manual frame conditions, which are core semantics of C/ACSL/Frama-C.
+- Java has no raw pointers, and memory-safety issues are more often expressed as nullability, object invariants, field frames, and exception behavior.
+- Rust's safe subset already rules out many C preconditions through ownership/borrowing, so directly copying C problems would make the Rust problems unnatural.
+- Python's verification ecosystem is better suited to typed contracts, list/dict behavior, and symbolic-execution-friendly functions; directly porting C pointer problems is meaningless.
 
-因此，C 题库可以作为题型灵感来源，而不是强制多语言母题。
+Therefore, the C problem set can serve as a source of inspiration for problem types, rather than as a mandatory multilingual parent set.
 
 ### 3.2 Language-specific set
 
-这部分题目体现每种语言自己的现实开发语义，是第一阶段的主数据集。
+These problems reflect each language's own real-world development semantics and constitute the main dataset of the first stage.
 
-当前四种语言的题库已经落地为如下 category distribution。
+The problem sets of the four languages have currently been implemented with the following category distribution.
 
 C/ACSL/Frama-C (`benchmarks/frama-c-problems`, 100 problems):
 
@@ -145,7 +135,7 @@ C/ACSL/Frama-C (`benchmarks/frama-c-problems`, 100 problems):
 - `scalar_c`: 5
 - `struct_records`: 10
 
-这组题保留 C/ACSL baseline 的特征，覆盖 weakest-precondition 基础题、循环不变式、数组读写、指针操作、frame condition、buffer/pointer validity、字节/字符串 buffer、struct 字段 frame 和 C 整数边界等验证主题。
+This group retains the characteristics of the C/ACSL baseline, covering verification topics such as weakest-precondition basics, loop invariants, array reads and writes, pointer operations, frame conditions, buffer/pointer validity, byte/string buffers, struct-field frames, and C integer bounds.
 
 Java/JML/OpenJML (`benchmarks/java-problems`, 100 problems):
 
@@ -165,7 +155,7 @@ Java/JML/OpenJML (`benchmarks/java-problems`, 100 problems):
 - `scalar_arithmetic`: 24
 - `strings_chars`: 8
 
-这组题重点覆盖 Java 自然语义中的数组边界、数组查询和更新、标量算术、布尔逻辑、字符串/字符基础性质、nullability、object invariant、field/object frame condition 和 exceptional behavior。
+This group focuses on array bounds, array query and update, scalar arithmetic, boolean logic, basic string/character properties, nullability, object invariants, field/object frame conditions, and exceptional behavior in Java's natural semantics.
 
 Rust/Verus (`benchmarks/rust-verus-problems`, 50 problems):
 
@@ -175,7 +165,7 @@ Rust/Verus (`benchmarks/rust-verus-problems`, 50 problems):
 - `vec_mutation`: 12
 - `ownership_slices`: 6
 
-这组题重点覆盖 safe Rust functional correctness、`Option`/`Result`、vector/slice bounds、panic freedom、ownership/borrowing 和 unique-borrow mutation。
+This group focuses on safe Rust functional correctness, `Option`/`Result`, vector/slice bounds, panic freedom, ownership/borrowing, and unique-borrow mutation.
 
 Python/Nagini (`benchmarks/python-nagini-problems`, 100 problems):
 
@@ -192,9 +182,9 @@ Python/Nagini (`benchmarks/python-nagini-problems`, 100 problems):
 - `scalar_arithmetic`: 10
 - `scalar_arithmetic_ext`: 10
 
-这组题重点覆盖 typed function contracts、`Optional`/`None` compatibility、list/dict API 行为、container permission、mutation postcondition、symbolic-execution-friendly pure functions 和 simple API exception freedom。
+This group focuses on typed function contracts, `Optional`/`None` compatibility, list/dict API behavior, container permissions, mutation postconditions, symbolic-execution-friendly pure functions, and simple API exception freedom.
 
-语言特有题不应和跨语言题混成一个不可解释的总分。可以报告：
+Language-specific problems should not be mixed with cross-language problems into an uninterpretable total score. The following can be reported:
 
 ```text
 language_specific_code_validity_rate
@@ -204,9 +194,9 @@ language_specific_joint_success_rate
 
 ### 3.3 Optional cross-language core set
 
-后期可以维护一个小规模 cross-language core set，用于回答“同一需求在不同语言/验证器下哪个更容易被模型完成”。这不是第一阶段的主线。
+A small cross-language core set can be maintained later to answer "under which language/verifier is the same requirement easier for the model to complete." This is not the main line of the first stage.
 
-适合放入 optional core set 的题型：
+Problem types suitable for inclusion in the optional core set:
 
 - scalar arithmetic with overflow constraints
 - array/list search
@@ -218,7 +208,7 @@ language_specific_joint_success_rate
 - frame/no-mutation properties
 - simple string or sequence transformations
 
-optional core set 的指标应单独报告：
+The metrics of the optional core set should be reported separately:
 
 ```text
 core_code_validity_rate
@@ -228,11 +218,11 @@ core_joint_success_rate
 ```
 
 
-## 4. 容器策略
+## 4. Container Strategy
 
-建议每种语言一个或多个独立容器，不建议把所有验证器塞进单个大容器。验证器之间依赖冲突概率很高，尤其是 Rust verifier、Why3、Viper、Z3、Java runtime 和 opam。
+It is suggested to have one or more independent containers per language, and not to cram all verifiers into a single large container. The probability of dependency conflicts among verifiers is high, especially for the Rust verifier, Why3, Viper, Z3, the Java runtime, and opam.
 
-推荐结构：
+Recommended structure:
 
 ```text
 docker/
@@ -244,7 +234,7 @@ docker/
   python-crosshair.Dockerfile
 ```
 
-上层 runner 可以统一：
+The upper-level runner can be unified:
 
 ```bash
 PYTHONPATH=. python3 scripts/run_multilang_pipeline.py \
@@ -254,7 +244,7 @@ PYTHONPATH=. python3 scripts/run_multilang_pipeline.py \
   --output-dir outputs/multilang-java-openjml
 ```
 
-底层通过不同 Docker image 执行 verifier：
+The lower level executes the verifier through different Docker images:
 
 ```text
 c/framac          -> Frama-C/WP
@@ -267,7 +257,7 @@ python/crosshair  -> CrossHair
 
 ## 5. Docker Hub base image recommendations
 
-以下是适合作为各语言 verifier 容器起点的 Docker Hub 官方镜像。
+The following are Docker Hub official images suitable as starting points for each language's verifier container.
 
 ### 5.1 Java
 
@@ -283,11 +273,11 @@ Alternative:
 FROM eclipse-temurin:25-jdk-noble
 ```
 
-理由：
+Rationale:
 
-- `eclipse-temurin` 是 Docker Official Image。
-- OpenJML 当前发行包自带 `openjml-java`，但安装和运行脚本仍需要稳定 JDK 环境。
-- Java 21 是保守 LTS 选择；如果 OpenJML release 明确支持更新 JDK，可以升级到 Java 25。
+- `eclipse-temurin` is a Docker Official Image.
+- The current OpenJML release bundles `openjml-java`, but its installation and run scripts still require a stable JDK environment.
+- Java 21 is a conservative LTS choice; if an OpenJML release explicitly supports a newer JDK, it can be upgraded to Java 25.
 
 Reference:
 
@@ -308,11 +298,11 @@ Alternative for Verus binary compatibility:
 FROM ubuntu:22.04
 ```
 
-理由：
+Rationale:
 
-- `rust` 是 Docker Official Image，适合安装 Rust verifier 和构建 Rust 项目。
-- Verus 官方 binary release 对 Ubuntu 22.04 x86_64 有一等支持；如果直接使用 Verus 预编译包，`ubuntu:22.04 + rustup` 可能比 `rust:1-bookworm` 更稳。
-- Creusot 通常需要 Rust、cargo、opam、Why3 和 SMT provers，建议单独建 `rust-creusot` 容器。
+- `rust` is a Docker Official Image, suitable for installing the Rust verifier and building Rust projects.
+- The official Verus binary release has first-class support for Ubuntu 22.04 x86_64; if the Verus prebuilt package is used directly, `ubuntu:22.04 + rustup` may be more stable than `rust:1-bookworm`.
+- Creusot usually needs Rust, cargo, opam, Why3, and SMT provers, so it is suggested to build a separate `rust-creusot` container.
 
 Reference:
 
@@ -334,11 +324,11 @@ Recommended base for CrossHair:
 FROM python:3.12-slim-bookworm
 ```
 
-理由：
+Rationale:
 
-- `python` 是 Docker Official Image。
-- Nagini 文档要求 Java 11+ 和 Python 3.12 到 3.14；`python:3.12-bookworm` 是较保守选择。
-- CrossHair 的依赖轻得多，可以使用 slim 镜像。
+- `python` is a Docker Official Image.
+- The Nagini documentation requires Java 11+ and Python 3.12 to 3.14; `python:3.12-bookworm` is a relatively conservative choice.
+- CrossHair has far lighter dependencies and can use the slim image.
 
 Reference:
 
@@ -348,7 +338,7 @@ Reference:
 
 ## 6. Verifier installation sketches
 
-这些步骤是容器构造草案，不应视为已经锁定的 reproducible Dockerfile。正式落地时需要 pin verifier release、checksum 和 solver version。
+These steps are drafts for container construction and should not be regarded as a locked-down reproducible Dockerfile. When formally implemented, the verifier release, checksum, and solver version need to be pinned.
 
 ### 6.1 Java: OpenJML
 

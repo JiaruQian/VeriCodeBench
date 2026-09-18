@@ -74,7 +74,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--app-name",
         type=str,
-        default=os.getenv("OPENROUTER_APP_NAME", "AutoSpec"),
+        default=os.getenv("OPENROUTER_APP_NAME", "CodeNova"),
         help="Optional X-Title header value.",
     )
     parser.add_argument("--temperature", type=float, default=0.1, help="Sampling temperature.")
@@ -120,7 +120,7 @@ def parse_args() -> argparse.Namespace:
         default=1,
         help=(
             "Enhanced only: rounds for spec self-check/refinement. "
-            "Only used when constraint extraction is enabled."
+            "Only used when constraint-guided specification (CGS) is enabled."
         ),
     )
     parser.add_argument(
@@ -131,35 +131,35 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--code-repair-strategy",
-        choices=["simple", "wybecoder"],
+        choices=["simple", "vgcr"],
         default="simple",
         help=(
             "Enhanced only: repair strategy. 'simple' is the original verifier-feedback "
-            "loop; 'wybecoder' uses verifier-subgoal planning plus multiple repair candidates."
+            "loop; 'vgcr' uses verifier-subgoal planning plus multiple repair candidates."
         ),
     )
     parser.add_argument(
-        "--wybecoder-candidates",
+        "--vgcr-candidates",
         type=int,
         default=3,
-        help="Enhanced only: number of repair candidates per WybeCoder-style attempt.",
+        help="Enhanced only: number of repair candidates per VGCR-style attempt.",
     )
     parser.add_argument(
-        "--enable-constraint-extraction",
-        dest="enable_constraint_extraction",
+        "--enable-cgs",
+        dest="enable_cgs",
         action="store_true",
         default=None,
         help=(
-            "Enhanced only: enable requirement constraint extraction + constraint-to-ACSL "
+            "Enhanced only: enable requirement constraint-guided specification (CGS) + constraint-to-ACSL "
             "mapping. Default: enabled for enhanced."
         ),
     )
     parser.add_argument(
-        "--disable-constraint-extraction",
-        dest="enable_constraint_extraction",
+        "--disable-cgs",
+        dest="enable_cgs",
         action="store_false",
         help=(
-            "Enhanced only: disable requirement constraint extraction and use direct "
+            "Enhanced only: disable requirement constraint-guided specification (CGS) and use direct "
             "requirement-to-ACSL spec generation."
         ),
     )
@@ -191,7 +191,7 @@ def parse_args() -> argparse.Namespace:
         help=(
             "Enhanced only: copy specs/ and code/ from an existing output directory, "
             "then only run verification and optional code repair. Use this for strict "
-            "incremental ablations such as base+repair or base+ce+repair."
+            "incremental ablations such as base+vgcr or base+cgs+vgcr."
         ),
     )
     parser.add_argument(
@@ -237,10 +237,10 @@ def main() -> None:
     )
     client = OpenAICompatibleClient(llm_config)
     if args.pipeline_variant == "enhanced":
-        enable_constraint_extraction = (
+        enable_cgs = (
             True
-            if args.enable_constraint_extraction is None
-            else args.enable_constraint_extraction
+            if args.enable_cgs is None
+            else args.enable_cgs
         )
         enable_code_repair = True if args.enable_code_repair is None else args.enable_code_repair
         pipeline = EnhancedRequirementToCodePipeline(
@@ -252,10 +252,10 @@ def main() -> None:
             spec_self_check_rounds=args.spec_self_check_rounds,
             code_repair_max_iter=args.code_repair_max_iter,
             enable_spec_evaluation=args.enable_spec_evaluation,
-            enable_constraint_extraction=enable_constraint_extraction,
+            enable_cgs=enable_cgs,
             enable_code_repair=enable_code_repair,
             code_repair_strategy=args.code_repair_strategy,
-            wybecoder_candidates=args.wybecoder_candidates,
+            vgcr_candidates=args.vgcr_candidates,
             reuse_artifacts_from=args.reuse_artifacts_from,
         )
     else:

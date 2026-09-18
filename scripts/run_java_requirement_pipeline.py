@@ -57,7 +57,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--app-name",
         type=str,
-        default=os.getenv("OPENROUTER_APP_NAME", "AutoSpec-Java"),
+        default=os.getenv("OPENROUTER_APP_NAME", "CodeNova-Java"),
     )
     parser.add_argument("--temperature", type=float, default=0.1)
     parser.add_argument("--max-tokens", type=int, default=4096)
@@ -69,41 +69,41 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--openjml-bin", type=str, default=os.getenv("OPENJML_BIN", "openjml"))
     parser.add_argument("--openjml-solver", type=str, default=os.getenv("OPENJML_SOLVER") or None)
     parser.add_argument(
-        "--enable-constraint-extraction",
-        dest="enable_constraint_extraction",
+        "--enable-cgs",
+        dest="enable_cgs",
         action="store_true",
         default=True,
-        help="Enable Java requirement constraint extraction + constraint-to-JML mapping.",
+        help="Enable Java requirement constraint-guided specification (CGS) + constraint-to-JML mapping.",
     )
     parser.add_argument(
-        "--disable-constraint-extraction",
-        dest="enable_constraint_extraction",
+        "--disable-cgs",
+        dest="enable_cgs",
         action="store_false",
-        help="Disable constraint extraction and use direct requirement-to-JML generation.",
+        help="Disable constraint-guided specification (CGS) and use direct requirement-to-JML generation.",
     )
     parser.add_argument(
         "--spec-self-check-rounds",
         type=int,
         default=1,
-        help="Rounds for Java spec self-check/refinement when constraint extraction is enabled.",
+        help="Rounds for Java spec self-check/refinement when constraint-guided specification (CGS) is enabled.",
     )
     parser.add_argument("--enable-code-repair", dest="enable_code_repair", action="store_true", default=True)
     parser.add_argument("--disable-code-repair", dest="enable_code_repair", action="store_false")
     parser.add_argument("--code-repair-max-iter", type=int, default=3)
     parser.add_argument(
         "--code-repair-strategy",
-        choices=["simple", "wybecoder"],
+        choices=["simple", "vgcr"],
         default="simple",
         help=(
             "'simple' feeds OpenJML output directly into one repair prompt; "
-            "'wybecoder' uses verifier-subgoal planning plus multiple repair candidates."
+            "'vgcr' uses verifier-subgoal planning plus multiple repair candidates."
         ),
     )
     parser.add_argument(
-        "--wybecoder-candidates",
+        "--vgcr-candidates",
         type=int,
         default=3,
-        help="Number of focused repair candidates per WybeCoder-style repair iteration.",
+        help="Number of focused repair candidates per VGCR-style repair iteration.",
     )
     parser.add_argument(
         "--reuse-artifacts-from",
@@ -157,12 +157,12 @@ def main() -> None:
         logger=lambda msg: print(msg, flush=True),
         openjml_bin=args.openjml_bin,
         openjml_solver=args.openjml_solver,
-        enable_constraint_extraction=args.enable_constraint_extraction,
+        enable_cgs=args.enable_cgs,
         spec_self_check_rounds=args.spec_self_check_rounds,
         enable_code_repair=args.enable_code_repair,
         code_repair_max_iter=args.code_repair_max_iter,
         code_repair_strategy=args.code_repair_strategy,
-        wybecoder_candidates=args.wybecoder_candidates,
+        vgcr_candidates=args.vgcr_candidates,
         reuse_artifacts_from=args.reuse_artifacts_from,
     )
     outcome = pipeline.run(requirements, resume=args.resume)

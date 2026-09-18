@@ -46,9 +46,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--enable-code-repair", action="store_true")
     parser.add_argument("--code-repair-max-iter", type=int, default=3)
     parser.add_argument(
-        "--code-repair-strategy", choices=["simple", "wybecoder"], default="simple"
+        "--code-repair-strategy", choices=["simple", "vgcr"], default="simple"
     )
-    parser.add_argument("--wybecoder-candidates", type=int, default=3)
+    parser.add_argument("--vgcr-candidates", type=int, default=3)
     parser.add_argument("--reuse-artifacts-from", type=Path)
     parser.add_argument("--task-id", type=int)
     parser.add_argument("--resume", action="store_true")
@@ -88,7 +88,7 @@ def main() -> None:
         enable_code_repair=args.enable_code_repair,
         code_repair_max_iter=args.code_repair_max_iter,
         code_repair_strategy=args.code_repair_strategy,
-        wybecoder_candidates=args.wybecoder_candidates,
+        vgcr_candidates=args.vgcr_candidates,
         reuse_artifacts_from=args.reuse_artifacts_from,
     )
     outcome = pipeline.run(as_rust_requirement_items(contracts), resume=args.resume)

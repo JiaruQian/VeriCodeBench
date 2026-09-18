@@ -1,5 +1,5 @@
 #!/bin/bash
-# Run offline constraint-entailment benchmark evaluation.
+# Run the offline Constraint Entailment Framework (CEF) benchmark evaluation.
 
 set -euo pipefail
 
@@ -9,9 +9,9 @@ cd "$PROJECT_ROOT"
 export PYTHONPATH="$PROJECT_ROOT${PYTHONPATH:+:$PYTHONPATH}"
 
 GROUND_TRUTH_SPEC_FILE="${GROUND_TRUTH_SPEC_FILE:-benchmarks/frama-c-problems/requirements/requirements_100_ground_truth_specs.json}"
-OUTPUT_DIR="${OUTPUT_DIR:-outputs/C-ce-dsv41-time-5-0916}"
+OUTPUT_DIR="${OUTPUT_DIR:-outputs/C-cgs-dsv41-time-5-0916}"
 SPECS_DIR="${SPECS_DIR:-}"          # optional, default <OUTPUT_DIR>/specs
-REPORT_FILE="${REPORT_FILE:-}"      # optional, default <OUTPUT_DIR>/reports/constraint_entailment.json
+REPORT_FILE="${REPORT_FILE:-}"      # optional, default <OUTPUT_DIR>/reports/cef.json
 TASK_ID="${TASK_ID:-}"              # optional
 MAX_COMBO_SIZE="${MAX_COMBO_SIZE:-5}"
 MAX_COMBINATION_TRIALS="${MAX_COMBINATION_TRIALS:-2000}"
@@ -36,7 +36,7 @@ if [[ -n "$TASK_ID" ]]; then
   CMD+=(--task-id "$TASK_ID")
 fi
 
-echo "[INFO] Running constraint entailment evaluation..."
+echo "[INFO] Running Constraint Entailment Framework (CEF) evaluation..."
 echo "[INFO] GROUND_TRUTH_SPEC_FILE=$GROUND_TRUTH_SPEC_FILE"
 echo "[INFO] OUTPUT_DIR=$OUTPUT_DIR"
 echo "[INFO] MAX_COMBO_SIZE=$MAX_COMBO_SIZE"

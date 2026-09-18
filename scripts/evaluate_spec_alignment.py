@@ -80,7 +80,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--app-name",
         type=str,
-        default=os.getenv("OPENROUTER_APP_NAME", "AutoSpec"),
+        default=os.getenv("OPENROUTER_APP_NAME", "CodeNova"),
         help="Optional X-Title header value.",
     )
     parser.add_argument("--temperature", type=float, default=0.0, help="Sampling temperature.")

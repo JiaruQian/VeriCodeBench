@@ -1,4 +1,4 @@
-"""Configuration settings for AutoSpec"""
+"""Configuration settings for CodeNova"""
 import os
 from pathlib import Path
 

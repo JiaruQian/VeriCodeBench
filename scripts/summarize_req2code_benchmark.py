@@ -30,7 +30,7 @@ def parse_args() -> argparse.Namespace:
         "--output-dir",
         type=Path,
         default=Path("outputs/req2code"),
-        help="Pipeline output directory containing reports/results.json and constraint_entailment.json.",
+        help="Pipeline output directory containing reports/results.json and the CEF report reports/cef.json.",
     )
     parser.add_argument(
         "--results-file",
@@ -351,7 +351,7 @@ def main() -> None:
     args = parse_args()
     results_file = args.results_file or (args.output_dir / "reports" / "results.json")
     entailment_file = args.entailment_file or (
-        args.output_dir / "reports" / "constraint_entailment.json"
+        args.output_dir / "reports" / "cef.json"
     )
     report_file = args.report_file or (args.output_dir / "reports" / "benchmark_summary.json")
     report_file.parent.mkdir(parents=True, exist_ok=True)

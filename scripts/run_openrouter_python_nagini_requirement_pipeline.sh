@@ -19,12 +19,12 @@ VERIFY_TIMEOUT="${VERIFY_TIMEOUT:-120}"
 NAGINI_BIN="${NAGINI_BIN:-nagini}"
 PIPELINE_VARIANT="${PIPELINE_VARIANT:-enhanced}"
 ENHANCEMENT_METHOD="${ENHANCEMENT_METHOD:-}"
-ENABLE_CONSTRAINT_EXTRACTION="${ENABLE_CONSTRAINT_EXTRACTION:-true}"
+ENABLE_CGS="${ENABLE_CGS:-true}"
 SPEC_SELF_CHECK_ROUNDS="${SPEC_SELF_CHECK_ROUNDS:-1}"
 CODE_REPAIR_MAX_ITER="${CODE_REPAIR_MAX_ITER:-3}"
 ENABLE_CODE_REPAIR="${ENABLE_CODE_REPAIR:-true}"
 CODE_REPAIR_STRATEGY="${CODE_REPAIR_STRATEGY:-simple}"
-WYBECODER_CANDIDATES="${WYBECODER_CANDIDATES:-3}"
+VGCR_CANDIDATES="${VGCR_CANDIDATES:-3}"
 REUSE_ARTIFACTS_FROM="${REUSE_ARTIFACTS_FROM:-}"
 SKIP_VERIFY="${SKIP_VERIFY:-false}"
 TASK_ID="${TASK_ID:-}"
@@ -53,10 +53,10 @@ args=(
 if [[ -n "$ENHANCEMENT_METHOD" ]]; then
   args+=(--enhancement-method "$ENHANCEMENT_METHOD")
 elif [[ "$PIPELINE_VARIANT" == "enhanced" ]]; then
-  if [[ "${ENABLE_CONSTRAINT_EXTRACTION,,}" == "true" ]]; then
-    args+=(--enable-constraint-extraction)
+  if [[ "${ENABLE_CGS,,}" == "true" ]]; then
+    args+=(--enable-cgs)
   else
-    args+=(--disable-constraint-extraction)
+    args+=(--disable-cgs)
   fi
   if [[ "${ENABLE_CODE_REPAIR,,}" == "true" ]]; then
     args+=(--enable-code-repair)
@@ -67,8 +67,8 @@ fi
 if [[ "${SKIP_VERIFY,,}" == "true" ]]; then
   args+=(--skip-verify)
 fi
-if [[ "$CODE_REPAIR_STRATEGY" == "wybecoder" ]]; then
-  args+=(--wybecoder-candidates "$WYBECODER_CANDIDATES")
+if [[ "$CODE_REPAIR_STRATEGY" == "vgcr" ]]; then
+  args+=(--vgcr-candidates "$VGCR_CANDIDATES")
 fi
 if [[ -n "$REUSE_ARTIFACTS_FROM" ]]; then
   args+=(--reuse-artifacts-from "$REUSE_ARTIFACTS_FROM")
@@ -87,10 +87,10 @@ echo "[INFO] OUTPUT_DIR=$OUTPUT_DIR"
 echo "[INFO] MODEL=$MODEL"
 echo "[INFO] PIPELINE_VARIANT=$PIPELINE_VARIANT"
 echo "[INFO] ENHANCEMENT_METHOD=${ENHANCEMENT_METHOD:-manual}"
-echo "[INFO] ENABLE_CONSTRAINT_EXTRACTION=$ENABLE_CONSTRAINT_EXTRACTION"
+echo "[INFO] ENABLE_CGS=$ENABLE_CGS"
 echo "[INFO] ENABLE_CODE_REPAIR=$ENABLE_CODE_REPAIR"
 echo "[INFO] CODE_REPAIR_STRATEGY=$CODE_REPAIR_STRATEGY"
-echo "[INFO] WYBECODER_CANDIDATES=$WYBECODER_CANDIDATES"
+echo "[INFO] VGCR_CANDIDATES=$VGCR_CANDIDATES"
 echo "[INFO] REUSE_ARTIFACTS_FROM=$REUSE_ARTIFACTS_FROM"
 echo "[INFO] SKIP_VERIFY=$SKIP_VERIFY"
 echo "[INFO] RESUME=$RESUME"

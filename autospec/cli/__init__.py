@@ -1,2 +1,2 @@
-"""Command-line interface for AutoSpec"""
+"""Command-line interface for CodeNova"""
 

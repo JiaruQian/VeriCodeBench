@@ -1,5 +1,5 @@
 #!/bin/bash
-# Master script to run all AutoSpec benchmarks
+# Master script to run all CodeNova benchmarks
 
 # Don't exit on error - we handle verification failures ourselves
 set +e
@@ -22,7 +22,7 @@ NC='\033[0m' # No Color
 usage() {
     echo "Usage: $0 [OPTIONS]"
     echo ""
-    echo "Run all AutoSpec benchmarks"
+    echo "Run all CodeNova benchmarks"
     echo ""
     echo "Options:"
     echo "  -v, --verbose        Show detailed output"
@@ -80,7 +80,7 @@ FRAMA_C_RESULT=0
 X509_RESULT=0
 
 echo "╔═══════════════════════════════════════════════════════╗"
-echo "║   AutoSpec - Complete Benchmark Test Suite           ║"
+echo "║   CodeNova - Complete Benchmark Test Suite           ║"
 echo "╚═══════════════════════════════════════════════════════╝"
 echo ""
 

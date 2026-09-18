@@ -19,7 +19,7 @@ MAX_TOKENS="${MAX_TOKENS:-4096}"
 ENABLE_CODE_REPAIR="${ENABLE_CODE_REPAIR:-false}"
 CODE_REPAIR_MAX_ITER="${CODE_REPAIR_MAX_ITER:-3}"
 CODE_REPAIR_STRATEGY="${CODE_REPAIR_STRATEGY:-simple}"
-WYBECODER_CANDIDATES="${WYBECODER_CANDIDATES:-3}"
+VGCR_CANDIDATES="${VGCR_CANDIDATES:-3}"
 REUSE_ARTIFACTS_FROM="${REUSE_ARTIFACTS_FROM:-}"
 TASK_ID="${TASK_ID:-}"
 RESUME="${RESUME:-false}"
@@ -37,7 +37,7 @@ CMD=(python3 scripts/run_c_code_only_pipeline.py
   --request-timeout "$REQUEST_TIMEOUT" --llm-retries "$LLM_RETRIES"
   --llm-retry-delay "$LLM_RETRY_DELAY" --verify-timeout "$VERIFY_TIMEOUT"
   --code-repair-max-iter "$CODE_REPAIR_MAX_ITER"
-  --code-repair-strategy "$CODE_REPAIR_STRATEGY" --wybecoder-candidates "$WYBECODER_CANDIDATES")
+  --code-repair-strategy "$CODE_REPAIR_STRATEGY" --vgcr-candidates "$VGCR_CANDIDATES")
 
 [[ "${ENABLE_CODE_REPAIR,,}" == "true" ]] && CMD+=(--enable-code-repair)
 [[ "${RESUME,,}" == "true" ]] && CMD+=(--resume)

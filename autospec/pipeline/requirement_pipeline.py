@@ -238,10 +238,10 @@ Output constraints:
 - Prefer minimal, verification-friendly fixes.
 """
 
-WYBECODER_REPAIR_ANALYSIS_SYSTEM_PROMPT = """You are a verification-guided C/ACSL repair planner.
+VGCR_REPAIR_ANALYSIS_SYSTEM_PROMPT = """You are a verification-guided C/ACSL repair planner.
 Return strict JSON only."""
 
-WYBECODER_REPAIR_ANALYSIS_USER_PROMPT_TEMPLATE = """Analyze a failed Frama-C/WP verification attempt and produce a repair plan.
+VGCR_REPAIR_ANALYSIS_USER_PROMPT_TEMPLATE = """Analyze a failed Frama-C/WP verification attempt and produce a repair plan.
 
 Requirement:
 {requirement}
@@ -285,10 +285,10 @@ Output constraints (IMPORTANT):
 - Keep the plan language-agnostic enough that it can later be reused by Java/JML and Rust/Verus backends.
 """
 
-WYBECODER_REPAIR_CANDIDATE_SYSTEM_PROMPT = """You are an expert C developer using prove-as-you-generate repair.
+VGCR_REPAIR_CANDIDATE_SYSTEM_PROMPT = """You are an expert C developer using prove-as-you-generate repair.
 Output C code only."""
 
-WYBECODER_REPAIR_CANDIDATE_USER_PROMPT_TEMPLATE = """Repair the C implementation using this verifier-derived plan.
+VGCR_REPAIR_CANDIDATE_USER_PROMPT_TEMPLATE = """Repair the C implementation using this verifier-derived plan.
 
 Requirement:
 {requirement}
@@ -896,10 +896,10 @@ class EnhancedRequirementToCodePipeline(RequirementToCodePipeline):
         spec_self_check_rounds: int = 1,
         code_repair_max_iter: int = 3,
         enable_spec_evaluation: bool = False,
-        enable_constraint_extraction: bool = True,
+        enable_cgs: bool = True,
         enable_code_repair: bool = True,
         code_repair_strategy: str = "simple",
-        wybecoder_candidates: int = 3,
+        vgcr_candidates: int = 3,
         reuse_artifacts_from: Optional[Path] = None,
     ):
         super().__init__(
@@ -912,12 +912,12 @@ class EnhancedRequirementToCodePipeline(RequirementToCodePipeline):
         self.spec_self_check_rounds = max(0, spec_self_check_rounds)
         self.code_repair_max_iter = max(0, code_repair_max_iter)
         self.enable_spec_evaluation = enable_spec_evaluation
-        self.enable_constraint_extraction = enable_constraint_extraction
+        self.enable_cgs = enable_cgs
         self.enable_code_repair = enable_code_repair
-        if code_repair_strategy not in {"simple", "wybecoder"}:
+        if code_repair_strategy not in {"simple", "vgcr"}:
             raise ValueError(f"Unsupported code_repair_strategy: {code_repair_strategy}")
         self.code_repair_strategy = code_repair_strategy
-        self.wybecoder_candidates = max(1, wybecoder_candidates)
+        self.vgcr_candidates = max(1, vgcr_candidates)
         self.reuse_artifacts_from = reuse_artifacts_from
 
     def _extract_constraints(self, requirement: str, signature_hint: str = "") -> Dict[str, Any]:
@@ -1267,7 +1267,7 @@ class EnhancedRequirementToCodePipeline(RequirementToCodePipeline):
             "raw_model_output": repaired_raw,
         }
 
-    def _wybecoder_repair_plan(
+    def _vgcr_repair_plan(
         self,
         item: RequirementItem,
         code_text: str,
@@ -1277,7 +1277,7 @@ class EnhancedRequirementToCodePipeline(RequirementToCodePipeline):
         verdict: Any,
         details: str,
     ) -> Dict[str, Any]:
-        plan_prompt = WYBECODER_REPAIR_ANALYSIS_USER_PROMPT_TEMPLATE.format(
+        plan_prompt = VGCR_REPAIR_ANALYSIS_USER_PROMPT_TEMPLATE.format(
             requirement=item.requirement,
             function_signature=function_signature,
             acsl_block=acsl_block,
@@ -1291,7 +1291,7 @@ class EnhancedRequirementToCodePipeline(RequirementToCodePipeline):
             verdict_message=verdict.message,
             verdict_details=_truncate_for_prompt(details, max_chars=7000),
         )
-        raw = self.llm_client.chat(WYBECODER_REPAIR_ANALYSIS_SYSTEM_PROMPT, plan_prompt)
+        raw = self.llm_client.chat(VGCR_REPAIR_ANALYSIS_SYSTEM_PROMPT, plan_prompt)
         try:
             plan = _extract_json_object(raw)
         except Exception as exc:
@@ -1356,7 +1356,7 @@ class EnhancedRequirementToCodePipeline(RequirementToCodePipeline):
         )
         return focuses
 
-    def _build_wybecoder_repair(
+    def _build_vgcr_repair(
         self,
         item: RequirementItem,
         code_file: Path,
@@ -1368,7 +1368,7 @@ class EnhancedRequirementToCodePipeline(RequirementToCodePipeline):
         details: str,
         attempt: int,
     ) -> tuple[str, Any, Dict[str, Any]]:
-        plan = self._wybecoder_repair_plan(
+        plan = self._vgcr_repair_plan(
             item=item,
             code_text=code_text,
             function_signature=function_signature,
@@ -1377,7 +1377,7 @@ class EnhancedRequirementToCodePipeline(RequirementToCodePipeline):
             verdict=verdict,
             details=details,
         )
-        candidate_count = self.wybecoder_candidates
+        candidate_count = self.vgcr_candidates
         focuses = self._candidate_focuses(plan)
         candidate_records: List[Dict[str, Any]] = []
         best_code = code_text
@@ -1386,10 +1386,10 @@ class EnhancedRequirementToCodePipeline(RequirementToCodePipeline):
         for candidate_idx in range(1, candidate_count + 1):
             focus = focuses[(candidate_idx - 1) % len(focuses)]
             self._log(
-                f"[id={item.id}] stage=wybecoder_repair attempt={attempt} "
+                f"[id={item.id}] stage=vgcr_repair attempt={attempt} "
                 f"candidate={candidate_idx}/{candidate_count}"
             )
-            candidate_prompt = WYBECODER_REPAIR_CANDIDATE_USER_PROMPT_TEMPLATE.format(
+            candidate_prompt = VGCR_REPAIR_CANDIDATE_USER_PROMPT_TEMPLATE.format(
                 requirement=item.requirement,
                 function_signature=function_signature,
                 acsl_block=acsl_block,
@@ -1405,7 +1405,7 @@ class EnhancedRequirementToCodePipeline(RequirementToCodePipeline):
                 candidate_focus=focus,
             )
             raw = self.llm_client.chat(
-                WYBECODER_REPAIR_CANDIDATE_SYSTEM_PROMPT,
+                VGCR_REPAIR_CANDIDATE_SYSTEM_PROMPT,
                 candidate_prompt,
             )
             candidate_code = _extract_c_code(raw)
@@ -1427,7 +1427,7 @@ class EnhancedRequirementToCodePipeline(RequirementToCodePipeline):
 
         code_file.write_text(best_code)
         return best_code, best_verdict, {
-            "strategy": "wybecoder",
+            "strategy": "vgcr",
             "plan": plan,
             "candidates": candidate_records,
         }
@@ -1472,8 +1472,8 @@ class EnhancedRequirementToCodePipeline(RequirementToCodePipeline):
                 "details_file": str(detail_path) if details else None,
             }
             try:
-                if self.code_repair_strategy == "wybecoder":
-                    code_text, verdict, strategy_info = self._build_wybecoder_repair(
+                if self.code_repair_strategy == "vgcr":
+                    code_text, verdict, strategy_info = self._build_vgcr_repair(
                         item=item,
                         code_file=code_file,
                         code_text=code_text,
@@ -1484,7 +1484,7 @@ class EnhancedRequirementToCodePipeline(RequirementToCodePipeline):
                         details=details,
                         attempt=attempt,
                     )
-                    history_entry["wybecoder"] = strategy_info
+                    history_entry["vgcr"] = strategy_info
                 else:
                     code_text, strategy_info = self._build_simple_repair(
                         item=item,
@@ -1572,12 +1572,12 @@ class EnhancedRequirementToCodePipeline(RequirementToCodePipeline):
                 "spec_file": str(spec_file),
                 "code_file": str(code_file),
                 "enhanced": {
-                    "enable_constraint_extraction": False,
+                    "enable_cgs": False,
                     "spec_self_check_rounds": 0,
                     "enable_code_repair": self.enable_code_repair,
                     "code_repair_max_iter": self.code_repair_max_iter,
                     "code_repair_strategy": self.code_repair_strategy,
-                    "wybecoder_candidates": self.wybecoder_candidates,
+                    "vgcr_candidates": self.vgcr_candidates,
                     "enable_spec_evaluation": False,
                     "reuse_artifacts_from": str(self.reuse_artifacts_from),
                     "generation_skipped_due_to_reuse": True,
@@ -1614,8 +1614,8 @@ class EnhancedRequirementToCodePipeline(RequirementToCodePipeline):
         constraints: Optional[Dict[str, Any]] = None
         signature_fallback = item.signature_hint
 
-        if self.enable_constraint_extraction:
-            self._log(f"[id={item.id}] stage=constraint_extraction start")
+        if self.enable_cgs:
+            self._log(f"[id={item.id}] stage=cgs start")
             constraints = self._extract_constraints(
                 item.requirement,
                 signature_hint=item.signature_hint,
@@ -1623,7 +1623,7 @@ class EnhancedRequirementToCodePipeline(RequirementToCodePipeline):
             signature_fallback = item.signature_hint or _clean_text(
                 constraints.get("function_signature")
             )
-            self._log(f"[id={item.id}] stage=constraint_extraction done")
+            self._log(f"[id={item.id}] stage=cgs done")
 
             self._log(f"[id={item.id}] stage=constraint_to_spec start")
             initial_spec = self._constraints_to_spec(
@@ -1678,7 +1678,7 @@ class EnhancedRequirementToCodePipeline(RequirementToCodePipeline):
             )
             alignment_info = {
                 "enabled": False,
-                "reason": "constraint extraction module disabled",
+                "reason": "constraint-guided specification (CGS) module disabled",
                 "rounds": [],
                 "final_aligned": None,
                 "max_rounds": 0,
@@ -1742,18 +1742,18 @@ class EnhancedRequirementToCodePipeline(RequirementToCodePipeline):
             "spec_evaluation": spec_evaluation,
             "raw_model_output": final_spec.get("raw_model_output", ""),
             "enhanced_modules": {
-                "constraint_extraction": self.enable_constraint_extraction,
+                "cgs": self.enable_cgs,
                 "spec_self_check_rounds": (
-                    self.spec_self_check_rounds if self.enable_constraint_extraction else 0
+                    self.spec_self_check_rounds if self.enable_cgs else 0
                 ),
                 "code_repair": self.enable_code_repair,
                 "code_repair_max_iter": (
                     self.code_repair_max_iter if self.enable_code_repair else 0
                 ),
                 "code_repair_strategy": self.code_repair_strategy,
-                "wybecoder_candidates": (
-                    self.wybecoder_candidates
-                    if self.enable_code_repair and self.code_repair_strategy == "wybecoder"
+                "vgcr_candidates": (
+                    self.vgcr_candidates
+                    if self.enable_code_repair and self.code_repair_strategy == "vgcr"
                     else 0
                 ),
                 "spec_evaluation": self.enable_spec_evaluation,
@@ -1786,12 +1786,12 @@ class EnhancedRequirementToCodePipeline(RequirementToCodePipeline):
             "spec_file": str(spec_file),
             "code_file": str(code_file),
             "enhanced": {
-                "enable_constraint_extraction": self.enable_constraint_extraction,
+                "enable_cgs": self.enable_cgs,
                 "spec_self_check_rounds": self.spec_self_check_rounds,
                 "enable_code_repair": self.enable_code_repair,
                 "code_repair_max_iter": self.code_repair_max_iter,
                 "code_repair_strategy": self.code_repair_strategy,
-                "wybecoder_candidates": self.wybecoder_candidates,
+                "vgcr_candidates": self.vgcr_candidates,
                 "enable_spec_evaluation": self.enable_spec_evaluation,
             },
             "spec_evaluation": spec_evaluation,

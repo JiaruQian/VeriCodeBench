@@ -61,7 +61,7 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-echo "=== AutoSpec X.509 Parser Benchmark Runner ==="
+echo "=== CodeNova X.509 Parser Benchmark Runner ==="
 echo "X.509 directory: $X509_DIR"
 echo ""
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Evaluate generated specs against manual language-specific ground-truth specs."""
+"""Constraint Entailment Framework (CEF): evaluate generated specs against manual
+language-specific ground-truth specs."""
 from __future__ import annotations
 
 import argparse
@@ -491,7 +492,7 @@ def _canonicalize_by_signature(
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
-            "Constraint Entailment Framework: evaluate whether generated contract "
+            "Constraint Entailment Framework (CEF): evaluate whether generated contract "
             "clauses cover manual ground-truth contract clauses."
         )
     )
@@ -517,7 +518,7 @@ def parse_args() -> argparse.Namespace:
         "--report-file",
         type=Path,
         default=None,
-        help="Optional report path (default: <output-dir>/reports/constraint_entailment.json).",
+        help="Optional report path (default: <output-dir>/reports/cef.json).",
     )
     parser.add_argument(
         "--task-id",
@@ -1774,7 +1775,7 @@ def _build_summary(
 def main() -> None:
     args = parse_args()
     specs_dir = args.specs_dir or (args.output_dir / "specs")
-    report_file = args.report_file or (args.output_dir / "reports" / "constraint_entailment.json")
+    report_file = args.report_file or (args.output_dir / "reports" / "cef.json")
     report_file.parent.mkdir(parents=True, exist_ok=True)
 
     ground_truth_file = args.ground_truth_spec_file

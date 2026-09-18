@@ -117,7 +117,7 @@ class CodeOnlyContractPipeline(EnhancedRequirementToCodePipeline):
         enable_code_repair: bool = False,
         code_repair_max_iter: int = 3,
         code_repair_strategy: str = "simple",
-        wybecoder_candidates: int = 3,
+        vgcr_candidates: int = 3,
         reuse_artifacts_from: Optional[Path] = None,
     ):
         super().__init__(
@@ -129,10 +129,10 @@ class CodeOnlyContractPipeline(EnhancedRequirementToCodePipeline):
             spec_self_check_rounds=0,
             code_repair_max_iter=code_repair_max_iter,
             enable_spec_evaluation=False,
-            enable_constraint_extraction=False,
+            enable_cgs=False,
             enable_code_repair=enable_code_repair,
             code_repair_strategy=code_repair_strategy,
-            wybecoder_candidates=wybecoder_candidates,
+            vgcr_candidates=vgcr_candidates,
             reuse_artifacts_from=reuse_artifacts_from,
         )
         self.contracts = {item.id: item for item in contracts}

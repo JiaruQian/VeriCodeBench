@@ -1,5 +1,5 @@
 #!/bin/bash
-# Script to run AutoSpec verification on frama-c-problems benchmarks
+# Script to run CodeNova verification on frama-c-problems benchmarks
 
 # Don't exit on error - we handle verification failures ourselves
 set +e
@@ -47,7 +47,7 @@ CATEGORIES=(
 usage() {
     echo "Usage: $0 [CATEGORY] [OPTIONS]"
     echo ""
-    echo "Run AutoSpec verification on frama-c-problems benchmarks"
+    echo "Run CodeNova verification on frama-c-problems benchmarks"
     echo ""
     echo "Arguments:"
     echo "  CATEGORY        Category to test (optional, tests all if not specified)"
@@ -159,7 +159,7 @@ test_category() {
 }
 
 # Main execution
-echo "=== AutoSpec Frama-C Problems Benchmark Runner ==="
+echo "=== CodeNova Frama-C Problems Benchmark Runner ==="
 echo "Benchmarks directory: $BENCHMARKS_DIR"
 
 cd "$PROJECT_ROOT"

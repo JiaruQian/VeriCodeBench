@@ -2,7 +2,8 @@
 
 VeriCodeBench contains benchmark source code, datasets, ground-truth contracts,
 evaluation scripts, and documentation for C/Frama-C, Java/OpenJML, Rust/Verus,
-and Python/Nagini.
+and Python/Nagini. It also includes CodeNova, which combines Constraint-Guided
+Specification (CGS) with Verifier-Guided Candidate Repair (VGCR).
 
 ## Release contents
 
@@ -12,20 +13,15 @@ local credentials, caches, experiment outputs, and reference-paper PDFs are
 not part of the source snapshot. The case-study documentation refers to
 experiments whose generated artifacts are not included in this source release.
 
-The `wybecoder/` directory contains third-party source code, configuration,
-datasets, tests, and its original license from
-[facebookresearch/wybecoder](https://github.com/facebookresearch/wybecoder),
-revision `5cad973ddb1986125c9fceff4f4bee485c6bb8c2`.
-It is included as ordinary files, without its Git history, Git LFS filters,
-hosted project website, paper, or precomputed experiment trajectories.
-Its website/viewer reproduction commands may require those omitted upstream
-assets. VeriCodeBench's WybeCoder-style repair strategy is implemented within
-`autospec/` and does not import this third-party directory.
+The internal `autospec` Python package name is retained for import
+compatibility. All method components are implemented within `autospec/`; CGS,
+VGCR, and the Constraint Entailment Framework (CEF) are self-contained and do
+not import any third-party repair framework.
 
 Third-party license notices, attribution, public dependency links, and standard
 tool accounts such as `/home/opam` are retained. They identify upstream
-dependencies rather than the authors of this submission. The internal
-`autospec` Python package name is retained for import compatibility.
+dependencies and native verification toolchains (Frama-C/WP, OpenJML, Verus,
+Nagini) rather than the authors of this submission.
 
 ## Portable workspace
 

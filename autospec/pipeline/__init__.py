@@ -1,6 +1,6 @@
-"""AutoSpec pipeline orchestration"""
+"""CodeNova pipeline orchestration"""
 
-from .autospec_runner import AutoSpecRunner
+from .autospec_runner import CodeNovaRunner
 from .requirement_pipeline import (
     EnhancedRequirementToCodePipeline,
     RequirementItem,
@@ -14,7 +14,7 @@ from .rust_requirement_pipeline import (
 )
 
 __all__ = [
-    "AutoSpecRunner",
+    "CodeNovaRunner",
     "EnhancedRequirementToCodePipeline",
     "RequirementToCodePipeline",
     "RequirementItem",

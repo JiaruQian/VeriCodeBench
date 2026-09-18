@@ -33,7 +33,6 @@ credentials.json
 .git-credentials
 .netrc
 outputs/
-wybecoder/runs/
 
 # Documentation
 *.md
