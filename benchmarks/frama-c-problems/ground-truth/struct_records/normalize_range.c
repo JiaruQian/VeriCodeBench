@@ -1,0 +1,18 @@
+struct Point { int x; int y; };
+struct Range { int lo; int hi; };
+struct Counter { int value; int limit; };
+struct Rect { int width; int height; };
+
+/*@
+  requires \valid(r);
+  assigns r->lo, r->hi;
+  ensures r->lo <= r->hi;
+  ensures (r->lo == \old(r->lo) && r->hi == \old(r->hi)) || (r->lo == \old(r->hi) && r->hi == \old(r->lo));
+*/
+void normalize_range(struct Range *r) {
+  if (r->lo > r->hi) {
+    int t = r->lo;
+    r->lo = r->hi;
+    r->hi = t;
+  }
+}

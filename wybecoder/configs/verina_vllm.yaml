@@ -1,0 +1,29 @@
+config:
+  task: verina_decomp
+  problems: data/verina_goedel.jsonl
+  n_attempts: 1
+  max_turns: 8
+  max_prover_turns: 2
+  n_worker_threads: 20
+  provers_per_goal: 8
+  max_subagents: 512  # overall
+  n_subagents: 16  # concurrent
+
+  # Strong model for decomposition and implementation
+  model: gpt-5
+
+  # Specialized prover model (Godel Prover)
+  prover_model: vllm-goedel-prover
+
+  # vLLM server configuration for Godel Prover (auto-start mode)
+  vllm_model_path: Goedel-LM/Goedel-Prover-V2-32B  # or local path to model
+  vllm_tensor_parallel_size: 8  # Use 8 GPUs for this large model
+  vllm_server_timeout: 600.0  # Larger models need more time to load
+  vllm_extra_args:
+    gpu-memory-utilization: 0.9
+    max-model-len: 40960
+
+  use_mcp: false
+
+  max_repls: 200
+  max_usage: 50

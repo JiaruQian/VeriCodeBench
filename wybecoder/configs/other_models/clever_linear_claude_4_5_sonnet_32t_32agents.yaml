@@ -1,0 +1,12 @@
+# srun -N 4 --ntasks-per-node=1 python -u -m src.worker configs/other_models/clever_linear_claude_4_5_sonnet_32t_32agents.yaml
+config:
+  task: clever_proof
+  problems: data/clever_loom.jsonl
+  n_attempts: 32
+  max_turns: 32
+  n_worker_threads: 40
+  name: claude_4_5_sonnet_genai_vertex
+  model: claude-4-5-sonnet-genai-vertex
+  temperature: 1.0
+  use_mcp: false
+  prompt_path: "data/prompt_linear.md"

@@ -1,0 +1,1934 @@
+[
+  {
+    "id": 1,
+    "path": "scalar_arithmetic/Problem001_MaxInt.py",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given two Python integers, return the greater value.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/scalar_arithmetic/Problem001_MaxInt.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def max_int(x: int, y: int) -> int:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "Result() == x or Result() == y",
+        "text": "result is one input",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "Result() >= x and Result() >= y",
+        "text": "result is at least both inputs",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Ensures(Result() == x or Result() == y)\nEnsures(Result() >= x and Result() >= y)"
+  },
+  {
+    "id": 2,
+    "path": "scalar_arithmetic/Problem002_MinInt.py",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given two Python integers, return the smaller value.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/scalar_arithmetic/Problem002_MinInt.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def min_int(x: int, y: int) -> int:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "Result() == x or Result() == y",
+        "text": "result is one input",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "Result() <= x and Result() <= y",
+        "text": "result is at most both inputs",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Ensures(Result() == x or Result() == y)\nEnsures(Result() <= x and Result() <= y)"
+  },
+  {
+    "id": 3,
+    "path": "scalar_arithmetic/Problem003_AbsInt.py",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given a Python integer, return its absolute value.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/scalar_arithmetic/Problem003_AbsInt.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def abs_int(x: int) -> int:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "Result() >= 0",
+        "text": "absolute value is nonnegative",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "x >= 0 ==> Result() == x",
+        "text": "nonnegative inputs are unchanged",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "x < 0 ==> Result() == -x",
+        "text": "negative inputs are negated",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Ensures(Result() >= 0)\nEnsures(Implies(x >= 0, Result() == x))\nEnsures(Implies(x < 0, Result() == -x))"
+  },
+  {
+    "id": 4,
+    "path": "scalar_arithmetic/Problem004_ClampInt.py",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given x and an ordered inclusive range [lo, hi], clamp x into that range.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/scalar_arithmetic/Problem004_ClampInt.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def clamp_int(x: int, lo: int, hi: int) -> int:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "lo <= hi",
+        "text": "bounds are ordered",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "lo <= Result() and Result() <= hi",
+        "text": "result lies in range",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "x < lo ==> Result() == lo",
+        "text": "low values clamp to lo",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "lo <= x and x <= hi ==> Result() == x",
+        "text": "in-range values are unchanged",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt5",
+        "type": "ensures",
+        "expr": "x > hi ==> Result() == hi",
+        "text": "high values clamp to hi",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Requires(lo <= hi)\nEnsures(lo <= Result() and Result() <= hi)\nEnsures(Implies(x < lo, Result() == lo))\nEnsures(Implies(lo <= x and x <= hi, Result() == x))\nEnsures(Implies(x > hi, Result() == hi))"
+  },
+  {
+    "id": 5,
+    "path": "scalar_arithmetic/Problem005_SafeDiv.py",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given integers x and y with y nonzero, return integer division x // y without raising ZeroDivisionError.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/scalar_arithmetic/Problem005_SafeDiv.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def safe_div(x: int, y: int) -> int:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "y != 0",
+        "text": "divisor is nonzero",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "Result() == x // y",
+        "text": "result is Python floor division",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Requires(y != 0)\nEnsures(Result() == x // y)"
+  },
+  {
+    "id": 6,
+    "path": "scalar_arithmetic/Problem006_Sign.py",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Return -1 for negative input, 0 for zero, and 1 for positive input.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/scalar_arithmetic/Problem006_Sign.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def sign(x: int) -> int:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "Result() == -1 or Result() == 0 or Result() == 1",
+        "text": "result is a sign code",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "x < 0 ==> Result() == -1",
+        "text": "negative maps to -1",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "x == 0 ==> Result() == 0",
+        "text": "zero maps to 0",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "x > 0 ==> Result() == 1",
+        "text": "positive maps to 1",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Ensures(Result() == -1 or Result() == 0 or Result() == 1)\nEnsures(Implies(x < 0, Result() == -1))\nEnsures(Implies(x == 0, Result() == 0))\nEnsures(Implies(x > 0, Result() == 1))"
+  },
+  {
+    "id": 7,
+    "path": "scalar_arithmetic/Problem007_IsEven.py",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Return true exactly when the integer is even.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/scalar_arithmetic/Problem007_IsEven.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def is_even(x: int) -> bool:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "Result() == (x % 2 == 0)",
+        "text": "boolean result matches parity",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Ensures(Result() == (x % 2 == 0))"
+  },
+  {
+    "id": 8,
+    "path": "scalar_arithmetic/Problem008_BetweenInclusive.py",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Return true exactly when x lies in the inclusive interval [lo, hi].",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/scalar_arithmetic/Problem008_BetweenInclusive.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def between_inclusive(x: int, lo: int, hi: int) -> bool:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "Result() == (lo <= x and x <= hi)",
+        "text": "result captures inclusive membership",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Ensures(Result() == (lo <= x and x <= hi))"
+  },
+  {
+    "id": 9,
+    "path": "scalar_arithmetic/Problem009_AddThree.py",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Return the mathematical sum of three Python integers.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/scalar_arithmetic/Problem009_AddThree.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def add_three(x: int, y: int, z: int) -> int:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "Result() == x + y + z",
+        "text": "result is the sum of all inputs",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Ensures(Result() == x + y + z)"
+  },
+  {
+    "id": 10,
+    "path": "scalar_arithmetic/Problem010_NonNegativeDifference.py",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given x >= y, return x - y and preserve nonnegativity.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/scalar_arithmetic/Problem010_NonNegativeDifference.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def nonnegative_difference(x: int, y: int) -> int:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "x >= y",
+        "text": "difference is nonnegative",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "Result() == x - y",
+        "text": "result is the difference",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "Result() >= 0",
+        "text": "result is nonnegative",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Requires(x >= y)\nEnsures(Result() == x - y)\nEnsures(Result() >= 0)"
+  },
+  {
+    "id": 11,
+    "path": "optional_none/Problem011_IsNoneInt.py",
+    "category": "optional_none",
+    "requirement_en": "Given an optional integer, return true exactly when it is None.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/optional_none/Problem011_IsNoneInt.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def is_none_int(x: Optional[int]) -> bool:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "Result() == (x is None)",
+        "text": "result captures None status",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Ensures(Result() == (x is None))"
+  },
+  {
+    "id": 12,
+    "path": "optional_none/Problem012_IsSomeInt.py",
+    "category": "optional_none",
+    "requirement_en": "Given an optional integer, return true exactly when it contains an integer.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/optional_none/Problem012_IsSomeInt.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def is_some_int(x: Optional[int]) -> bool:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "Result() == (x is not None)",
+        "text": "result captures non-None status",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Ensures(Result() == (x is not None))"
+  },
+  {
+    "id": 13,
+    "path": "optional_none/Problem013_UnwrapOr.py",
+    "category": "optional_none",
+    "requirement_en": "Return the contained optional integer, or the provided default when it is None.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/optional_none/Problem013_UnwrapOr.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def unwrap_or(x: Optional[int], default: int) -> int:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "x is not None ==> Result() == x",
+        "text": "non-None value is returned",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "x is None ==> Result() == default",
+        "text": "default is returned for None",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Ensures(Implies(x is not None, Result() == x))\nEnsures(Implies(x is None, Result() == default))"
+  },
+  {
+    "id": 14,
+    "path": "optional_none/Problem014_RequireSome.py",
+    "category": "optional_none",
+    "requirement_en": "Given a non-None optional integer, return the contained value without raising an exception.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/optional_none/Problem014_RequireSome.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def require_some(x: Optional[int]) -> int:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "x is not None",
+        "text": "input contains a value",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "Result() == x",
+        "text": "contained value is returned",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Requires(x is not None)\nEnsures(Result() == x)"
+  },
+  {
+    "id": 15,
+    "path": "optional_none/Problem015_IncrementOptional.py",
+    "category": "optional_none",
+    "requirement_en": "Increment a present optional integer and keep None unchanged.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/optional_none/Problem015_IncrementOptional.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def increment_optional(x: Optional[int]) -> Optional[int]:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "x is None ==> Result() is None",
+        "text": "None remains None",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "x is not None ==> Result() is not None",
+        "text": "present value produces a non-None result",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "x is not None ==> Result() == x + 1",
+        "text": "present value is incremented",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Ensures(Implies(x is None, Result() is None))\nEnsures(Implies(x is not None, Result() is not None))\nEnsures(Implies(x is not None, Result() == x + 1))"
+  },
+  {
+    "id": 16,
+    "path": "optional_none/Problem016_PositiveOrNone.py",
+    "category": "optional_none",
+    "requirement_en": "Return x when x is positive, otherwise return None.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/optional_none/Problem016_PositiveOrNone.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def positive_or_none(x: int) -> Optional[int]:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "x > 0 ==> Result() is not None",
+        "text": "positive value produces a non-None result",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "x > 0 ==> Result() == x",
+        "text": "positive value is returned",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "x <= 0 ==> Result() is None",
+        "text": "nonpositive values map to None",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Ensures(Implies(x > 0, Result() is not None))\nEnsures(Implies(x > 0, Result() == x))\nEnsures(Implies(x <= 0, Result() is None))"
+  },
+  {
+    "id": 17,
+    "path": "optional_none/Problem017_DefaultIfZero.py",
+    "category": "optional_none",
+    "requirement_en": "Return the fallback exactly when x is zero, otherwise return x.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/optional_none/Problem017_DefaultIfZero.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def default_if_zero(x: int, fallback: int) -> int:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "x == 0 ==> Result() == fallback",
+        "text": "zero maps to fallback",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "x != 0 ==> Result() == x",
+        "text": "nonzero maps to itself",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Ensures(Implies(x == 0, Result() == fallback))\nEnsures(Implies(x != 0, Result() == x))"
+  },
+  {
+    "id": 18,
+    "path": "optional_none/Problem018_Coalesce3.py",
+    "category": "optional_none",
+    "requirement_en": "Return the first non-None value among a, b, and fallback, where fallback is always an integer.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/optional_none/Problem018_Coalesce3.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def coalesce3(a: Optional[int], b: Optional[int], fallback: int) -> int:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "a is not None ==> Result() == a",
+        "text": "first value has priority",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "a is None and b is not None ==> Result() == b",
+        "text": "second value used when first is None",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "a is None and b is None ==> Result() == fallback",
+        "text": "fallback used when both are None",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Ensures(Implies(a is not None, Result() == a))\nEnsures(Implies(a is None and b is not None, Result() == b))\nEnsures(Implies(a is None and b is None, Result() == fallback))"
+  },
+  {
+    "id": 19,
+    "path": "list_basics/Problem019_ListLength.py",
+    "category": "list_basics",
+    "requirement_en": "Given a list of integers, return its length without mutating it.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/list_basics/Problem019_ListLength.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def list_length(a: List[int]) -> int:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "Acc(list_pred(a))",
+        "text": "caller provides list permission",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "Acc(list_pred(a))",
+        "text": "list permission is returned",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "Result() == len(a)",
+        "text": "result is list length",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Requires(Acc(list_pred(a)))\nEnsures(Acc(list_pred(a)))\nEnsures(Result() == len(a))"
+  },
+  {
+    "id": 20,
+    "path": "list_basics/Problem020_ListIsEmpty.py",
+    "category": "list_basics",
+    "requirement_en": "Return true exactly when the integer list is empty.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/list_basics/Problem020_ListIsEmpty.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def list_is_empty(a: List[int]) -> bool:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "Acc(list_pred(a))",
+        "text": "caller provides list permission",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "Acc(list_pred(a))",
+        "text": "list permission is returned",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "Result() == (len(a) == 0)",
+        "text": "result captures empty status",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Requires(Acc(list_pred(a)))\nEnsures(Acc(list_pred(a)))\nEnsures(Result() == (len(a) == 0))"
+  },
+  {
+    "id": 21,
+    "path": "list_basics/Problem021_ListFirst.py",
+    "category": "list_basics",
+    "requirement_en": "Given a nonempty integer list, return the first element.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/list_basics/Problem021_ListFirst.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def list_first(a: List[int]) -> int:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "Acc(list_pred(a))",
+        "text": "caller provides list permission",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "len(a) > 0",
+        "text": "list is nonempty",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "Acc(list_pred(a))",
+        "text": "list permission is returned",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "Result() == Old(a[0])",
+        "text": "first element is returned",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Requires(Acc(list_pred(a)))\nRequires(len(a) > 0)\nEnsures(Acc(list_pred(a)))\nEnsures(Result() == Old(a[0]))"
+  },
+  {
+    "id": 22,
+    "path": "list_basics/Problem022_ListLast.py",
+    "category": "list_basics",
+    "requirement_en": "Given a nonempty integer list, return the last element.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/list_basics/Problem022_ListLast.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def list_last(a: List[int]) -> int:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "Acc(list_pred(a))",
+        "text": "caller provides list permission",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "len(a) > 0",
+        "text": "list is nonempty",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "Acc(list_pred(a))",
+        "text": "list permission is returned",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "Result() == Old(a[len(a) - 1])",
+        "text": "last element is returned",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Requires(Acc(list_pred(a)))\nRequires(len(a) > 0)\nEnsures(Acc(list_pred(a)))\nEnsures(Result() == Old(a[len(a) - 1]))"
+  },
+  {
+    "id": 23,
+    "path": "list_basics/Problem023_ListGetAt.py",
+    "category": "list_basics",
+    "requirement_en": "Given an integer list and a valid index, return the indexed element.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/list_basics/Problem023_ListGetAt.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def list_get_at(a: List[int], i: int) -> int:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "Acc(list_pred(a))",
+        "text": "caller provides list permission",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "0 <= i and i < len(a)",
+        "text": "index is valid",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "Acc(list_pred(a))",
+        "text": "list permission is returned",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "Result() == Old(a[i])",
+        "text": "indexed element is returned",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Requires(Acc(list_pred(a)))\nRequires(0 <= i and i < len(a))\nEnsures(Acc(list_pred(a)))\nEnsures(Result() == Old(a[i]))"
+  },
+  {
+    "id": 24,
+    "path": "list_basics/Problem024_HeadOrDefault.py",
+    "category": "list_basics",
+    "requirement_en": "Return the first list element when the list is nonempty, otherwise return the default.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/list_basics/Problem024_HeadOrDefault.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def head_or_default(a: List[int], default: int) -> int:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "Acc(list_pred(a))",
+        "text": "caller provides list permission",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "Acc(list_pred(a))",
+        "text": "list permission is returned",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "len(a) == Old(len(a))",
+        "text": "list length is unchanged",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "len(a) == 0 ==> Result() == default",
+        "text": "empty list returns default",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt5",
+        "type": "ensures",
+        "expr": "Old(len(a)) > 0 ==> Result() == Old(a[0])",
+        "text": "nonempty list returns first element",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Requires(Acc(list_pred(a)))\nEnsures(Acc(list_pred(a)))\nEnsures(len(a) == Old(len(a)))\nEnsures(Implies(len(a) == 0, Result() == default))\nEnsures(Implies(Old(len(a)) > 0, Result() == Old(a[0])))"
+  },
+  {
+    "id": 25,
+    "path": "list_basics/Problem025_SecondElement.py",
+    "category": "list_basics",
+    "requirement_en": "Given a list with at least two elements, return the second element.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/list_basics/Problem025_SecondElement.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def second_element(a: List[int]) -> int:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "Acc(list_pred(a))",
+        "text": "caller provides list permission",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "len(a) >= 2",
+        "text": "list has a second element",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "Acc(list_pred(a))",
+        "text": "list permission is returned",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "Result() == Old(a[1])",
+        "text": "second element is returned",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Requires(Acc(list_pred(a)))\nRequires(len(a) >= 2)\nEnsures(Acc(list_pred(a)))\nEnsures(Result() == Old(a[1]))"
+  },
+  {
+    "id": 26,
+    "path": "list_basics/Problem026_ListSumTwo.py",
+    "category": "list_basics",
+    "requirement_en": "Given a list with at least two integers, return the sum of the first two.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/list_basics/Problem026_ListSumTwo.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def list_sum_two(a: List[int]) -> int:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "Acc(list_pred(a))",
+        "text": "caller provides list permission",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "len(a) >= 2",
+        "text": "two elements are available",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "Acc(list_pred(a))",
+        "text": "list permission is returned",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "Result() == Old(a[0]) + Old(a[1])",
+        "text": "result sums first two elements",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Requires(Acc(list_pred(a)))\nRequires(len(a) >= 2)\nEnsures(Acc(list_pred(a)))\nEnsures(Result() == Old(a[0]) + Old(a[1]))"
+  },
+  {
+    "id": 27,
+    "path": "list_basics/Problem027_ListContainsAtIndex.py",
+    "category": "list_basics",
+    "requirement_en": "Return true when the given valid index stores the target value.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/list_basics/Problem027_ListContainsAtIndex.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def list_contains_at_index(a: List[int], i: int, target: int) -> bool:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "Acc(list_pred(a))",
+        "text": "caller provides list permission",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "0 <= i and i < len(a)",
+        "text": "index is valid",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "Acc(list_pred(a))",
+        "text": "list permission is returned",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "Result() == (Old(a[i]) == target)",
+        "text": "result compares indexed value",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Requires(Acc(list_pred(a)))\nRequires(0 <= i and i < len(a))\nEnsures(Acc(list_pred(a)))\nEnsures(Result() == (Old(a[i]) == target))"
+  },
+  {
+    "id": 28,
+    "path": "list_basics/Problem028_ListPrefixPairSorted.py",
+    "category": "list_basics",
+    "requirement_en": "Given a list with at least two elements, return true exactly when the first pair is nondecreasing.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/list_basics/Problem028_ListPrefixPairSorted.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def list_prefix_pair_sorted(a: List[int]) -> bool:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "Acc(list_pred(a))",
+        "text": "caller provides list permission",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "len(a) >= 2",
+        "text": "first pair exists",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "Acc(list_pred(a))",
+        "text": "list permission is returned",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "Result() == (Old(a[0]) <= Old(a[1]))",
+        "text": "result checks pair ordering",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Requires(Acc(list_pred(a)))\nRequires(len(a) >= 2)\nEnsures(Acc(list_pred(a)))\nEnsures(Result() == (Old(a[0]) <= Old(a[1])))"
+  },
+  {
+    "id": 29,
+    "path": "list_mutation/Problem029_SetAtIndex.py",
+    "category": "list_mutation",
+    "requirement_en": "Given a list, valid index, and value, store the value at that index.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/list_mutation/Problem029_SetAtIndex.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def set_at_index(a: List[int], i: int, value: int) -> None:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "Acc(list_pred(a))",
+        "text": "caller provides list permission",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "0 <= i and i < len(a)",
+        "text": "index is valid",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "Acc(list_pred(a))",
+        "text": "list permission is returned",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "len(a) == Old(len(a))",
+        "text": "list length is unchanged",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt5",
+        "type": "ensures",
+        "expr": "a[i] == value",
+        "text": "indexed element is updated",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Requires(Acc(list_pred(a)))\nRequires(0 <= i and i < len(a))\nEnsures(Acc(list_pred(a)))\nEnsures(len(a) == Old(len(a)))\nEnsures(a[i] == value)"
+  },
+  {
+    "id": 30,
+    "path": "list_mutation/Problem030_SetFirst.py",
+    "category": "list_mutation",
+    "requirement_en": "Given a nonempty list, replace its first element with value.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/list_mutation/Problem030_SetFirst.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def set_first(a: List[int], value: int) -> None:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "Acc(list_pred(a))",
+        "text": "caller provides list permission",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "len(a) > 0",
+        "text": "list is nonempty",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "Acc(list_pred(a))",
+        "text": "list permission is returned",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "len(a) == Old(len(a))",
+        "text": "list length is unchanged",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt5",
+        "type": "ensures",
+        "expr": "a[0] == value",
+        "text": "first element is updated",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Requires(Acc(list_pred(a)))\nRequires(len(a) > 0)\nEnsures(Acc(list_pred(a)))\nEnsures(len(a) == Old(len(a)))\nEnsures(a[0] == value)"
+  },
+  {
+    "id": 31,
+    "path": "list_mutation/Problem031_SetLast.py",
+    "category": "list_mutation",
+    "requirement_en": "Given a nonempty list, replace its last element with value.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/list_mutation/Problem031_SetLast.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def set_last(a: List[int], value: int) -> None:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "Acc(list_pred(a))",
+        "text": "caller provides list permission",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "len(a) > 0",
+        "text": "list is nonempty",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "Acc(list_pred(a))",
+        "text": "list permission is returned",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "len(a) == Old(len(a))",
+        "text": "list length is unchanged",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt5",
+        "type": "ensures",
+        "expr": "a[len(a) - 1] == value",
+        "text": "last element is updated",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Requires(Acc(list_pred(a)))\nRequires(len(a) > 0)\nEnsures(Acc(list_pred(a)))\nEnsures(len(a) == Old(len(a)))\nEnsures(a[len(a) - 1] == value)"
+  },
+  {
+    "id": 32,
+    "path": "list_mutation/Problem032_SwapFirstTwo.py",
+    "category": "list_mutation",
+    "requirement_en": "Given a list with at least two elements, swap the first two elements.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/list_mutation/Problem032_SwapFirstTwo.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def swap_first_two(a: List[int]) -> None:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "Acc(list_pred(a))",
+        "text": "caller provides list permission",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "len(a) >= 2",
+        "text": "two elements exist",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "Acc(list_pred(a))",
+        "text": "list permission is returned",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "len(a) == Old(len(a))",
+        "text": "list length is unchanged",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt5",
+        "type": "ensures",
+        "expr": "a[0] == Old(a[1])",
+        "text": "old second element moves to first",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt6",
+        "type": "ensures",
+        "expr": "a[1] == Old(a[0])",
+        "text": "old first element moves to second",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Requires(Acc(list_pred(a)))\nRequires(len(a) >= 2)\nEnsures(Acc(list_pred(a)))\nEnsures(len(a) == Old(len(a)))\nEnsures(a[0] == Old(a[1]))\nEnsures(a[1] == Old(a[0]))"
+  },
+  {
+    "id": 33,
+    "path": "list_mutation/Problem033_IncrementAtIndex.py",
+    "category": "list_mutation",
+    "requirement_en": "Given a list and valid index, increment that element by one.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/list_mutation/Problem033_IncrementAtIndex.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def increment_at_index(a: List[int], i: int) -> None:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "Acc(list_pred(a))",
+        "text": "caller provides list permission",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "0 <= i and i < len(a)",
+        "text": "index is valid",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "Acc(list_pred(a))",
+        "text": "list permission is returned",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "len(a) == Old(len(a))",
+        "text": "list length is unchanged",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt5",
+        "type": "ensures",
+        "expr": "a[i] == Old(a[i]) + 1",
+        "text": "indexed element is incremented",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Requires(Acc(list_pred(a)))\nRequires(0 <= i and i < len(a))\nEnsures(Acc(list_pred(a)))\nEnsures(len(a) == Old(len(a)))\nEnsures(a[i] == Old(a[i]) + 1)"
+  },
+  {
+    "id": 34,
+    "path": "list_mutation/Problem034_DecrementAtIndex.py",
+    "category": "list_mutation",
+    "requirement_en": "Given a list and valid index, decrement that element by one.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/list_mutation/Problem034_DecrementAtIndex.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def decrement_at_index(a: List[int], i: int) -> None:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "Acc(list_pred(a))",
+        "text": "caller provides list permission",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "0 <= i and i < len(a)",
+        "text": "index is valid",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "Acc(list_pred(a))",
+        "text": "list permission is returned",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "len(a) == Old(len(a))",
+        "text": "list length is unchanged",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt5",
+        "type": "ensures",
+        "expr": "a[i] == Old(a[i]) - 1",
+        "text": "indexed element is decremented",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Requires(Acc(list_pred(a)))\nRequires(0 <= i and i < len(a))\nEnsures(Acc(list_pred(a)))\nEnsures(len(a) == Old(len(a)))\nEnsures(a[i] == Old(a[i]) - 1)"
+  },
+  {
+    "id": 35,
+    "path": "list_mutation/Problem035_AppendValue.py",
+    "category": "list_mutation",
+    "requirement_en": "Append a value to the end of the list.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/list_mutation/Problem035_AppendValue.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def append_value(a: List[int], value: int) -> None:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "Acc(list_pred(a))",
+        "text": "caller provides list permission",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "Acc(list_pred(a))",
+        "text": "list permission is returned",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "len(a) == Old(len(a)) + 1",
+        "text": "list length increases by one",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "a[len(a) - 1] == value",
+        "text": "new last element is appended value",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Requires(Acc(list_pred(a)))\nEnsures(Acc(list_pred(a)))\nEnsures(len(a) == Old(len(a)) + 1)\nEnsures(a[len(a) - 1] == value)"
+  },
+  {
+    "id": 36,
+    "path": "list_mutation/Problem036_ReadAndZeroLast.py",
+    "category": "list_mutation",
+    "requirement_en": "Given a nonempty list, return its last element and replace that last element with zero.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/list_mutation/Problem036_ReadAndZeroLast.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def read_and_zero_last(a: List[int]) -> int:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "Acc(list_pred(a))",
+        "text": "caller provides list permission",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "len(a) > 0",
+        "text": "list is nonempty",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "Acc(list_pred(a))",
+        "text": "list permission is returned",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "len(a) == Old(len(a))",
+        "text": "list length is unchanged",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt5",
+        "type": "ensures",
+        "expr": "Result() == Old(a[len(a) - 1])",
+        "text": "old last element is returned",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt6",
+        "type": "ensures",
+        "expr": "a[len(a) - 1] == 0",
+        "text": "last element is replaced with zero",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Requires(Acc(list_pred(a)))\nRequires(len(a) > 0)\nEnsures(Acc(list_pred(a)))\nEnsures(len(a) == Old(len(a)))\nEnsures(Result() == Old(a[len(a) - 1]))\nEnsures(a[len(a) - 1] == 0)"
+  },
+  {
+    "id": 37,
+    "path": "list_mutation/Problem037_ZeroIfSingleton.py",
+    "category": "list_mutation",
+    "requirement_en": "If the list has exactly one element, replace it with zero; otherwise only preserve the length.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/list_mutation/Problem037_ZeroIfSingleton.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def zero_if_singleton(a: List[int]) -> None:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "Acc(list_pred(a))",
+        "text": "caller provides list permission",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "Acc(list_pred(a))",
+        "text": "list permission is returned",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "len(a) == Old(len(a))",
+        "text": "list length is unchanged",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "Old(len(a)) == 1 ==> a[0] == 0",
+        "text": "singleton element is zeroed",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Requires(Acc(list_pred(a)))\nEnsures(Acc(list_pred(a)))\nEnsures(len(a) == Old(len(a)))\nEnsures(Implies(Old(len(a)) == 1, a[0] == 0))"
+  },
+  {
+    "id": 38,
+    "path": "list_mutation/Problem038_ReplaceNegativeIndexFree.py",
+    "category": "list_mutation",
+    "requirement_en": "Given a valid nonnegative index, replace that element; the precondition rules out Python negative indexing.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/list_mutation/Problem038_ReplaceNegativeIndexFree.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def replace_negative_index_free(a: List[int], i: int, value: int) -> None:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "Acc(list_pred(a))",
+        "text": "caller provides list permission",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "0 <= i and i < len(a)",
+        "text": "negative indexing and out-of-bounds access are forbidden",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "Acc(list_pred(a))",
+        "text": "list permission is returned",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "len(a) == Old(len(a))",
+        "text": "list length is unchanged",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt5",
+        "type": "ensures",
+        "expr": "a[i] == value",
+        "text": "valid indexed element is updated",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Requires(Acc(list_pred(a)))\nRequires(0 <= i and i < len(a))\nEnsures(Acc(list_pred(a)))\nEnsures(len(a) == Old(len(a)))\nEnsures(a[i] == value)"
+  },
+  {
+    "id": 39,
+    "path": "dict_apis/Problem039_DictContainsKey.py",
+    "category": "dict_apis",
+    "requirement_en": "Return true exactly when the dictionary contains the key.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/dict_apis/Problem039_DictContainsKey.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def dict_contains_key(d: Dict[int, int], key: int) -> bool:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "Acc(dict_pred(d))",
+        "text": "caller provides dictionary permission",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "Acc(dict_pred(d))",
+        "text": "dictionary permission is returned",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "Result() == (key in d)",
+        "text": "result captures key membership",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Requires(Acc(dict_pred(d)))\nEnsures(Acc(dict_pred(d)))\nEnsures(Result() == (key in d))"
+  },
+  {
+    "id": 40,
+    "path": "dict_apis/Problem040_DictGetExisting.py",
+    "category": "dict_apis",
+    "requirement_en": "Given a dictionary and an existing key, return the associated value.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/dict_apis/Problem040_DictGetExisting.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def dict_get_existing(d: Dict[int, int], key: int) -> int:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "Acc(dict_pred(d))",
+        "text": "caller provides dictionary permission",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "key in d",
+        "text": "key exists",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "Acc(dict_pred(d))",
+        "text": "dictionary permission is returned",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "Result() == Old(d[key])",
+        "text": "associated value is returned",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Requires(Acc(dict_pred(d)))\nRequires(key in d)\nEnsures(Acc(dict_pred(d)))\nEnsures(Result() == Old(d[key]))"
+  },
+  {
+    "id": 41,
+    "path": "dict_apis/Problem041_DictGetDefault.py",
+    "category": "dict_apis",
+    "requirement_en": "Return the stored dictionary value when the key exists, otherwise return the default.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/dict_apis/Problem041_DictGetDefault.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def dict_get_default(d: Dict[int, int], key: int, default: int) -> int:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "Acc(dict_pred(d))",
+        "text": "caller provides dictionary permission",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "Acc(dict_pred(d))",
+        "text": "dictionary permission is returned",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "Old(key in d) ==> Result() == Old(d[key])",
+        "text": "existing key returns stored value",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "key not in d ==> Result() == default",
+        "text": "missing key returns default",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Requires(Acc(dict_pred(d)))\nEnsures(Acc(dict_pred(d)))\nEnsures(Implies(Old(key in d), Result() == Old(d[key])))\nEnsures(Implies(key not in d, Result() == default))"
+  },
+  {
+    "id": 42,
+    "path": "dict_apis/Problem042_DictSetKey.py",
+    "category": "dict_apis",
+    "requirement_en": "Set a dictionary key to a value.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/dict_apis/Problem042_DictSetKey.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def dict_set_key(d: Dict[int, int], key: int, value: int) -> None:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "Acc(dict_pred(d))",
+        "text": "caller provides dictionary permission",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "Acc(dict_pred(d))",
+        "text": "dictionary permission is returned",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "key in d",
+        "text": "key exists after update",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "d[key] == value",
+        "text": "key maps to updated value",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Requires(Acc(dict_pred(d)))\nEnsures(Acc(dict_pred(d)))\nEnsures(key in d)\nEnsures(d[key] == value)"
+  },
+  {
+    "id": 43,
+    "path": "dict_apis/Problem043_DictIncrementExisting.py",
+    "category": "dict_apis",
+    "requirement_en": "Given an existing key, increment its dictionary value by one.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/dict_apis/Problem043_DictIncrementExisting.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def dict_increment_existing(d: Dict[int, int], key: int) -> None:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "Acc(dict_pred(d))",
+        "text": "caller provides dictionary permission",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "key in d",
+        "text": "key exists",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "Acc(dict_pred(d))",
+        "text": "dictionary permission is returned",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "key in d",
+        "text": "key still exists",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt5",
+        "type": "ensures",
+        "expr": "d[key] == Old(d[key]) + 1",
+        "text": "stored value is incremented",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Requires(Acc(dict_pred(d)))\nRequires(key in d)\nEnsures(Acc(dict_pred(d)))\nEnsures(key in d)\nEnsures(d[key] == Old(d[key]) + 1)"
+  },
+  {
+    "id": 44,
+    "path": "dict_apis/Problem044_DictZeroExisting.py",
+    "category": "dict_apis",
+    "requirement_en": "Given an existing key, replace its dictionary value with zero.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/dict_apis/Problem044_DictZeroExisting.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def dict_zero_existing(d: Dict[int, int], key: int) -> None:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "Acc(dict_pred(d))",
+        "text": "caller provides dictionary permission",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "key in d",
+        "text": "key exists before update",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "Acc(dict_pred(d))",
+        "text": "dictionary permission is returned",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "key in d",
+        "text": "key still exists",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt5",
+        "type": "ensures",
+        "expr": "d[key] == 0",
+        "text": "stored value is zero after update",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Requires(Acc(dict_pred(d)))\nRequires(key in d)\nEnsures(Acc(dict_pred(d)))\nEnsures(key in d)\nEnsures(d[key] == 0)"
+  },
+  {
+    "id": 45,
+    "path": "dict_apis/Problem045_DictSize.py",
+    "category": "dict_apis",
+    "requirement_en": "Return the number of key-value pairs in the dictionary.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/dict_apis/Problem045_DictSize.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def dict_size(d: Dict[int, int]) -> int:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "Acc(dict_pred(d))",
+        "text": "caller provides dictionary permission",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "Acc(dict_pred(d))",
+        "text": "dictionary permission is returned",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "Result() == len(d)",
+        "text": "result is dictionary size",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Requires(Acc(dict_pred(d)))\nEnsures(Acc(dict_pred(d)))\nEnsures(Result() == len(d))"
+  },
+  {
+    "id": 46,
+    "path": "dict_apis/Problem046_DictEnsureKey.py",
+    "category": "dict_apis",
+    "requirement_en": "Ensure a key is present with fallback value when missing; leave existing value unchanged when present.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/dict_apis/Problem046_DictEnsureKey.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def dict_ensure_key(d: Dict[int, int], key: int, fallback: int) -> None:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "Acc(dict_pred(d))",
+        "text": "caller provides dictionary permission",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "Acc(dict_pred(d))",
+        "text": "dictionary permission is returned",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "key in d",
+        "text": "key exists after call",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "Old(key in d) ==> d[key] == Old(d[key])",
+        "text": "existing value is preserved",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt5",
+        "type": "ensures",
+        "expr": "not Old(key in d) ==> d[key] == fallback",
+        "text": "missing key gets fallback",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Requires(Acc(dict_pred(d)))\nEnsures(Acc(dict_pred(d)))\nEnsures(key in d)\nEnsures(Implies(Old(key in d), d[key] == Old(d[key])))\nEnsures(Implies(not Old(key in d), d[key] == fallback))"
+  },
+  {
+    "id": 47,
+    "path": "exception_freedom/Problem047_RequireValidIndex.py",
+    "category": "exception_freedom",
+    "requirement_en": "Given a list and valid nonnegative index, return the element without raising IndexError.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/exception_freedom/Problem047_RequireValidIndex.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def require_valid_index(a: List[int], i: int) -> int:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "Acc(list_pred(a))",
+        "text": "caller provides list permission",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "0 <= i and i < len(a)",
+        "text": "index is valid and nonnegative",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "Acc(list_pred(a))",
+        "text": "list permission is returned",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "Result() == Old(a[i])",
+        "text": "indexed value is returned",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Requires(Acc(list_pred(a)))\nRequires(0 <= i and i < len(a))\nEnsures(Acc(list_pred(a)))\nEnsures(Result() == Old(a[i]))"
+  },
+  {
+    "id": 48,
+    "path": "exception_freedom/Problem048_RequireExistingKey.py",
+    "category": "exception_freedom",
+    "requirement_en": "Given a dictionary and existing key, return the value without raising KeyError.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/exception_freedom/Problem048_RequireExistingKey.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def require_existing_key(d: Dict[int, int], key: int) -> int:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "Acc(dict_pred(d))",
+        "text": "caller provides dictionary permission",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "key in d",
+        "text": "key exists",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "Acc(dict_pred(d))",
+        "text": "dictionary permission is returned",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "Result() == Old(d[key])",
+        "text": "existing value is returned",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Requires(Acc(dict_pred(d)))\nRequires(key in d)\nEnsures(Acc(dict_pred(d)))\nEnsures(Result() == Old(d[key]))"
+  },
+  {
+    "id": 49,
+    "path": "exception_freedom/Problem049_SafeReciprocalFlag.py",
+    "category": "exception_freedom",
+    "requirement_en": "Return true exactly when division by x would be safe.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/exception_freedom/Problem049_SafeReciprocalFlag.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def safe_reciprocal_flag(x: int) -> bool:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "Result() == (x != 0)",
+        "text": "true exactly for nonzero divisor",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Ensures(Result() == (x != 0))"
+  },
+  {
+    "id": 50,
+    "path": "exception_freedom/Problem050_SafeSliceUpper.py",
+    "category": "exception_freedom",
+    "requirement_en": "Given a list and valid upper bound, return that upper bound; the precondition makes a[:n] safe.",
+    "ground_truth_file": "benchmarks/python-nagini-problems/ground-truth/exception_freedom/Problem050_SafeSliceUpper.py",
+    "ground_truth_source": "manual",
+    "verifier": "nagini",
+    "spec_language": "nagini_contracts",
+    "function_signature": "def safe_slice_upper(a: List[int], n: int) -> int:",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "Acc(list_pred(a))",
+        "text": "caller provides list permission",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "0 <= n and n <= len(a)",
+        "text": "slice upper bound is valid",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "Acc(list_pred(a))",
+        "text": "list permission is returned",
+        "source": "manual_nagini_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "Result() == n",
+        "text": "validated upper bound is returned",
+        "source": "manual_nagini_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "Requires(Acc(list_pred(a)))\nRequires(0 <= n and n <= len(a))\nEnsures(Acc(list_pred(a)))\nEnsures(Result() == n)"
+  }
+]

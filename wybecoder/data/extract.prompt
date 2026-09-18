@@ -1,0 +1,29 @@
+# Copyright (c) Meta Platforms, Inc. and affiliates.
+# All rights reserved.
+# This source code is licensed under the license found in the
+# LICENSE file in the root directory of this source tree.
+
+
+You are an expert code analyst and pattern recognition agent. Your task is to process a batch of code snippets containing `ESCALATE:` messages from a junior coding agent. These messages indicate a point where the agent got stuck.
+
+Your goal is to extract these failures, group them by their root cause, and produce a concise, structured summary for this single batch.
+
+**Input:** A block of code containing one or more `ESCALATE:` messages.
+
+**Instructions:**
+
+- **Extract:** Systematically find and extract the text of every `ESCALATE:` message (the content immediately following `ESCALATE:`).
+- **Analyze and Group:** Read all extracted messages. Group messages that describe the *same fundamental problem*, even if the wording is different (e.g., "unable to find library lemma", "could not prove helper lemma").
+- **Summarize and Count:** For each unique group, write a single, clear sentence that summarizes the core failure pattern. Count how many messages fall into this group.
+- **Format:** Produce your output as a Markdown list. Each item **must** follow this exact format:
+
+(Count: [N]) [One-sentence summary of the failure pattern.]
+- [1-2 sentences with details about the first instance of the observed failure pattern (e.g. missing library lemma's name, statement of the unprovable lemma) including a representative problem ID]
+- [likewise for subsequent instances of the pattern]
+- ...
+
+Note that you can keep a certain distance to the claims of the junior coding agent (e.g. if it claims that the framework is not suitable for the job). Focus on the underlying issues, not its potentially flawed higher-level takes.
+
+## Input texts:
+
+{texts}

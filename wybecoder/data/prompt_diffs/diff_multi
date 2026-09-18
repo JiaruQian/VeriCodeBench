@@ -1,0 +1,87 @@
+87a88,94
+> * **Loop invariant too weak**: If an invariant-related goal fails to prove:
+>   - The invariant may not capture enough information about the loop state.
+>   - Check: Does the invariant mention ALL mutable variables in the loop?
+>   - Check: Does the invariant relate the current state to what you'll need in the postcondition?
+> * **Invariant too strong**: If an invariant fails to hold during the loop:
+>   - The invariant may be claiming more than the loop actually maintains.
+>   - Weaken the invariant or add preconditions to when it holds.
+109a117,130
+> **Important:** If `grind` or `simp_all` report "made no progress", try this fallback chain instead:
+> 
+> ```lean
+> prove_correct my_method by
+>   loom_solve
+>   -- If goals remain, try tactics in order:
+>   all_goals try omega      -- For arithmetic goals (Int/Nat with +, -, <, ≤, *)
+>   all_goals try decide     -- For decidable propositions (concrete equalities)
+>   all_goals try grind      -- For complex goals with quantifiers
+>   all_goals try simp_all   -- Only as final cleanup
+> ```
+> 
+> Never rely on `simp_all` alone as your primary tactic for closing goals. Choose tactics based on the goal structure.
+> 
+187a209,259
+> ## 4b. Troubleshooting Proof Failures
+> 
+> When `loom_solve` leaves unsolved goals, follow this systematic approach:
+> 
+> ### Step 1: Analyze the Goal Type
+> 
+> Read the unsolved goal carefully. Different goal patterns require different tactics:
+> 
+> | Goal Pattern | Recommended Tactic |
+> |--------------|-------------------|
+> | Arithmetic over Int/Nat (contains `+`, `-`, `<`, `≤`, `*`, `%`) | `omega` |
+> | Decidable equality (`x == y` for concrete values) | `decide` |
+> | Case analysis needed (disjunction, match on structure) | `cases h` or `rcases h with ...` |
+> | Array indexing properties (`arr[i]!`) | Add `solverHint` for `Array.get_set_c`, etc. |
+> | Quantifier goals (`∀`, `∃`) | `intro`, `use`, or `grind` |
+> | Cleanup/simplification | `simp_all` (only AFTER other tactics) |
+> 
+> ### Step 2: If the Same Error Repeats 3+ Times
+> 
+> **STOP** using the same tactic. This indicates the approach is not working. Instead:
+> 
+> 1. Re-read the unsolved goal to understand what property is missing
+> 2. Check if an invariant is too weak → strengthen it to capture more information
+> 3. Try a fundamentally different tactic from Step 1 based on the goal structure
+> 4. Consider if a helper lemma is needed to bridge the gap
+> 
+> Do NOT just retry `loom_solve <;> simp_all` repeatedly when it keeps failing on the same goal.
+> 
+> ## 4c. Available Solver Hints
+> 
+> When adding `attribute [local solverHint]` declarations, **only use lemma names that actually exist**. Here is a reference list of commonly available hints in the Loom/Velvet framework:
+> 
+> ### Array Operations
+> * `Array.size_set` — size of array after set operation
+> * `Array.size_swap` — size of array after swap operation
+> * `Array.get_set_c` — accessing array after set at same/different index
+> * `Array.multiset_swap` — swap preserves multiset (permutation property)
+> * `Array.size_replicate` — size of array created by replicate
+> 
+> ### Arithmetic
+> * `Nat.mod_lt` — modular arithmetic bounds
+> * `Nat.sub_add_cancel` — subtraction/addition identity
+> * `Int.add_comm`, `Int.mul_comm` — commutativity properties
+> 
+> ### DO NOT USE (these do not exist)
+> * ❌ `Array.get_swap_c` — does NOT exist (confusion with `Array.get_set_c`)
+> * ❌ `<MethodName>_correct` — not a standard naming convention in this framework
+> * ❌ `List.qsort` — Lean 4 uses different sorting functions
+> 
+> **If you need a lemma and aren't sure of its name**: Instead of guessing, describe what property you need in a comment. Do not add `solverHint` attributes for names you're uncertain about, as this will cause "unknown constant" errors.
+> 
+362a435
+> - **Do NOT add any guard statements**: You must not add any new `guard` statements in your generated Lean code. If the input or instructions contain any guard statements, you must exclude them from your final Lean code output.
+369c442
+<   There is NO point in adding additional finer-grained mathlib imports. 
+---
+>   There is NO point in adding additional finer-grained mathlib imports.
+372a446,450
+>   **If you cannot complete a proof after multiple attempts, you MUST:**
+>   1. Explain which specific goal is blocking you and what it requires
+>   2. Suggest what lemma or invariant strengthening might be needed
+>   3. Still provide code WITHOUT `sorry` that gets as far as possible with partial tactics
+>   Do NOT introduce `sorry` to make compilation succeed. Leaving unsolved goals is better than using `sorry`.

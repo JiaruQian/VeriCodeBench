@@ -1,0 +1,12 @@
+# AutoSpec Requirements
+
+# CLI interface
+click>=8.1.0
+
+# Type hints support for older Python versions (if needed)
+typing-extensions>=4.5.0
+
+# Optional SMT entailment backend used by scripts/evaluate_constraint_entailment.py.
+# Pin below 4.16 because newer source builds require a C++ standard library
+# with <format> in some Debian/Rust containers.
+z3-solver==4.12.2.0

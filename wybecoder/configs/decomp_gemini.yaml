@@ -1,0 +1,12 @@
+config:
+  task: "verina_decomp"
+  problems: "data/verina.jsonl"
+  n_attempts: 1
+  max_turns: 8
+  n_worker_threads: 20
+  n_subagents: 32  # concurrent subagents
+  provers_per_goal: 8
+  max_subagents: 128
+  model: "gemini-3-pro-preview"
+  max_repls: 200
+  prompt_path: "data/prompt_decomp.md"

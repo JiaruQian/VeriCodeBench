@@ -1,0 +1,2709 @@
+[
+  {
+    "id": 1,
+    "path": "scalar_arithmetic/Problem001_MaxU64.rs",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given two unsigned 64-bit integers, return the greater value without overflow or mutation.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/scalar_arithmetic/Problem001_MaxU64.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn max_u64(x: u64, y: u64) -> u64;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "r == x || r == y",
+        "text": "result is one input",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "r >= x && r >= y",
+        "text": "result is at least both inputs",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures r == x || r == y, r >= x && r >= y"
+  },
+  {
+    "id": 2,
+    "path": "scalar_arithmetic/Problem002_MinU64.rs",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given two unsigned 64-bit integers, return the smaller value.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/scalar_arithmetic/Problem002_MinU64.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn min_u64(x: u64, y: u64) -> u64;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "r == x || r == y",
+        "text": "result is one input",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "r <= x && r <= y",
+        "text": "result is at most both inputs",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures r == x || r == y, r <= x && r <= y"
+  },
+  {
+    "id": 3,
+    "path": "scalar_arithmetic/Problem003_ClampU64.rs",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given a value and an inclusive valid range, return the value clamped into that range.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/scalar_arithmetic/Problem003_ClampU64.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn clamp_u64(x: u64, lo: u64, hi: u64) -> u64;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "lo <= hi",
+        "text": "range is ordered",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "lo <= r && r <= hi",
+        "text": "result lies in range",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "x < lo ==> r == lo",
+        "text": "low values clamp to lower bound",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "lo <= x && x <= hi ==> r == x",
+        "text": "in-range values are unchanged",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt5",
+        "type": "ensures",
+        "expr": "x > hi ==> r == hi",
+        "text": "high values clamp to upper bound",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires lo <= hi; ensures lo <= r && r <= hi; ensures x < lo ==> r == lo; ensures lo <= x && x <= hi ==> r == x; ensures x > hi ==> r == hi"
+  },
+  {
+    "id": 4,
+    "path": "scalar_arithmetic/Problem004_SafeAdd.rs",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given two unsigned integers whose sum fits in u64, return their sum.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/scalar_arithmetic/Problem004_SafeAdd.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn safe_add(x: u64, y: u64) -> u64;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "x <= u64::MAX - y",
+        "text": "addition cannot overflow",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "r == x + y",
+        "text": "result is mathematical sum",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires x <= u64::MAX - y; ensures r == x + y"
+  },
+  {
+    "id": 5,
+    "path": "scalar_arithmetic/Problem005_SafeSub.rs",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given two unsigned integers where the subtrahend is not larger, return their difference.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/scalar_arithmetic/Problem005_SafeSub.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn safe_sub(x: u64, y: u64) -> u64;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "y <= x",
+        "text": "subtraction cannot underflow",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "r == x - y",
+        "text": "result is mathematical difference",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires y <= x; ensures r == x - y"
+  },
+  {
+    "id": 6,
+    "path": "scalar_arithmetic/Problem006_IncrementBounded.rs",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given an unsigned integer smaller than u64::MAX, return it plus one.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/scalar_arithmetic/Problem006_IncrementBounded.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn increment_bounded(x: u64) -> u64;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "x < u64::MAX",
+        "text": "increment cannot overflow",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "r == x + 1",
+        "text": "result is incremented value",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires x < u64::MAX; ensures r == x + 1"
+  },
+  {
+    "id": 7,
+    "path": "scalar_arithmetic/Problem007_DecrementPositive.rs",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given a positive unsigned integer, return it minus one.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/scalar_arithmetic/Problem007_DecrementPositive.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn decrement_positive(x: u64) -> u64;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "x > 0",
+        "text": "decrement cannot underflow",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "r == x - 1",
+        "text": "result is decremented value",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires x > 0; ensures r == x - 1"
+  },
+  {
+    "id": 8,
+    "path": "scalar_arithmetic/Problem008_AbsDiff.rs",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given two unsigned integers, return their absolute difference without underflow.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/scalar_arithmetic/Problem008_AbsDiff.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn abs_diff_u64(x: u64, y: u64) -> u64;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "x >= y ==> r == x - y",
+        "text": "when x is larger result is x minus y",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "x < y ==> r == y - x",
+        "text": "when y is larger result is y minus x",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures x >= y ==> r == x - y; ensures x < y ==> r == y - x"
+  },
+  {
+    "id": 9,
+    "path": "scalar_arithmetic/Problem009_AverageFloor.rs",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given two unsigned integers whose sum fits in u64, return floor((x + y) / 2).",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/scalar_arithmetic/Problem009_AverageFloor.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn average_floor(x: u64, y: u64) -> u64;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "x <= u64::MAX - y",
+        "text": "addition cannot overflow",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "r == (x + y) / 2",
+        "text": "result is floor average",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires x <= u64::MAX - y; ensures r == (x + y) / 2"
+  },
+  {
+    "id": 10,
+    "path": "scalar_arithmetic/Problem010_SaturatingSub.rs",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given two unsigned integers, subtract the second from the first, returning zero on underflow.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/scalar_arithmetic/Problem010_SaturatingSub.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn saturating_sub_u64(x: u64, y: u64) -> u64;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "x >= y ==> r == x - y",
+        "text": "normal subtraction when safe",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "x < y ==> r == 0",
+        "text": "underflow case saturates to zero",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures x >= y ==> r == x - y; ensures x < y ==> r == 0"
+  },
+  {
+    "id": 11,
+    "path": "option_result/Problem011_OptionIsSome.rs",
+    "category": "option_result",
+    "requirement_en": "Given an Option<u64>, return true exactly when it contains a value.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/option_result/Problem011_OptionIsSome.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn option_is_some(o: Option<u64>) -> bool;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "r <==> o is Some",
+        "text": "result reflects Some variant",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures r <==> o is Some"
+  },
+  {
+    "id": 12,
+    "path": "option_result/Problem012_OptionIsNone.rs",
+    "category": "option_result",
+    "requirement_en": "Given an Option<u64>, return true exactly when it is None.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/option_result/Problem012_OptionIsNone.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn option_is_none(o: Option<u64>) -> bool;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "r <==> o is None",
+        "text": "result reflects None variant",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures r <==> o is None"
+  },
+  {
+    "id": 13,
+    "path": "option_result/Problem013_UnwrapOr.rs",
+    "category": "option_result",
+    "requirement_en": "Given an Option<u64> and a default, return the contained value or the default.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/option_result/Problem013_UnwrapOr.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn unwrap_or_u64(o: Option<u64>, default: u64) -> u64;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "o is Some ==> r == o->Some_0",
+        "text": "Some returns contained value",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "o is None ==> r == default",
+        "text": "None returns default",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures o is Some ==> r == o->Some_0; ensures o is None ==> r == default"
+  },
+  {
+    "id": 14,
+    "path": "option_result/Problem014_OptionIncrement.rs",
+    "category": "option_result",
+    "requirement_en": "Given an Option<u64>, increment the contained value when present and safe, otherwise keep None.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/option_result/Problem014_OptionIncrement.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn option_increment(o: Option<u64>) -> Option<u64>;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "o is Some ==> o->Some_0 < u64::MAX",
+        "text": "contained value can be incremented",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "o is None ==> r is None",
+        "text": "None remains None",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "o is Some ==> r is Some && r->Some_0 == o->Some_0 + 1",
+        "text": "Some value is incremented",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires o is Some ==> o->Some_0 < u64::MAX; ensures o is None ==> r is None; ensures o is Some ==> r is Some && r->Some_0 == o->Some_0 + 1"
+  },
+  {
+    "id": 15,
+    "path": "option_result/Problem015_FilterNonzero.rs",
+    "category": "option_result",
+    "requirement_en": "Given a u64, return Some(x) exactly when x is nonzero, otherwise None.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/option_result/Problem015_FilterNonzero.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn filter_nonzero(x: u64) -> Option<u64>;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "x == 0 ==> r is None",
+        "text": "zero is rejected",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "x != 0 ==> r is Some && r->Some_0 == x",
+        "text": "nonzero is returned",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures x == 0 ==> r is None; ensures x != 0 ==> r is Some && r->Some_0 == x"
+  },
+  {
+    "id": 16,
+    "path": "option_result/Problem016_BoolToResult.rs",
+    "category": "option_result",
+    "requirement_en": "Given a boolean and value, return Ok(value) when the boolean is true and Err otherwise.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/option_result/Problem016_BoolToResult.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn bool_to_result(ok: bool, value: u64) -> Result<u64, ()>;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "ok ==> r is Ok && r->Ok_0 == value",
+        "text": "true returns Ok value",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "!ok ==> r is Err",
+        "text": "false returns Err",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures ok ==> r is Ok && r->Ok_0 == value; ensures !ok ==> r is Err"
+  },
+  {
+    "id": 17,
+    "path": "option_result/Problem017_ResultIsOk.rs",
+    "category": "option_result",
+    "requirement_en": "Given a Result<u64, ()>, return true exactly when it is Ok.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/option_result/Problem017_ResultIsOk.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn result_is_ok(x: Result<u64, ()>) -> bool;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "r <==> x is Ok",
+        "text": "result reflects Ok variant",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures r <==> x is Ok"
+  },
+  {
+    "id": 18,
+    "path": "option_result/Problem018_ResultUnwrapOr.rs",
+    "category": "option_result",
+    "requirement_en": "Given a Result<u64, ()> and a default, return the Ok value or the default.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/option_result/Problem018_ResultUnwrapOr.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn result_unwrap_or(x: Result<u64, ()>, default: u64) -> u64;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "x is Ok ==> r == x->Ok_0",
+        "text": "Ok returns contained value",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "x is Err ==> r == default",
+        "text": "Err returns default",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures x is Ok ==> r == x->Ok_0; ensures x is Err ==> r == default"
+  },
+  {
+    "id": 19,
+    "path": "option_result/Problem019_CheckedAddOption.rs",
+    "category": "option_result",
+    "requirement_en": "Given two unsigned integers, return Some(sum) when addition fits in u64 and None otherwise.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/option_result/Problem019_CheckedAddOption.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn checked_add_option(x: u64, y: u64) -> Option<u64>;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "x <= u64::MAX - y ==> r is Some && r->Some_0 == x + y",
+        "text": "safe addition returns Some sum",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "x > u64::MAX - y ==> r is None",
+        "text": "overflow returns None",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures x <= u64::MAX - y ==> r is Some && r->Some_0 == x + y; ensures x > u64::MAX - y ==> r is None"
+  },
+  {
+    "id": 20,
+    "path": "option_result/Problem020_SafeDivResult.rs",
+    "category": "option_result",
+    "requirement_en": "Given two unsigned integers, return Ok(x / y) when y is nonzero and Err when y is zero.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/option_result/Problem020_SafeDivResult.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn safe_div_result(x: u64, y: u64) -> Result<u64, ()>;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "y == 0 ==> r is Err",
+        "text": "division by zero returns Err",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "y != 0 ==> r is Ok && r->Ok_0 == x / y",
+        "text": "nonzero divisor returns quotient",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures y == 0 ==> r is Err; ensures y != 0 ==> r is Ok && r->Ok_0 == x / y"
+  },
+  {
+    "id": 21,
+    "path": "vec_immutable/Problem021_VecLen.rs",
+    "category": "vec_immutable",
+    "requirement_en": "Given an immutable borrowed Vec<u64>, return its length without mutation.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_immutable/Problem021_VecLen.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_len(v: &Vec<u64>) -> usize;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "r == v.len()",
+        "text": "result is executable vector length",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "r == v@.len()",
+        "text": "result is ghost sequence length",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures r == v.len(); ensures r == v@.len()"
+  },
+  {
+    "id": 22,
+    "path": "vec_immutable/Problem022_VecIsEmpty.rs",
+    "category": "vec_immutable",
+    "requirement_en": "Given an immutable borrowed Vec<u64>, return true exactly when its length is zero.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_immutable/Problem022_VecIsEmpty.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_is_empty(v: &Vec<u64>) -> bool;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "r <==> v.len() == 0",
+        "text": "empty iff length is zero",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures r <==> v.len() == 0"
+  },
+  {
+    "id": 23,
+    "path": "vec_immutable/Problem023_VecFirst.rs",
+    "category": "vec_immutable",
+    "requirement_en": "Given a nonempty borrowed Vec<u64>, return its first element without mutation.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_immutable/Problem023_VecFirst.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_first(v: &Vec<u64>) -> u64;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "v.len() > 0",
+        "text": "vector is nonempty",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "r == v[0]",
+        "text": "result is first element",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires v.len() > 0; ensures r == v[0]"
+  },
+  {
+    "id": 24,
+    "path": "vec_immutable/Problem024_VecLast.rs",
+    "category": "vec_immutable",
+    "requirement_en": "Given a nonempty borrowed Vec<u64>, return its last element without mutation.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_immutable/Problem024_VecLast.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_last(v: &Vec<u64>) -> u64;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "v.len() > 0",
+        "text": "vector is nonempty",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "r == v[v.len() - 1]",
+        "text": "result is last element",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires v.len() > 0; ensures r == v[v.len() - 1]"
+  },
+  {
+    "id": 25,
+    "path": "vec_immutable/Problem025_VecGetAt.rs",
+    "category": "vec_immutable",
+    "requirement_en": "Given a borrowed Vec<u64> and a valid index, return the indexed element.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_immutable/Problem025_VecGetAt.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_get_at(v: &Vec<u64>, i: usize) -> u64;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "i < v.len()",
+        "text": "index is in bounds",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "r == v[i as int]",
+        "text": "result is indexed element",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires i < v.len(); ensures r == v[i as int]"
+  },
+  {
+    "id": 26,
+    "path": "vec_immutable/Problem026_VecGetOption.rs",
+    "category": "vec_immutable",
+    "requirement_en": "Given a borrowed Vec<u64> and an index, return Some(element) for in-bounds indices and None otherwise.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_immutable/Problem026_VecGetOption.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_get_option(v: &Vec<u64>, i: usize) -> Option<u64>;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "i < v.len() ==> r is Some && r->Some_0 == v[i as int]",
+        "text": "valid index returns Some element",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "i >= v.len() ==> r is None",
+        "text": "invalid index returns None",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures i < v.len() ==> r is Some && r->Some_0 == v[i as int]; ensures i >= v.len() ==> r is None"
+  },
+  {
+    "id": 27,
+    "path": "vec_immutable/Problem027_VecHeadOrDefault.rs",
+    "category": "vec_immutable",
+    "requirement_en": "Given a borrowed Vec<u64> and a default, return the first element when present and the default otherwise.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_immutable/Problem027_VecHeadOrDefault.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_head_or_default(v: &Vec<u64>, default: u64) -> u64;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "v.len() > 0 ==> r == v[0]",
+        "text": "nonempty vector returns first element",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "v.len() == 0 ==> r == default",
+        "text": "empty vector returns default",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures v.len() > 0 ==> r == v[0]; ensures v.len() == 0 ==> r == default"
+  },
+  {
+    "id": 28,
+    "path": "vec_immutable/Problem028_VecLastOrDefault.rs",
+    "category": "vec_immutable",
+    "requirement_en": "Given a borrowed Vec<u64> and a default, return the last element when present and the default otherwise.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_immutable/Problem028_VecLastOrDefault.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_last_or_default(v: &Vec<u64>, default: u64) -> u64;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "v.len() > 0 ==> r == v[v.len() - 1]",
+        "text": "nonempty vector returns last element",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "v.len() == 0 ==> r == default",
+        "text": "empty vector returns default",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures v.len() > 0 ==> r == v[v.len() - 1]; ensures v.len() == 0 ==> r == default"
+  },
+  {
+    "id": 29,
+    "path": "vec_immutable/Problem029_VecContains.rs",
+    "category": "vec_immutable",
+    "requirement_en": "Given a borrowed Vec<u64> and a target, return true exactly when some element equals the target.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_immutable/Problem029_VecContains.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_contains(v: &Vec<u64>, target: u64) -> bool;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "r <==> exists|i:int| 0 <= i < v.len() && v[i] == target",
+        "text": "result iff target occurs",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures r <==> exists|i:int| 0 <= i < v.len() && v[i] == target"
+  },
+  {
+    "id": 30,
+    "path": "vec_immutable/Problem030_VecAllNonzero.rs",
+    "category": "vec_immutable",
+    "requirement_en": "Given a borrowed Vec<u64>, return true exactly when every element is nonzero.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_immutable/Problem030_VecAllNonzero.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_all_nonzero(v: &Vec<u64>) -> bool;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "r <==> forall|i:int| 0 <= i < v.len() ==> v[i] != 0",
+        "text": "result iff all elements are nonzero",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures r <==> forall|i:int| 0 <= i < v.len() ==> v[i] != 0"
+  },
+  {
+    "id": 31,
+    "path": "vec_immutable/Problem031_VecAnyZero.rs",
+    "category": "vec_immutable",
+    "requirement_en": "Given a borrowed Vec<u64>, return true exactly when at least one element is zero.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_immutable/Problem031_VecAnyZero.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_any_zero(v: &Vec<u64>) -> bool;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "r <==> exists|i:int| 0 <= i < v.len() && v[i] == 0",
+        "text": "result iff a zero occurs",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures r <==> exists|i:int| 0 <= i < v.len() && v[i] == 0"
+  },
+  {
+    "id": 32,
+    "path": "vec_immutable/Problem032_VecSecond.rs",
+    "category": "vec_immutable",
+    "requirement_en": "Given a borrowed Vec<u64> with at least two elements, return the second element.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_immutable/Problem032_VecSecond.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_second(v: &Vec<u64>) -> u64;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "v.len() > 1",
+        "text": "second element exists",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "r == v[1]",
+        "text": "result is second element",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires v.len() > 1; ensures r == v[1]"
+  },
+  {
+    "id": 33,
+    "path": "vec_mutation/Problem033_VecSetAt.rs",
+    "category": "vec_mutation",
+    "requirement_en": "Given a uniquely borrowed Vec<u64>, a valid index, and a value, update exactly that element.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_mutation/Problem033_VecSetAt.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_set_at(v: &mut Vec<u64>, i: usize, x: u64);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "i < old(v).len()",
+        "text": "index is valid in pre-state",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "final(v)@ == old(v)@.update(i as int, x)",
+        "text": "final vector is old vector with one updated element",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires i < old(v).len(); ensures final(v)@ == old(v)@.update(i as int, x)"
+  },
+  {
+    "id": 34,
+    "path": "vec_mutation/Problem034_VecSwapTwo.rs",
+    "category": "vec_mutation",
+    "requirement_en": "Given a uniquely borrowed Vec<u64> and two valid indices, swap the two elements and leave all others unchanged.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_mutation/Problem034_VecSwapTwo.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_swap_two(v: &mut Vec<u64>, i: usize, j: usize);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "i < old(v).len()",
+        "text": "first index is valid",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "j < old(v).len()",
+        "text": "second index is valid",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "final(v).len() == old(v).len()",
+        "text": "length is unchanged",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "final(v)[i as int] == old(v)[j as int]",
+        "text": "first position receives old second value",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt5",
+        "type": "ensures",
+        "expr": "final(v)[j as int] == old(v)[i as int]",
+        "text": "second position receives old first value",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt6",
+        "type": "ensures",
+        "expr": "forall|k:int| 0 <= k < old(v).len() && k != i && k != j ==> final(v)[k] == old(v)[k]",
+        "text": "other elements unchanged",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires i < old(v).len(); requires j < old(v).len(); ensures final(v).len() == old(v).len(); ensures final(v)[i as int] == old(v)[j as int]; ensures final(v)[j as int] == old(v)[i as int]; ensures forall other positions unchanged"
+  },
+  {
+    "id": 35,
+    "path": "vec_mutation/Problem035_VecPush.rs",
+    "category": "vec_mutation",
+    "requirement_en": "Given a uniquely borrowed Vec<u64> and a value, append the value to the vector.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_mutation/Problem035_VecPush.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_push_value(v: &mut Vec<u64>, x: u64);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "final(v)@ == old(v)@.push(x)",
+        "text": "final vector is old vector with appended value",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures final(v)@ == old(v)@.push(x)"
+  },
+  {
+    "id": 36,
+    "path": "vec_mutation/Problem036_VecPop.rs",
+    "category": "vec_mutation",
+    "requirement_en": "Given a nonempty uniquely borrowed Vec<u64>, pop and return the last element.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_mutation/Problem036_VecPop.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_pop_value(v: &mut Vec<u64>) -> u64;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "old(v).len() > 0",
+        "text": "vector is nonempty in pre-state",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "r == old(v)[old(v).len() - 1]",
+        "text": "result is old last element",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "final(v)@ == old(v)@.drop_last()",
+        "text": "final vector drops old last element",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires old(v).len() > 0; ensures r == old(v)[old(v).len() - 1]; ensures final(v)@ == old(v)@.drop_last()"
+  },
+  {
+    "id": 37,
+    "path": "vec_mutation/Problem037_VecReplaceIfInBounds.rs",
+    "category": "vec_mutation",
+    "requirement_en": "Given a uniquely borrowed Vec<u64>, index, and value, update the element only when the index is in bounds and report whether an update happened.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_mutation/Problem037_VecReplaceIfInBounds.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_replace_if_in_bounds(v: &mut Vec<u64>, i: usize, x: u64) -> bool;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "final(v).len() == old(v).len()",
+        "text": "length unchanged",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "i < old(v).len() ==> r && final(v)@ == old(v)@.update(i as int, x)",
+        "text": "valid index updates element and returns true",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "i >= old(v).len() ==> !r && final(v)@ == old(v)@",
+        "text": "invalid index leaves vector unchanged and returns false",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures final(v).len() == old(v).len(); ensures valid index updates and returns true; ensures invalid index leaves unchanged and returns false"
+  },
+  {
+    "id": 38,
+    "path": "vec_mutation/Problem038_VecPopIfNonempty.rs",
+    "category": "vec_mutation",
+    "requirement_en": "Given a uniquely borrowed Vec<u64>, pop the last element when present and return it as an Option.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_mutation/Problem038_VecPopIfNonempty.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_pop_if_nonempty(v: &mut Vec<u64>) -> Option<u64>;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "old(v).len() == 0 ==> r is None && final(v)@ == old(v)@",
+        "text": "empty vector returns None unchanged",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "old(v).len() > 0 ==> r is Some && r->Some_0 == old(v)[old(v).len() - 1] && final(v)@ == old(v)@.drop_last()",
+        "text": "nonempty vector returns old last and drops it",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures empty vector returns None unchanged; ensures nonempty vector returns Some old last and drops it"
+  },
+  {
+    "id": 39,
+    "path": "vec_mutation/Problem039_VecPushTwo.rs",
+    "category": "vec_mutation",
+    "requirement_en": "Given a uniquely borrowed Vec<u64> and two values, append both values in order.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_mutation/Problem039_VecPushTwo.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_push_two(v: &mut Vec<u64>, x: u64, y: u64);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "final(v)@ == old(v)@.push(x).push(y)",
+        "text": "final vector appends x then y",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures final(v)@ == old(v)@.push(x).push(y)"
+  },
+  {
+    "id": 40,
+    "path": "vec_mutation/Problem040_VecFillAll.rs",
+    "category": "vec_mutation",
+    "requirement_en": "Given a uniquely borrowed Vec<u64> and a value, set every element to that value.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_mutation/Problem040_VecFillAll.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_fill_all(v: &mut Vec<u64>, x: u64);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "final(v).len() == old(v).len()",
+        "text": "length unchanged",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "forall|i:int| 0 <= i < old(v).len() ==> final(v)[i] == x",
+        "text": "all elements equal fill value",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures final(v).len() == old(v).len(); ensures forall elements equal x"
+  },
+  {
+    "id": 41,
+    "path": "vec_mutation/Problem041_VecZeroPrefix.rs",
+    "category": "vec_mutation",
+    "requirement_en": "Given a uniquely borrowed Vec<u64> and a valid prefix length, set the prefix to zero and leave the suffix unchanged.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_mutation/Problem041_VecZeroPrefix.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_zero_prefix(v: &mut Vec<u64>, n: usize);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "n <= old(v).len()",
+        "text": "prefix length is valid",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "final(v).len() == old(v).len()",
+        "text": "length unchanged",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "forall|i:int| 0 <= i < n ==> final(v)[i] == 0",
+        "text": "prefix elements are zero",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "forall|i:int| n <= i < old(v).len() ==> final(v)[i] == old(v)[i]",
+        "text": "suffix elements unchanged",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires n <= old(v).len(); ensures length unchanged; ensures prefix zero; ensures suffix unchanged"
+  },
+  {
+    "id": 42,
+    "path": "vec_mutation/Problem042_VecCopyPrefix.rs",
+    "category": "vec_mutation",
+    "requirement_en": "Given immutable source and uniquely borrowed destination vectors where destination is long enough, copy all source elements into the destination prefix and leave the rest unchanged.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_mutation/Problem042_VecCopyPrefix.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_copy_prefix(src: &Vec<u64>, dst: &mut Vec<u64>);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "old(dst).len() >= src.len()",
+        "text": "destination is long enough",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "final(dst).len() == old(dst).len()",
+        "text": "destination length unchanged",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "forall|i:int| 0 <= i < src.len() ==> final(dst)[i] == src[i]",
+        "text": "destination prefix equals source",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "forall|i:int| src.len() <= i < old(dst).len() ==> final(dst)[i] == old(dst)[i]",
+        "text": "destination suffix unchanged",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires old(dst).len() >= src.len(); ensures destination length unchanged; ensures prefix copied; ensures suffix unchanged"
+  },
+  {
+    "id": 43,
+    "path": "vec_mutation/Problem043_VecIncrementAll.rs",
+    "category": "vec_mutation",
+    "requirement_en": "Given a uniquely borrowed Vec<u64> whose elements can all be incremented, add one to every element.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_mutation/Problem043_VecIncrementAll.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_increment_all(v: &mut Vec<u64>);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "forall|i:int| 0 <= i < old(v).len() ==> old(v)[i] < u64::MAX",
+        "text": "every increment is overflow-free",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "final(v).len() == old(v).len()",
+        "text": "length unchanged",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "forall|i:int| 0 <= i < old(v).len() ==> final(v)[i] == old(v)[i] + 1",
+        "text": "every element incremented",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires all old elements are below u64::MAX; ensures length unchanged; ensures every element incremented"
+  },
+  {
+    "id": 44,
+    "path": "vec_mutation/Problem044_VecSetFirstIfNonempty.rs",
+    "category": "vec_mutation",
+    "requirement_en": "Given a uniquely borrowed Vec<u64> and a value, set the first element only when the vector is nonempty and return whether it changed.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_mutation/Problem044_VecSetFirstIfNonempty.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_set_first_if_nonempty(v: &mut Vec<u64>, x: u64) -> bool;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "old(v).len() == 0 ==> !r && final(v)@ == old(v)@",
+        "text": "empty vector unchanged and returns false",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "old(v).len() > 0 ==> r && final(v)@ == old(v)@.update(0, x)",
+        "text": "nonempty vector updates first element and returns true",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures empty unchanged false; ensures nonempty updates first true"
+  },
+  {
+    "id": 45,
+    "path": "ownership_slices/Problem045_TakeVecLen.rs",
+    "category": "ownership_slices",
+    "requirement_en": "Given owned Vec<u64>, consume it and return its length.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/ownership_slices/Problem045_TakeVecLen.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn take_vec_len(v: Vec<u64>) -> usize;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "r == v@.len()",
+        "text": "result equals length of consumed vector's ghost view",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures r == v@.len()"
+  },
+  {
+    "id": 46,
+    "path": "ownership_slices/Problem046_CloneVec.rs",
+    "category": "ownership_slices",
+    "requirement_en": "Given an immutable borrowed Vec<u64>, return an owned clone with the same sequence of elements.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/ownership_slices/Problem046_CloneVec.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn clone_vec(v: &Vec<u64>) -> Vec<u64>;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "r@ == v@",
+        "text": "clone has same ghost sequence as input",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures r@ == v@"
+  },
+  {
+    "id": 47,
+    "path": "ownership_slices/Problem047_SliceLen.rs",
+    "category": "ownership_slices",
+    "requirement_en": "Given an immutable slice of u64, return its length without indexing.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/ownership_slices/Problem047_SliceLen.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn slice_len(s: &[u64]) -> usize;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "r == s.len()",
+        "text": "result is executable slice length",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "r == s@.len()",
+        "text": "result is ghost sequence length",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures r == s.len(); ensures r == s@.len()"
+  },
+  {
+    "id": 48,
+    "path": "ownership_slices/Problem048_SliceFirst.rs",
+    "category": "ownership_slices",
+    "requirement_en": "Given a nonempty immutable slice of u64, return its first element.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/ownership_slices/Problem048_SliceFirst.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn slice_first(s: &[u64]) -> u64;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "s.len() > 0",
+        "text": "slice is nonempty",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "r == s[0]",
+        "text": "result is first slice element",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires s.len() > 0; ensures r == s[0]"
+  },
+  {
+    "id": 49,
+    "path": "ownership_slices/Problem049_ArrayGet3.rs",
+    "category": "ownership_slices",
+    "requirement_en": "Given a borrowed fixed-size array of length three and a valid index, return the indexed element.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/ownership_slices/Problem049_ArrayGet3.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn array_get3(a: &[u64; 3], i: usize) -> u64;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "i < 3",
+        "text": "index is valid for length-three array",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "r == a@[i as int]",
+        "text": "result is indexed array element",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires i < 3; ensures r == a@[i as int]"
+  },
+  {
+    "id": 50,
+    "path": "ownership_slices/Problem050_ArraySet3.rs",
+    "category": "ownership_slices",
+    "requirement_en": "Given a uniquely borrowed fixed-size array of length three, valid index, and value, update exactly that array position.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/ownership_slices/Problem050_ArraySet3.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn array_set3(a: &mut [u64; 3], i: usize, x: u64);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "i < 3",
+        "text": "index is valid for length-three array",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "final(a)@ == old(a)@.update(i as int, x)",
+        "text": "final array is old array with indexed value updated",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires i < 3; ensures final(a)@ == old(a)@.update(i as int, x)"
+  },
+  {
+    "id": 51,
+    "path": "scalar_arithmetic_ext/Problem051_IsEven.rs",
+    "category": "scalar_arithmetic_ext",
+    "requirement_en": "Given an unsigned 64-bit integer, return true exactly when it is even.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/scalar_arithmetic_ext/Problem051_IsEven.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn is_even_u64(x: u64) -> bool;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "r == (x % 2 == 0)",
+        "text": "result is true exactly when input is even",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures r == (x % 2 == 0)"
+  },
+  {
+    "id": 52,
+    "path": "scalar_arithmetic_ext/Problem052_IsOdd.rs",
+    "category": "scalar_arithmetic_ext",
+    "requirement_en": "Given an unsigned 64-bit integer, return true exactly when it is odd.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/scalar_arithmetic_ext/Problem052_IsOdd.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn is_odd_u64(x: u64) -> bool;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "r == (x % 2 == 1)",
+        "text": "result is true exactly when input is odd",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures r == (x % 2 == 1)"
+  },
+  {
+    "id": 53,
+    "path": "scalar_arithmetic_ext/Problem053_DoubleBounded.rs",
+    "category": "scalar_arithmetic_ext",
+    "requirement_en": "Given an unsigned 64-bit integer whose double does not overflow, return twice the value.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/scalar_arithmetic_ext/Problem053_DoubleBounded.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn double_bounded(x: u64) -> u64;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "x <= u64::MAX / 2",
+        "text": "doubling does not overflow",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "r == x * 2",
+        "text": "result is twice input",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires x <= u64::MAX / 2; ensures r == x * 2"
+  },
+  {
+    "id": 54,
+    "path": "scalar_arithmetic_ext/Problem054_SquareBounded.rs",
+    "category": "scalar_arithmetic_ext",
+    "requirement_en": "Given an unsigned 64-bit integer whose square does not overflow, return its square.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/scalar_arithmetic_ext/Problem054_SquareBounded.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn square_bounded(x: u64) -> u64;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "x <= 4294967295",
+        "text": "square fits in u64",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "r == x * x",
+        "text": "result is input squared",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires x <= 4294967295; ensures r == x * x"
+  },
+  {
+    "id": 55,
+    "path": "scalar_arithmetic_ext/Problem055_Max3U64.rs",
+    "category": "scalar_arithmetic_ext",
+    "requirement_en": "Given three unsigned 64-bit integers, return the greatest of the three values.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/scalar_arithmetic_ext/Problem055_Max3U64.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn max3_u64(x: u64, y: u64, z: u64) -> u64;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "r == x || r == y || r == z",
+        "text": "result is one input",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "r >= x && r >= y && r >= z",
+        "text": "result is at least all inputs",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures r == x || r == y || r == z, r >= x && r >= y && r >= z"
+  },
+  {
+    "id": 56,
+    "path": "scalar_arithmetic_ext/Problem056_Min3U64.rs",
+    "category": "scalar_arithmetic_ext",
+    "requirement_en": "Given three unsigned 64-bit integers, return the least of the three values.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/scalar_arithmetic_ext/Problem056_Min3U64.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn min3_u64(x: u64, y: u64, z: u64) -> u64;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "r == x || r == y || r == z",
+        "text": "result is one input",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "r <= x && r <= y && r <= z",
+        "text": "result is no greater than all inputs",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures r == x || r == y || r == z, r <= x && r <= y && r <= z"
+  },
+  {
+    "id": 57,
+    "path": "scalar_arithmetic_ext/Problem057_ClampI32.rs",
+    "category": "scalar_arithmetic_ext",
+    "requirement_en": "Given a signed 32-bit integer and lower and upper bounds with low at most high, clamp the value into that inclusive range.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/scalar_arithmetic_ext/Problem057_ClampI32.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn clamp_i32(x: i32, low: i32, high: i32) -> i32;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "low <= high",
+        "text": "bounds are ordered",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "low <= r && r <= high",
+        "text": "result lies inside range",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "low <= x && x <= high ==> r == x",
+        "text": "in-range input unchanged",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "x < low ==> r == low",
+        "text": "below-range input maps to low",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt5",
+        "type": "ensures",
+        "expr": "x > high ==> r == high",
+        "text": "above-range input maps to high",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires low <= high; ensures low <= r && r <= high, low <= x && x <= high ==> r == x, x < low ==> r == low, x > high ==> r == high"
+  },
+  {
+    "id": 58,
+    "path": "scalar_arithmetic_ext/Problem058_NonnegativeI64.rs",
+    "category": "scalar_arithmetic_ext",
+    "requirement_en": "Given a signed 64-bit integer, return true exactly when it is nonnegative.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/scalar_arithmetic_ext/Problem058_NonnegativeI64.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn is_nonnegative_i64(x: i64) -> bool;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "r == (x >= 0)",
+        "text": "result reflects nonnegative predicate",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures r == (x >= 0)"
+  },
+  {
+    "id": 59,
+    "path": "scalar_arithmetic_ext/Problem059_SafeMulSmall.rs",
+    "category": "scalar_arithmetic_ext",
+    "requirement_en": "Given two unsigned 64-bit integers whose product does not overflow, return their product.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/scalar_arithmetic_ext/Problem059_SafeMulSmall.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn safe_mul_u64(x: u64, y: u64) -> u64;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "y == 0 || x <= u64::MAX / y",
+        "text": "multiplication does not overflow",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "r == x * y",
+        "text": "result is product",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires y == 0 || x <= u64::MAX / y; ensures r == x * y"
+  },
+  {
+    "id": 60,
+    "path": "scalar_arithmetic_ext/Problem060_MidpointFloor.rs",
+    "category": "scalar_arithmetic_ext",
+    "requirement_en": "Given two unsigned 64-bit integers with sum not overflowing, return the floor midpoint.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/scalar_arithmetic_ext/Problem060_MidpointFloor.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn midpoint_floor(x: u64, y: u64) -> u64;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "x <= u64::MAX - y",
+        "text": "sum does not overflow",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "r == (x + y) / 2",
+        "text": "result is floor average",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires x <= u64::MAX - y; ensures r == (x + y) / 2"
+  },
+  {
+    "id": 61,
+    "path": "option_result_ext/Problem061_OptionMapDouble.rs",
+    "category": "option_result_ext",
+    "requirement_en": "Given an optional unsigned integer whose contained value can be doubled without overflow, return an option containing twice the value when present and None otherwise.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/option_result_ext/Problem061_OptionMapDouble.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn option_map_double(o: Option<u64>) -> Option<u64>;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "o is Some ==> o->Some_0 <= u64::MAX / 2",
+        "text": "contained value can be doubled",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "o is None ==> r is None",
+        "text": "None stays None",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "o is Some ==> r is Some && r->Some_0 == o->Some_0 * 2",
+        "text": "Some value is doubled",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires o is Some ==> o->Some_0 <= u64::MAX / 2; ensures o is None ==> r is None, o is Some ==> r is Some && r->Some_0 == o->Some_0 * 2"
+  },
+  {
+    "id": 62,
+    "path": "option_result_ext/Problem062_OptionDefaultZero.rs",
+    "category": "option_result_ext",
+    "requirement_en": "Given an optional unsigned integer, return its contained value when present and zero otherwise.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/option_result_ext/Problem062_OptionDefaultZero.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn option_default_zero(o: Option<u64>) -> u64;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "o is Some ==> r == o->Some_0",
+        "text": "Some returns contained value",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "o is None ==> r == 0",
+        "text": "None returns zero",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures o is Some ==> r == o->Some_0, o is None ==> r == 0"
+  },
+  {
+    "id": 63,
+    "path": "option_result_ext/Problem063_OptionIsZero.rs",
+    "category": "option_result_ext",
+    "requirement_en": "Given an optional unsigned integer, return true exactly when it is Some containing zero.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/option_result_ext/Problem063_OptionIsZero.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn option_is_zero(o: Option<u64>) -> bool;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "r == (o is Some && o->Some_0 == 0)",
+        "text": "result recognizes Some(0)",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures r == (o is Some && o->Some_0 == 0)"
+  },
+  {
+    "id": 64,
+    "path": "option_result_ext/Problem064_ResultMapIncrement.rs",
+    "category": "option_result_ext",
+    "requirement_en": "Given a Result containing an unsigned integer or error code, and every Ok value can be incremented without overflow, return Ok(value+1) for Ok and preserve Err.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/option_result_ext/Problem064_ResultMapIncrement.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn result_map_increment(res: Result<u64, u64>) -> Result<u64, u64>;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "res is Ok ==> res->Ok_0 < u64::MAX",
+        "text": "Ok value can be incremented",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "res is Ok ==> r is Ok && r->Ok_0 == res->Ok_0 + 1",
+        "text": "Ok value incremented",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "res is Err ==> r is Err && r->Err_0 == res->Err_0",
+        "text": "Err preserved",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires res is Ok ==> res->Ok_0 < u64::MAX; ensures res is Ok ==> r is Ok && r->Ok_0 == res->Ok_0 + 1, res is Err ==> r is Err && r->Err_0 == res->Err_0"
+  },
+  {
+    "id": 65,
+    "path": "option_result_ext/Problem065_ResultDefault.rs",
+    "category": "option_result_ext",
+    "requirement_en": "Given a Result containing an unsigned integer or error code and a default value, return the Ok value when present and the default on Err.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/option_result_ext/Problem065_ResultDefault.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn result_default(res: Result<u64, u64>, default: u64) -> u64;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "res is Ok ==> r == res->Ok_0",
+        "text": "Ok returns value",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "res is Err ==> r == default",
+        "text": "Err returns default",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures res is Ok ==> r == res->Ok_0, res is Err ==> r == default"
+  },
+  {
+    "id": 66,
+    "path": "option_result_ext/Problem066_CheckedSubOption.rs",
+    "category": "option_result_ext",
+    "requirement_en": "Given two unsigned integers, return Some(x-y) when x is at least y and None otherwise.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/option_result_ext/Problem066_CheckedSubOption.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn checked_sub_option(x: u64, y: u64) -> Option<u64>;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "x >= y ==> r is Some && r->Some_0 == x - y",
+        "text": "successful subtraction returned",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "x < y ==> r is None",
+        "text": "underflow returns None",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures x >= y ==> r is Some && r->Some_0 == x - y, x < y ==> r is None"
+  },
+  {
+    "id": 67,
+    "path": "option_result_ext/Problem067_SafeModuloResult.rs",
+    "category": "option_result_ext",
+    "requirement_en": "Given two unsigned integers, return Ok(x % y) when divisor is nonzero and Err(x) when divisor is zero.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/option_result_ext/Problem067_SafeModuloResult.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn safe_mod_result(x: u64, y: u64) -> Result<u64, u64>;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "y != 0 ==> r is Ok && r->Ok_0 == x % y",
+        "text": "nonzero divisor returns modulo",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "y == 0 ==> r is Err && r->Err_0 == x",
+        "text": "zero divisor returns error containing dividend",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures y != 0 ==> r is Ok && r->Ok_0 == x % y, y == 0 ==> r is Err && r->Err_0 == x"
+  },
+  {
+    "id": 68,
+    "path": "option_result_ext/Problem068_OptionOr.rs",
+    "category": "option_result_ext",
+    "requirement_en": "Given two optional unsigned integers, return the first option when it is Some, otherwise return the second option.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/option_result_ext/Problem068_OptionOr.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn option_or_u64(a: Option<u64>, b: Option<u64>) -> Option<u64>;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "a is Some ==> r == a",
+        "text": "Some first option wins",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "a is None ==> r == b",
+        "text": "None first option yields second",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures a is Some ==> r == a, a is None ==> r == b"
+  },
+  {
+    "id": 69,
+    "path": "option_result_ext/Problem069_ResultIsErr.rs",
+    "category": "option_result_ext",
+    "requirement_en": "Given a Result containing an unsigned integer or error code, return true exactly when it is Err.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/option_result_ext/Problem069_ResultIsErr.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn result_is_err(res: Result<u64, u64>) -> bool;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "r == (res is Err)",
+        "text": "result recognizes Err variant",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures r == (res is Err)"
+  },
+  {
+    "id": 70,
+    "path": "option_result_ext/Problem070_OptionFilterEven.rs",
+    "category": "option_result_ext",
+    "requirement_en": "Given an optional unsigned integer, return the same Some value only when it is even, and None for absent or odd values.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/option_result_ext/Problem070_OptionFilterEven.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn option_filter_even(o: Option<u64>) -> Option<u64>;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "o is Some && o->Some_0 % 2 == 0 ==> r is Some && r->Some_0 == o->Some_0",
+        "text": "even Some preserved",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "o is None ==> r is None",
+        "text": "None preserved",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "o is Some && o->Some_0 % 2 == 1 ==> r is None",
+        "text": "odd Some filtered out",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures o is Some && o->Some_0 % 2 == 0 ==> r is Some && r->Some_0 == o->Some_0, o is None ==> r is None, o is Some && o->Some_0 % 2 == 1 ==> r is None"
+  },
+  {
+    "id": 71,
+    "path": "vec_immutable_ext/Problem071_VecThird.rs",
+    "category": "vec_immutable_ext",
+    "requirement_en": "Given an immutable vector of unsigned integers with length greater than two, return the third element.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_immutable_ext/Problem071_VecThird.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_third(v: &Vec<u64>) -> u64;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "v.len() > 2",
+        "text": "third element exists",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "r == v[2]",
+        "text": "result is third element",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires v.len() > 2; ensures r == v[2]"
+  },
+  {
+    "id": 72,
+    "path": "vec_immutable_ext/Problem072_VecLenAtLeast.rs",
+    "category": "vec_immutable_ext",
+    "requirement_en": "Given an immutable vector of unsigned integers and a bound, return true exactly when the vector length is at least the bound.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_immutable_ext/Problem072_VecLenAtLeast.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_len_at_least(v: &Vec<u64>, n: usize) -> bool;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "r == (v.len() >= n)",
+        "text": "result compares length to bound",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures r == (v.len() >= n)"
+  },
+  {
+    "id": 73,
+    "path": "vec_immutable_ext/Problem073_VecAllLessThan.rs",
+    "category": "vec_immutable_ext",
+    "requirement_en": "Given an immutable vector and a limit, return true exactly when every element is strictly less than the limit.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_immutable_ext/Problem073_VecAllLessThan.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_all_less_than(v: &Vec<u64>, limit: u64) -> bool;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "r == (forall|i: int| 0 <= i < v.len() ==> v[i] < limit)",
+        "text": "result captures all-elements-less-than predicate",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures r == (forall|i: int| 0 <= i < v.len() ==> v[i] < limit)"
+  },
+  {
+    "id": 74,
+    "path": "vec_immutable_ext/Problem074_VecAnyGreaterThan.rs",
+    "category": "vec_immutable_ext",
+    "requirement_en": "Given an immutable vector and a limit, return true exactly when at least one element is greater than the limit.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_immutable_ext/Problem074_VecAnyGreaterThan.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_any_greater_than(v: &Vec<u64>, limit: u64) -> bool;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "r == (exists|i: int| 0 <= i < v.len() && v[i] > limit)",
+        "text": "result captures existence of greater element",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures r == (exists|i: int| 0 <= i < v.len() && v[i] > limit)"
+  },
+  {
+    "id": 75,
+    "path": "vec_immutable_ext/Problem075_VecCountZero.rs",
+    "category": "vec_immutable_ext",
+    "requirement_en": "Given an immutable vector with length at most u64::MAX, return the number of zero elements.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_immutable_ext/Problem075_VecCountZero.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_count_zero(v: &Vec<u64>) -> u64;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "v.len() <= u64::MAX",
+        "text": "count fits in u64",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "r <= v.len()",
+        "text": "count cannot exceed length",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires v.len() <= u64::MAX; ensures r <= v.len()"
+  },
+  {
+    "id": 76,
+    "path": "vec_immutable_ext/Problem076_VecSum2.rs",
+    "category": "vec_immutable_ext",
+    "requirement_en": "Given an immutable vector of length two whose two elements sum without overflow, return the sum of its elements.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_immutable_ext/Problem076_VecSum2.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_sum2(v: &Vec<u64>) -> u64;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "v.len() == 2",
+        "text": "vector has exactly two elements",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "v[0] <= u64::MAX - v[1]",
+        "text": "sum does not overflow",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "r == v[0] + v[1]",
+        "text": "result is sum of two elements",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires v.len() == 2, v[0] <= u64::MAX - v[1]; ensures r == v[0] + v[1]"
+  },
+  {
+    "id": 77,
+    "path": "vec_immutable_ext/Problem077_VecPairSorted.rs",
+    "category": "vec_immutable_ext",
+    "requirement_en": "Given an immutable vector of length two, return true exactly when the first element is at most the second.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_immutable_ext/Problem077_VecPairSorted.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_pair_sorted(v: &Vec<u64>) -> bool;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "v.len() == 2",
+        "text": "vector has exactly two elements",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "r == (v[0] <= v[1])",
+        "text": "result checks pair ordering",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires v.len() == 2; ensures r == (v[0] <= v[1])"
+  },
+  {
+    "id": 78,
+    "path": "vec_immutable_ext/Problem078_VecGetOrZero.rs",
+    "category": "vec_immutable_ext",
+    "requirement_en": "Given an immutable vector and index, return the element at the index when in bounds and zero otherwise.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_immutable_ext/Problem078_VecGetOrZero.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_get_or_zero(v: &Vec<u64>, i: usize) -> u64;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "i < v.len() ==> r == v[i as int]",
+        "text": "in-bounds returns indexed element",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "i >= v.len() ==> r == 0",
+        "text": "out-of-bounds returns zero",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures i < v.len() ==> r == v[i as int], i >= v.len() ==> r == 0"
+  },
+  {
+    "id": 79,
+    "path": "vec_immutable_ext/Problem079_VecSameLen.rs",
+    "category": "vec_immutable_ext",
+    "requirement_en": "Given two immutable vectors, return true exactly when their lengths are equal.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_immutable_ext/Problem079_VecSameLen.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_same_len(a: &Vec<u64>, b: &Vec<u64>) -> bool;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "r == (a.len() == b.len())",
+        "text": "result compares vector lengths",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures r == (a.len() == b.len())"
+  },
+  {
+    "id": 80,
+    "path": "vec_immutable_ext/Problem080_SliceLast.rs",
+    "category": "vec_immutable_ext",
+    "requirement_en": "Given an immutable slice of unsigned integers with positive length, return its last element.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_immutable_ext/Problem080_SliceLast.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn slice_last(s: &[u64]) -> u64;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "s.len() > 0",
+        "text": "last element exists",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "r == s[(s.len() - 1) as int]",
+        "text": "result is last slice element",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires s.len() > 0; ensures r == s[(s.len() - 1) as int]"
+  },
+  {
+    "id": 81,
+    "path": "vec_mutation_ext/Problem081_VecClearAll.rs",
+    "category": "vec_mutation_ext",
+    "requirement_en": "Given a uniquely borrowed vector, remove all elements.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_mutation_ext/Problem081_VecClearAll.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_clear_all(v: &mut Vec<u64>);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "final(v).len() == 0",
+        "text": "final vector is empty",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures final(v).len() == 0"
+  },
+  {
+    "id": 82,
+    "path": "vec_mutation_ext/Problem082_VecSetLast.rs",
+    "category": "vec_mutation_ext",
+    "requirement_en": "Given a uniquely borrowed nonempty vector and a value, update exactly the last element to that value.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_mutation_ext/Problem082_VecSetLast.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_set_last(v: &mut Vec<u64>, x: u64);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "old(v).len() > 0",
+        "text": "last element exists",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "final(v).len() == old(v).len()",
+        "text": "length unchanged",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "final(v)@ == old(v)@.update((old(v).len() - 1) as int, x)",
+        "text": "only last element updated",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires old(v).len() > 0; ensures final(v).len() == old(v).len(), final(v)@ == old(v)@.update((old(v).len() - 1) as int, x)"
+  },
+  {
+    "id": 83,
+    "path": "vec_mutation_ext/Problem083_VecPushIfEmpty.rs",
+    "category": "vec_mutation_ext",
+    "requirement_en": "Given a uniquely borrowed vector and value, push the value only when the vector is initially empty.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_mutation_ext/Problem083_VecPushIfEmpty.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_push_if_empty(v: &mut Vec<u64>, x: u64);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "old(v).len() == 0 ==> final(v)@ == old(v)@.push(x)",
+        "text": "empty vector receives value",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "old(v).len() != 0 ==> final(v)@ == old(v)@",
+        "text": "nonempty vector unchanged",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures old(v).len() == 0 ==> final(v)@ == old(v)@.push(x), old(v).len() != 0 ==> final(v)@ == old(v)@"
+  },
+  {
+    "id": 84,
+    "path": "vec_mutation_ext/Problem084_VecPopIfLenGreaterThanOne.rs",
+    "category": "vec_mutation_ext",
+    "requirement_en": "Given a uniquely borrowed vector, pop one element exactly when the initial length is greater than one.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_mutation_ext/Problem084_VecPopIfLenGreaterThanOne.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_pop_if_len_gt_one(v: &mut Vec<u64>);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "old(v).len() > 1 ==> final(v)@ == old(v)@.subrange(0, old(v).len() - 1)",
+        "text": "long vector loses last element",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "old(v).len() <= 1 ==> final(v)@ == old(v)@",
+        "text": "short vector unchanged",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures old(v).len() > 1 ==> final(v)@ == old(v)@.subrange(0, old(v).len() - 1), old(v).len() <= 1 ==> final(v)@ == old(v)@"
+  },
+  {
+    "id": 85,
+    "path": "vec_mutation_ext/Problem085_VecSetSecond.rs",
+    "category": "vec_mutation_ext",
+    "requirement_en": "Given a uniquely borrowed vector with at least two elements and a value, update exactly the second element.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_mutation_ext/Problem085_VecSetSecond.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_set_second(v: &mut Vec<u64>, x: u64);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "old(v).len() >= 2",
+        "text": "second element exists",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "final(v)@ == old(v)@.update(1, x)",
+        "text": "second element updated",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires old(v).len() >= 2; ensures final(v)@ == old(v)@.update(1, x)"
+  },
+  {
+    "id": 86,
+    "path": "vec_mutation_ext/Problem086_VecSwapFirstLast.rs",
+    "category": "vec_mutation_ext",
+    "requirement_en": "Given a uniquely borrowed nonempty vector, swap exactly the first and last elements.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_mutation_ext/Problem086_VecSwapFirstLast.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_swap_first_last(v: &mut Vec<u64>);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "old(v).len() > 0",
+        "text": "first and last positions exist",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "final(v).len() == old(v).len()",
+        "text": "length unchanged",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "final(v)[0] == old(v)[(old(v).len() - 1) as int]",
+        "text": "first becomes old last",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "final(v)[(old(v).len() - 1) as int] == old(v)[0]",
+        "text": "last becomes old first",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires old(v).len() > 0; ensures final(v).len() == old(v).len(), final(v)[0] == old(v)[(old(v).len() - 1) as int], final(v)[(old(v).len() - 1) as int] == old(v)[0]"
+  },
+  {
+    "id": 87,
+    "path": "vec_mutation_ext/Problem087_VecIncrementFirst.rs",
+    "category": "vec_mutation_ext",
+    "requirement_en": "Given a uniquely borrowed nonempty vector whose first element can be incremented without overflow, increment exactly the first element.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_mutation_ext/Problem087_VecIncrementFirst.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_increment_first(v: &mut Vec<u64>);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "old(v).len() > 0",
+        "text": "first element exists",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "old(v)[0] < u64::MAX",
+        "text": "increment does not overflow",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "final(v).len() == old(v).len()",
+        "text": "length unchanged",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "final(v)[0] == old(v)[0] + 1",
+        "text": "first element incremented",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires old(v).len() > 0, old(v)[0] < u64::MAX; ensures final(v).len() == old(v).len(), final(v)[0] == old(v)[0] + 1"
+  },
+  {
+    "id": 88,
+    "path": "vec_mutation_ext/Problem088_VecAppendZero.rs",
+    "category": "vec_mutation_ext",
+    "requirement_en": "Given a uniquely borrowed vector, append one zero element.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_mutation_ext/Problem088_VecAppendZero.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_append_zero(v: &mut Vec<u64>);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "final(v)@ == old(v)@.push(0)",
+        "text": "zero appended",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures final(v)@ == old(v)@.push(0)"
+  },
+  {
+    "id": 89,
+    "path": "vec_mutation_ext/Problem089_VecTruncateOne.rs",
+    "category": "vec_mutation_ext",
+    "requirement_en": "Given a uniquely borrowed vector, keep only the first element when initially nonempty and leave empty vectors empty.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_mutation_ext/Problem089_VecTruncateOne.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_truncate_one(v: &mut Vec<u64>);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "old(v).len() == 0 ==> final(v).len() == 0",
+        "text": "empty vector remains empty",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "old(v).len() > 0 ==> final(v).len() == 1",
+        "text": "nonempty vector is truncated to one element",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "old(v).len() > 0 ==> final(v)[0] == old(v)[0]",
+        "text": "first element is preserved",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures old(v).len() == 0 ==> final(v).len() == 0, old(v).len() > 0 ==> final(v).len() == 1, old(v).len() > 0 ==> final(v)[0] == old(v)[0]"
+  },
+  {
+    "id": 90,
+    "path": "vec_mutation_ext/Problem090_VecSetAllZero.rs",
+    "category": "vec_mutation_ext",
+    "requirement_en": "Given a uniquely borrowed vector, set every element to zero without changing the length.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/vec_mutation_ext/Problem090_VecSetAllZero.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn vec_set_all_zero(v: &mut Vec<u64>);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "final(v).len() == old(v).len()",
+        "text": "length unchanged",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "forall|i: int| 0 <= i < old(v).len() ==> final(v)[i] == 0",
+        "text": "every final element is zero",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures final(v).len() == old(v).len(), forall|i: int| 0 <= i < old(v).len() ==> final(v)[i] == 0"
+  },
+  {
+    "id": 91,
+    "path": "ownership_slices_ext/Problem091_ArraySwap3.rs",
+    "category": "ownership_slices_ext",
+    "requirement_en": "Given a uniquely borrowed fixed-size array of length three and two valid indices, swap exactly those two positions.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/ownership_slices_ext/Problem091_ArraySwap3.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn array_swap3(a: &mut [u64; 3], i: usize, j: usize);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "i < 3 && j < 3",
+        "text": "indices are valid",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "final(a)@[i as int] == old(a)@[j as int]",
+        "text": "i receives old j",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "final(a)@[j as int] == old(a)@[i as int]",
+        "text": "j receives old i",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires i < 3 && j < 3; ensures final(a)@[i as int] == old(a)@[j as int], final(a)@[j as int] == old(a)@[i as int]"
+  },
+  {
+    "id": 92,
+    "path": "ownership_slices_ext/Problem092_ArrayFirst3.rs",
+    "category": "ownership_slices_ext",
+    "requirement_en": "Given an immutable fixed-size array of length three, return its first element.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/ownership_slices_ext/Problem092_ArrayFirst3.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn array_first3(a: &[u64; 3]) -> u64;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "r == a@[0]",
+        "text": "result is first array element",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures r == a@[0]"
+  },
+  {
+    "id": 93,
+    "path": "ownership_slices_ext/Problem093_ArrayLast3.rs",
+    "category": "ownership_slices_ext",
+    "requirement_en": "Given an immutable fixed-size array of length three, return its last element.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/ownership_slices_ext/Problem093_ArrayLast3.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn array_last3(a: &[u64; 3]) -> u64;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "r == a@[2]",
+        "text": "result is last array element",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures r == a@[2]"
+  },
+  {
+    "id": 94,
+    "path": "ownership_slices_ext/Problem094_ArraySum3Bounded.rs",
+    "category": "ownership_slices_ext",
+    "requirement_en": "Given an immutable fixed-size array of length three whose elements can be summed without overflow, return the sum of all elements.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/ownership_slices_ext/Problem094_ArraySum3Bounded.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn array_sum3_bounded(a: &[u64; 3]) -> u64;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a@[0] <= u64::MAX - a@[1]",
+        "text": "first two elements sum safely",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "a@[0] + a@[1] <= u64::MAX - a@[2]",
+        "text": "all three elements sum safely",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "r == a@[0] + a@[1] + a@[2]",
+        "text": "result is array sum",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires a@[0] <= u64::MAX - a@[1], a@[0] + a@[1] <= u64::MAX - a@[2]; ensures r == a@[0] + a@[1] + a@[2]"
+  },
+  {
+    "id": 95,
+    "path": "ownership_slices_ext/Problem095_SliceIsEmpty.rs",
+    "category": "ownership_slices_ext",
+    "requirement_en": "Given an immutable slice, return true exactly when it is empty.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/ownership_slices_ext/Problem095_SliceIsEmpty.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn slice_is_empty(s: &[u64]) -> bool;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "r == (s.len() == 0)",
+        "text": "result reflects slice emptiness",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures r == (s.len() == 0)"
+  },
+  {
+    "id": 96,
+    "path": "ownership_slices_ext/Problem096_SliceGetAt.rs",
+    "category": "ownership_slices_ext",
+    "requirement_en": "Given an immutable slice and a valid index, return the element at that index.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/ownership_slices_ext/Problem096_SliceGetAt.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn slice_get_at(s: &[u64], i: usize) -> u64;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "i < s.len()",
+        "text": "index is valid",
+        "source": "manual_verus_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "r == s[i as int]",
+        "text": "result is indexed slice element",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "requires i < s.len(); ensures r == s[i as int]"
+  },
+  {
+    "id": 97,
+    "path": "ownership_slices_ext/Problem097_ArraySetFirst3.rs",
+    "category": "ownership_slices_ext",
+    "requirement_en": "Given a uniquely borrowed fixed-size array of length three and a value, update exactly the first position.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/ownership_slices_ext/Problem097_ArraySetFirst3.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn array_set_first3(a: &mut [u64; 3], x: u64);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "final(a)@ == old(a)@.update(0, x)",
+        "text": "first array element updated",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures final(a)@ == old(a)@.update(0, x)"
+  },
+  {
+    "id": 98,
+    "path": "ownership_slices_ext/Problem098_ArraySetLast3.rs",
+    "category": "ownership_slices_ext",
+    "requirement_en": "Given a uniquely borrowed fixed-size array of length three and a value, update exactly the last position.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/ownership_slices_ext/Problem098_ArraySetLast3.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn array_set_last3(a: &mut [u64; 3], x: u64);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "final(a)@ == old(a)@.update(2, x)",
+        "text": "last array element updated",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures final(a)@ == old(a)@.update(2, x)"
+  },
+  {
+    "id": 99,
+    "path": "ownership_slices_ext/Problem099_ArrayAllZero3.rs",
+    "category": "ownership_slices_ext",
+    "requirement_en": "Given an immutable fixed-size array of length three, return true exactly when all three elements are zero.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/ownership_slices_ext/Problem099_ArrayAllZero3.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn array_all_zero3(a: &[u64; 3]) -> bool;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "r == (a@[0] == 0 && a@[1] == 0 && a@[2] == 0)",
+        "text": "result checks all entries are zero",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures r == (a@[0] == 0 && a@[1] == 0 && a@[2] == 0)"
+  },
+  {
+    "id": 100,
+    "path": "ownership_slices_ext/Problem100_ArrayAnyZero3.rs",
+    "category": "ownership_slices_ext",
+    "requirement_en": "Given an immutable fixed-size array of length three, return true exactly when at least one element is zero.",
+    "ground_truth_file": "benchmarks/rust-verus-problems/ground-truth/ownership_slices_ext/Problem100_ArrayAnyZero3.rs",
+    "ground_truth_source": "manual",
+    "verifier": "verus",
+    "function_signature": "fn array_any_zero3(a: &[u64; 3]) -> bool;",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "ensures",
+        "expr": "r == (a@[0] == 0 || a@[1] == 0 || a@[2] == 0)",
+        "text": "result checks some entry is zero",
+        "source": "manual_verus_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "ensures r == (a@[0] == 0 || a@[1] == 0 || a@[2] == 0)"
+  }
+]

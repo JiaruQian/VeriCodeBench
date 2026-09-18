@@ -1,0 +1,191 @@
+88c88
+< * **Never use `return` inside a `while` loop body.** Loop bodies must signal continuation/termination of the *loop*, not the entire method. Instead, use a boolean flag pattern: initialize a flag variable, include it in the loop condition (`while i < n ∧ all_ok`), add an invariant linking the flag to the checked property, and set the flag instead of returning early. See Example 3 in Section 5 for a complete example.
+---
+> * **Never use `return` inside a `while` loop body.** Loop bodies must signal continuation/termination of the *loop*, not the entire method. Instead, use a boolean flag pattern: initialize a flag variable, include it in the loop condition (`while i < n ∧ all_ok`), add an invariant linking the flag to the checked property, and set the flag instead of returning early. See Example 3 in Section 6 for a complete example.
+90a91,97
+> * **Loop invariant too weak**: If an invariant-related goal fails to prove:
+>   - The invariant may not capture enough information about the loop state.
+>   - Check: Does the invariant mention ALL mutable variables in the loop?
+>   - Check: Does the invariant relate the current state to what you'll need in the postcondition?
+> * **Invariant too strong**: If an invariant fails to hold during the loop:
+>   - The invariant may be claiming more than the loop actually maintains.
+>   - Weaken the invariant or add preconditions to when it holds.
+104c111
+< ### The Main Tactic: `loom_solve`
+---
+> ### The Primary Workflow: loom_solve
+106c113
+< Always start with `loom_solve`. This tactic generates the verification conditions and attempts to solve all verification conditions automatically. Otherwise, it will leave the remaining unproven goals. It is thus often a good idea to chain `<;> try grind` after `loom_solve` which might further close easy goals.
+---
+> Always begin with `loom_solve`. This tactic generates verification conditions and attempts to solve them automatically via SMT.
+113c120,260
+< ## 5. Complete Examples
+---
+> ### When loom_solve Succeeds
+> 
+> If `loom_solve` closes all goals, you're done! The proof is complete.
+> 
+> ### When loom_solve Fails: Systematic Troubleshooting
+> 
+> If `loom_solve` leaves unsolved goals or times out, follow this decision tree:
+> 
+> #### Decision 1: Is it a timeout?
+> 
+> **Symptoms**: Error message says "(deterministic) timeout" or "maxHeartbeats exceeded"
+> 
+> **Solution**: Escalate resources aggressively (10x minimum):
+> ```lean
+> set_option maxHeartbeats 1000000 in  -- 10x from default 100k
+> set_option auto.smt.timeout 8 in      -- 2x from default 4s
+> prove_correct method_name by
+>   loom_solve <;> try grind
+> ```
+> 
+> **Important**:
+> - First timeout: 100k → 1M (10x)
+> - Second timeout: 1M → 10M (10x)
+> - Third timeout with same proof code → **Change strategy**, not just resources
+> 
+> #### Decision 2: Are there unsolved goals?
+> 
+> **Symptoms**: Lean shows "unsolved goals" with case information
+> 
+> **Solution**: Analyze the goal type and apply appropriate tactics:
+> 
+> | Goal Contains | Tactic to Try | Example |
+> |---------------|---------------|---------|
+> | `+`, `-`, `<`, `≤` over Int/Nat | `omega` | `⊢ i + 1 ≤ n` |
+> | `==` with concrete values | `decide` | `⊢ 5 == 3 + 2` |
+> | `∀`, `∃` quantifiers | `intro`, `use`, `grind` | `⊢ ∀ x, P x` |
+> | Array indexing `arr[i]!` | Add solverHints (see below) | `⊢ arr[i]! = old_arr[i]!` |
+> | Disjunction or cases | `cases` or `by_cases` | `⊢ P ∨ Q` |
+> 
+> **Tactic fallback chain**:
+> ```lean
+> prove_correct my_method by
+>   loom_solve
+>   all_goals try omega      -- Try arithmetic first
+>   all_goals try decide     -- Then decidability
+>   all_goals try grind      -- Then general automation
+>   all_goals try simp_all   -- Finally cleanup
+> ```
+> 
+> **Never** use `simp_all` alone as your first tactic after `loom_solve`. It rarely helps with substantive goals.
+> 
+> #### Decision 3: Are there "unknown constant" errors?
+> 
+> **Symptoms**: Error says "unknown constant `Array.get_swap_c`" or similar
+> 
+> **Root cause**: You're referencing a lemma that doesn't exist
+> 
+> **Solution**: Only use solver hints from this verified list:
+> 
+> **Available Solver Hints**:
+> - `Array.size_set` — size after set operation
+> - `Array.size_swap` — size after swap
+> - `Array.get_set_c` — get after set (conditional on index)
+> - `Array.multiset_swap` — swap preserves permutation
+> - `Array.size_replicate` — size of replicated array
+> - `Nat.mod_lt` — modular arithmetic bounds
+> - `Nat.sub_add_cancel` — subtraction/addition cancellation
+> 
+> **Do NOT guess lemma names**. Common hallucinations to avoid:
+> - ❌ `Array.get_swap_c` (doesn't exist)
+> - ❌ `<MethodName>_correct` (not a standard name)
+> - ❌ `List.qsort` (wrong Lean 4 API)
+> 
+> If uncertain about a lemma name, describe what you need in a comment instead of adding a wrong `solverHint`.
+> 
+> #### Decision 4: Is the same error repeating 3+ times?
+> 
+> **Symptoms**: You get the identical unsolved goal or error across multiple attempts
+> 
+> **Root cause**: Your proof strategy is fundamentally not working
+> 
+> **Solution**: STOP and change approach:
+> 
+> 1. **Re-examine the goal**: What property does it actually require?
+> 2. **Check invariants**: Are they strong enough? Do they mention all mutable variables?
+> 3. **Try different tactics**: If `simp` failed 3 times, try `omega`, `grind`, or `cases`
+> 4. **Consider helper lemmas**: Maybe a standalone lemma is needed
+> 
+> **Do NOT** keep retrying `loom_solve <;> simp_all` when it repeatedly fails. Tactical repetition won't solve strategic problems.
+> 
+> ### Providing Solver Hints
+> 
+> Add hints **before** `prove_correct` using:
+> 
+> ```lean
+> attribute [local solverHint] Array.size_set Array.get_set_c
+> 
+> prove_correct my_method by
+>   loom_solve <;> try grind
+> ```
+> 
+> Common hints by use case:
+> - Array operations → `Array.size_set`, `Array.get_set_c`, `Array.multiset_swap`
+> - Modular arithmetic → `Nat.mod_lt`
+> - Swapping → `Array.size_swap`, `Array.multiset_swap`
+> 
+> ## 5. Handling Proof Failures (Advanced)
+> 
+> For goals left after the decision tree above, there are additional options:
+> 
+> ### Option 1: Strengthen Invariants
+> 
+> Proving additional or stronger invariants can help proofs for other invariants to pass. For example, in list or array manipulation code, it is often helpful to prove first that the size or length does not change in a loop before proving more challenging invariants about the loop's exact semantics.
+> 
+> ### Option 2: Extract and Prove a Theorem
+> 
+> Look at the remaining goals and produce a `theorem` statement that would make proving that goal easier. The theorem will be placed just before the `prove_correct` block.
+> 
+> **Example:**
+> ```lean
+> @[local solverHint]
+> theorem my_get_set_c [Inhabited α] (i j: Nat) (val: α) (arr: Array α):
+>   i < arr.size → (arr.set! j val)[i]! = if i = j then val else arr[i]! := by
+>   simp [Array.get_set_c]
+> ```
+> 
+> ### Option 3: Finish the Proof Manually
+> 
+> Use standard Lean tactics and the available theorems to solve the remaining goals.
+> 
+> **Example:**
+> ```lean
+> prove_correct complex_method by
+>   loom_solve <;> try grind
+>   -- Now, handle remaining goals manually
+>   { intros k hk
+>     have := my_theorem k hk
+>     by_cases h : k = i <;> simp_all }
+> ```
+> 
+> ## 6. Complete Examples
+269c416
+< ## 6. Special Loom Data Structures and Definitions
+---
+> ## 7. Special Loom Data Structures and Definitions
+297c444
+< ## 7. Important Notes
+---
+> ## 8. Important Notes
+298a446
+> - **Do NOT add any guard statements**: You must not add any new `guard` statements in your generated Lean code. If the input or instructions contain any guard statements, you must exclude them from your final Lean code output.
+305c453
+<   There is NO point in adding additional finer-grained mathlib imports. 
+---
+>   There is NO point in adding additional finer-grained mathlib imports.
+308c456,461
+< - You should NOT skip ANY proofs for brevity and you should NEVER use `sorry` as a placeholder for a proof.
+---
+> - **NEVER use `sorry` as a placeholder for a proof.**
+>   If you cannot complete a proof after multiple attempts:
+>   1. Explain which specific goal is blocking you and what property it requires
+>   2. Suggest what lemma or invariant strengthening might help
+>   3. Provide code WITHOUT `sorry` showing partial progress with tactics
+>   Do NOT introduce `sorry` to make compilation succeed. Leaving unsolved goals is better than using `sorry`.
+317c470
+< ## 8. Imperative Code Requirement
+---
+> ## 9. Imperative Code Requirement

@@ -1,0 +1,12 @@
+# srun -N 4 --ntasks-per-node=1 python -u -m src.worker configs/other_models/verina_linear_claude_4_5_opus_32t_32agents.yaml
+config:
+  task: "verina_proof"
+  problems: "data/verina.jsonl"
+  n_attempts: 32
+  max_turns: 32
+  n_worker_threads: 40
+  use_mcp: false
+  temperature: 1.0
+  name: claude_4_5_opus_genai_vertex
+  model: claude-4-5-opus-genai-vertex
+  prompt_path: data/prompt_linear.md

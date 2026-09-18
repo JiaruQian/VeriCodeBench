@@ -1,0 +1,211 @@
+101d100
+< ### The Main Tactic: `loom_solve`
+103c102,104
+< Always start with `loom_solve`. This tactic attempts to solve all verification conditions automatically.
+---
+> ### The Primary Workflow: loom_solve
+> 
+> Always begin with `loom_solve`. This tactic generates verification conditions and attempts to solve them automatically via SMT.
+110c111,113
+< ### Handling Proof Failures
+---
+> ### When loom_solve Succeeds
+> 
+> If `loom_solve` closes all goals, you're done! The proof is complete.
+112c115
+< If `loom_solve` fails, follow this two-step hybrid strategy:
+---
+> ### When loom_solve Fails: Systematic Troubleshooting
+114c117
+< #### Step 1: Provide Solver Hints
+---
+> If `loom_solve` leaves unsolved goals or times out, follow this decision tree:
+116c119
+< The SMT solver may lack knowledge of specific mathematical lemmas. Provide these using the `attribute [local solverHint]` command *before* the `prove_correct` block.
+---
+> #### Decision 1: Is it a timeout?
+118,122c121
+< **Common Necessary Hints:**
+< * For modular arithmetic: `attribute [local solverHint] Nat.mod_lt`
+< * For array size properties: `attribute [local solverHint] Array.size_replicate Array.size_set`
+< * For array element access after updates: `attribute [local solverHint] Array.get_set_c`
+< * For array swaps: `attribute [local solverHint] Array.multiset_swap`
+---
+> **Symptoms**: Error message says "(deterministic) timeout" or "maxHeartbeats exceeded"
+124c123,129
+< #### Step 2: Add Interactive Tactics
+---
+> **Solution**: Escalate resources aggressively (10x minimum):
+> ```lean
+> set_option maxHeartbeats 1000000 in  -- 10x from default 100k
+> set_option auto.smt.timeout 8 in      -- 2x from default 4s
+> prove_correct method_name by
+>   loom_solve
+> ```
+126c131,148
+< If hints are not enough, `loom_solve` will leave the remaining unproven goals. Use standard Lean tactics to solve them. A common pattern is to use `simp_all` or `grind` after `loom_solve`.
+---
+> **Important**:
+> - First timeout: 100k → 1M (10x)
+> - Second timeout: 1M → 10M (10x)  
+> - Third timeout with same proof code → **Change strategy**, not just resources
+> 
+> #### Decision 2: Are there unsolved goals?
+> 
+> **Symptoms**: Lean shows "unsolved goals" with case information
+> 
+> **Solution**: Analyze the goal type and apply appropriate tactics:
+> 
+> | Goal Contains | Tactic to Try | Example |
+> |---------------|---------------|---------|
+> | `+`, `-`, `<`, `≤` over Int/Nat | `omega` | `⊢ i + 1 ≤ n` |
+> | `==` with concrete values | `decide` | `⊢ 5 == 3 + 2` |
+> | `∀`, `∃` quantifiers | `intro`, `use`, `grind` | `⊢ ∀ x, P x` |
+> | Array indexing `arr[i]!` | Add solverHints (see below) | `⊢ arr[i]! = old_arr[i]!` |
+> | Disjunction or cases | `cases` or `by_cases` | `⊢ P ∨ Q` |
+128c150
+< **Example:**
+---
+> **Tactic fallback chain**:
+130,134c152,157
+< prove_correct complex_method by
+<   loom_solve <;> simp_all -- try simp on all generated subgoals
+<   -- Now, handle remaining goals manually
+<   { intros k hk
+<     by_cases h : k = i <;> simp_all }
+---
+> prove_correct my_method by
+>   loom_solve
+>   all_goals try omega      -- Try arithmetic first
+>   all_goals try decide     -- Then decidability
+>   all_goals try grind      -- Then general automation
+>   all_goals try simp_all   -- Finally cleanup
+137c160,183
+< #### Handling Timeouts
+---
+> **Never** use `simp_all` alone as your first tactic after `loom_solve`. It rarely helps with substantive goals.
+> 
+> 
+> #### Decision 3: Are there "unknown constant" errors?
+> 
+> **Symptoms**: Error says "unknown constant `Array.get_swap_c`" or similar
+> 
+> **Root cause**: You're referencing a lemma that doesn't exist
+> 
+> **Solution**: Only use solver hints from this verified list:
+> 
+> **Available Solver Hints**:
+> - `Array.size_set` — size after set operation
+> - `Array.size_swap` — size after swap
+> - `Array.get_set_c` — get after set (conditional on index)
+> - `Array.multiset_swap` — swap preserves permutation
+> - `Array.size_replicate` — size of replicated array
+> - `Nat.mod_lt` — modular arithmetic bounds
+> - `Nat.sub_add_cancel` — subtraction/addition cancellation
+> 
+> **Do NOT guess lemma names**. Common hallucinations to avoid:
+> - ❌ `Array.get_swap_c` (doesn't exist)
+> - ❌ `<MethodName>_correct` (not a standard name)
+> - ❌ `List.qsort` (wrong Lean 4 API)
+139c185,204
+< If the proof times out, you can increase resource limits using scoped options. Use these options only when encountering timeout errors, not preemptively.
+---
+> If uncertain about a lemma name, describe what you need in a comment instead of adding a wrong `solverHint`.
+> 
+> #### Decision 4: Is the same error repeating 3+ times?
+> 
+> **Symptoms**: You get the identical unsolved goal or error across multiple attempts
+> 
+> **Root cause**: Your proof strategy is fundamentally not working
+> 
+> **Solution**: STOP and change approach:
+> 
+> 1. **Re-examine the goal**: What property does it actually require?
+> 2. **Check invariants**: Are they strong enough? Do they mention all mutable variables?
+> 3. **Try different tactics**: If `simp` failed 3 times, try `omega`, `grind`, or `cases`
+> 4. **Consider helper lemmas**: Maybe a standalone lemma is needed
+> 
+> **Do NOT** keep retrying `loom_solve <;> simp_all` when it repeatedly fails. Tactical repetition won't solve strategic problems.
+> 
+> ### Providing Solver Hints
+> 
+> Add hints **before** `prove_correct` using:
+141d205
+< **Syntax:**
+143,145c207,209
+< set_option maxHeartbeats 1000000 in
+< set_option auto.smt.timeout 8 in
+< prove_correct method_name by
+---
+> attribute [local solverHint] Array.size_set Array.get_set_c
+> 
+> prove_correct my_method by
+149,151c213,252
+< **Common timeout options:**
+< * `maxHeartbeats`: Increases computation budget (default: 200000)
+< * `auto.smt.timeout`: Increases SMT solver timeout in seconds (default: 4)
+---
+> Common hints by use case:
+> - Array operations → `Array.size_set`, `Array.get_set_c`, `Array.multiset_swap`
+> - Modular arithmetic → `Nat.mod_lt`
+> - Swapping → `Array.size_swap`, `Array.multiset_swap`
+> 
+> 
+> ## 5. Common Mistakes and How to Fix Them
+> 
+> * **Never use `return` inside a `while` loop body.**  
+>   Loop bodies must signal loop continuation/termination, not method termination.  
+>   **Fix**: Use a boolean flag pattern (see Example 3).
+> 
+> * **Empty else branches**  
+>   Don't write `else ()` or `else skip`.  
+>   **Fix**: Simply omit the `else` clause.
+> 
+> * **Chained inequalities**  
+>   Lean doesn't support `a < b < c`.  
+>   **Fix**: Write `a < b ∧ b < c`.
+> 
+> * **Loop invariant too weak**  
+>   **Symptoms**: Proof fails with unsolved goals mentioning loop variables.  
+>   **Fix**:
+>   - Ensure invariant mentions ALL mutable variables modified in the loop
+>   - Check invariant connects current state to postcondition requirements
+>   - Strengthen to capture more information about loop progress
+> 
+> * **Invariant too strong**  
+>   **Symptoms**: Invariant fails to hold during loop execution.  
+>   **Fix**:
+>   - Weaken the invariant to only claim what the loop actually maintains
+>   - Add preconditions if the invariant only holds under certain conditions
+> 
+> * **Using `sorry`**  
+>   **NEVER use `sorry` as a placeholder.** If stuck after multiple attempts:
+>   1. Explain which specific goal blocks you
+>   2. Suggest what lemma or invariant might help
+>   3. Provide code WITHOUT `sorry` showing partial progress
+>   
+>   Leaving unsolved goals is acceptable; using `sorry` is not.
+153c254
+< ## 5. Complete Examples
+---
+> ## 6. Complete Examples
+331,333c432
+< 
+< 
+< ## 6. Important Notes
+---
+> ## 7. Important Notes
+343c442,448
+< - You should NOT skip ANY proofs for brevity and you should NEVER use `sorry` as a placeholder for a proof.
+---
+> - **NEVER use `sorry` as a placeholder for a proof.**
+>   If you cannot complete a proof after multiple attempts:
+>   1. Explain which specific goal is blocking you and what property it requires
+>   2. Suggest what lemma or invariant strengthening might help
+>   3. Provide code WITHOUT `sorry` showing partial progress with tactics
+> 
+>   Do NOT introduce `sorry` to make compilation succeed. Leaving unsolved goals is better than using `sorry`.
+345c450
+< ## 7. Imperative Code Requirement
+---
+> ## 8. Imperative Code Requirement

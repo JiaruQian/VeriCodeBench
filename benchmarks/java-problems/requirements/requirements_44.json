@@ -1,0 +1,273 @@
+[
+  {
+    "id": 1,
+    "path": "array_basics/Problem001_ArrayLength.java",
+    "category": "array_basics",
+    "requirement_en": "Given a non-null integer array, return its length without modifying the array."
+  },
+  {
+    "id": 2,
+    "path": "array_basics/Problem002_IsEmpty.java",
+    "category": "array_basics",
+    "requirement_en": "Given a non-null integer array, return true exactly when its length is zero."
+  },
+  {
+    "id": 3,
+    "path": "array_basics/Problem003_FirstElement.java",
+    "category": "array_basics",
+    "requirement_en": "Given a non-null nonempty integer array, return its first element without modifying it."
+  },
+  {
+    "id": 4,
+    "path": "array_basics/Problem004_LastElement.java",
+    "category": "array_basics",
+    "requirement_en": "Given a non-null nonempty integer array, return its last element without modifying it."
+  },
+  {
+    "id": 5,
+    "path": "array_basics/Problem005_GetAtIndex.java",
+    "category": "array_basics",
+    "requirement_en": "Given a non-null integer array and a valid index, return the element at that index."
+  },
+  {
+    "id": 6,
+    "path": "mutable_arrays/Problem006_SetAtIndex.java",
+    "category": "mutable_arrays",
+    "requirement_en": "Given a non-null integer array, a valid index, and a value, store the value at the index and leave all other elements unchanged."
+  },
+  {
+    "id": 7,
+    "path": "mutable_arrays/Problem007_SwapTwoIndices.java",
+    "category": "mutable_arrays",
+    "requirement_en": "Given a non-null integer array and two valid indices, swap the two indexed elements."
+  },
+  {
+    "id": 8,
+    "path": "mutable_arrays/Problem008_ZeroPrefix.java",
+    "category": "mutable_arrays",
+    "requirement_en": "Given a non-null integer array and a valid prefix length n, set the first n elements to zero and leave the suffix unchanged."
+  },
+  {
+    "id": 9,
+    "path": "mutable_arrays/Problem009_FillArray.java",
+    "category": "mutable_arrays",
+    "requirement_en": "Given a non-null integer array and a value, set every element to that value."
+  },
+  {
+    "id": 10,
+    "path": "array_search/Problem010_ContainsValue.java",
+    "category": "array_search",
+    "requirement_en": "Given a non-null integer array and a target value, return true exactly when some element equals the target."
+  },
+  {
+    "id": 11,
+    "path": "array_search/Problem011_FirstIndexOf.java",
+    "category": "array_search",
+    "requirement_en": "Given a non-null integer array and a target value, return the first target index or -1 if absent."
+  },
+  {
+    "id": 12,
+    "path": "array_search/Problem012_CountValue.java",
+    "category": "array_search",
+    "requirement_en": "Given a non-null integer array and a target value, count occurrences of the target."
+  },
+  {
+    "id": 13,
+    "path": "array_predicates/Problem013_AllEven.java",
+    "category": "array_predicates",
+    "requirement_en": "Given a non-null integer array, return true exactly when every element is even."
+  },
+  {
+    "id": 14,
+    "path": "array_predicates/Problem014_AnyNegative.java",
+    "category": "array_predicates",
+    "requirement_en": "Given a non-null integer array, return true exactly when at least one element is negative."
+  },
+  {
+    "id": 15,
+    "path": "array_extrema/Problem015_ArrayMax.java",
+    "category": "array_extrema",
+    "requirement_en": "Given a non-null nonempty integer array, return a maximum element without modifying the array."
+  },
+  {
+    "id": 16,
+    "path": "array_extrema/Problem016_ArrayMin.java",
+    "category": "array_extrema",
+    "requirement_en": "Given a non-null nonempty integer array, return a minimum element without modifying the array."
+  },
+  {
+    "id": 17,
+    "path": "mutable_arrays/Problem017_CopyArray.java",
+    "category": "mutable_arrays",
+    "requirement_en": "Given non-null source and destination arrays where the destination is long enough, copy all source elements into the destination."
+  },
+  {
+    "id": 18,
+    "path": "mutable_arrays/Problem018_IncrementAll.java",
+    "category": "mutable_arrays",
+    "requirement_en": "Given a non-null integer array whose elements can be safely incremented, add one to every element."
+  },
+  {
+    "id": 19,
+    "path": "mutable_arrays/Problem019_DoubleAll.java",
+    "category": "mutable_arrays",
+    "requirement_en": "Given a non-null integer array whose elements can be safely doubled, double every element in place."
+  },
+  {
+    "id": 20,
+    "path": "mutable_arrays/Problem020_ReplaceEvenIndices.java",
+    "category": "mutable_arrays",
+    "requirement_en": "Given a non-null integer array, set elements at even indices to zero and leave odd indices unchanged."
+  },
+  {
+    "id": 21,
+    "path": "array_ordering/Problem021_AdjacentSwapIfDescending.java",
+    "category": "array_ordering",
+    "requirement_en": "Given a non-null integer array and a valid adjacent pair, swap the pair only if it is descending."
+  },
+  {
+    "id": 22,
+    "path": "array_ordering/Problem022_SelectionSortThree.java",
+    "category": "array_ordering",
+    "requirement_en": "Given a non-null integer array of length three, sort the three elements in nondecreasing order in place."
+  },
+  {
+    "id": 23,
+    "path": "scalar_arithmetic/Problem023_Max2.java",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given two integers, return the greater value."
+  },
+  {
+    "id": 24,
+    "path": "scalar_arithmetic/Problem024_Min2.java",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given two integers, return the smaller value."
+  },
+  {
+    "id": 25,
+    "path": "scalar_arithmetic/Problem025_AbsNonMin.java",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given an integer other than Integer.MIN_VALUE, return its absolute value."
+  },
+  {
+    "id": 26,
+    "path": "scalar_arithmetic/Problem026_Clamp.java",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given integers x, lo, and hi with lo <= hi, clamp x into the closed interval [lo, hi]."
+  },
+  {
+    "id": 27,
+    "path": "scalar_arithmetic/Problem027_SafeAdd.java",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given two integers whose mathematical sum is inside int range, return their sum."
+  },
+  {
+    "id": 28,
+    "path": "scalar_arithmetic/Problem028_SafeSubtract.java",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given two integers whose mathematical difference is inside int range, return x minus y."
+  },
+  {
+    "id": 29,
+    "path": "scalar_arithmetic/Problem029_TriangleAngles.java",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given three angles, return true exactly when all are positive and their mathematical sum is 180."
+  },
+  {
+    "id": 30,
+    "path": "scalar_arithmetic/Problem030_TriangleSides.java",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given three side lengths, return true exactly when they satisfy the strict mathematical triangle inequality."
+  },
+  {
+    "id": 31,
+    "path": "loop_arithmetic/Problem031_SumToN.java",
+    "category": "loop_arithmetic",
+    "requirement_en": "Given n between 0 and 65535, return the arithmetic sum 0 + ... + n."
+  },
+  {
+    "id": 32,
+    "path": "loop_arithmetic/Problem032_RepeatedAdditionProduct.java",
+    "category": "loop_arithmetic",
+    "requirement_en": "Given nonnegative a and bounded b, return a*b using repeated addition."
+  },
+  {
+    "id": 33,
+    "path": "exceptions/Problem033_RequireNonNullLength.java",
+    "category": "exceptions",
+    "requirement_en": "Given an integer array, return its length when non-null and throw IllegalArgumentException when null."
+  },
+  {
+    "id": 34,
+    "path": "exceptions/Problem034_SafeDivideException.java",
+    "category": "exceptions",
+    "requirement_en": "Given integers x and y, return x/y when y is nonzero and division cannot overflow, and throw IllegalArgumentException when y is zero."
+  },
+  {
+    "id": 35,
+    "path": "exceptions/Problem035_BoundedIndexException.java",
+    "category": "exceptions",
+    "requirement_en": "Given an array and index, return the indexed element for valid inputs and throw IllegalArgumentException when the array is null or the index is invalid."
+  },
+  {
+    "id": 36,
+    "path": "nullability/Problem036_NonNullResult.java",
+    "category": "nullability",
+    "requirement_en": "Given a possibly null String and a fallback non-null String, return the input when non-null, otherwise the fallback."
+  },
+  {
+    "id": 37,
+    "path": "object_frames/Problem037_BoxSetValue.java",
+    "category": "object_frames",
+    "requirement_en": "Given a non-null mutable Box and a value, update only the box value field.",
+    "type_context": "public static class Box { public int value; }"
+  },
+  {
+    "id": 38,
+    "path": "object_frames/Problem038_BoxNoMutationRead.java",
+    "category": "object_frames",
+    "requirement_en": "Given a non-null mutable Box, return its value without modifying the box.",
+    "type_context": "public static class Box { public int value; }"
+  },
+  {
+    "id": 39,
+    "path": "object_invariants/Problem039_CounterIncrement.java",
+    "category": "object_invariants",
+    "requirement_en": "Given a non-null Counter whose value can be safely incremented, increment it by one.",
+    "type_context": "public static class Counter {\n        //@ public invariant value >= 0;\n        public int value;\n    }"
+  },
+  {
+    "id": 40,
+    "path": "object_invariants/Problem040_CounterDecrementIfPositive.java",
+    "category": "object_invariants",
+    "requirement_en": "Given a non-null Counter, decrement it only when its value is positive and preserve nonnegativity.",
+    "type_context": "public static class Counter {\n        //@ public invariant value >= 0;\n        public int value;\n    }"
+  },
+  {
+    "id": 41,
+    "path": "object_frames/Problem041_PairSumReadonly.java",
+    "category": "object_frames",
+    "requirement_en": "Given a non-null Pair, return the sum of its two fields without modifying the object.",
+    "type_context": "public static class Pair { public int left; public int right; }"
+  },
+  {
+    "id": 42,
+    "path": "object_invariants/Problem042_RangeContains.java",
+    "category": "object_invariants",
+    "requirement_en": "Given a non-null Range, return true exactly when x is inside its inclusive bounds.",
+    "type_context": "public static class Range {\n        //@ public invariant low <= high;\n        public int low;\n        public int high;\n    }"
+  },
+  {
+    "id": 43,
+    "path": "object_frames/Problem043_FrameTwoBoxes.java",
+    "category": "object_frames",
+    "requirement_en": "Given two distinct non-null boxes, update the first box and leave the second box unchanged.",
+    "type_context": "public static class Box { public int value; }"
+  },
+  {
+    "id": 44,
+    "path": "exceptions/Problem044_DigitValueException.java",
+    "category": "exceptions",
+    "requirement_en": "Given a character, return its decimal digit value when it is between '0' and '9', otherwise throw IllegalArgumentException."
+  }
+]

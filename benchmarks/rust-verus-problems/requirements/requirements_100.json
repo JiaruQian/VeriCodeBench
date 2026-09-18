@@ -1,0 +1,602 @@
+[
+  {
+    "id": 1,
+    "path": "scalar_arithmetic/Problem001_MaxU64.rs",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given two unsigned 64-bit integers, return the greater value without overflow or mutation."
+  },
+  {
+    "id": 2,
+    "path": "scalar_arithmetic/Problem002_MinU64.rs",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given two unsigned 64-bit integers, return the smaller value."
+  },
+  {
+    "id": 3,
+    "path": "scalar_arithmetic/Problem003_ClampU64.rs",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given a value and an inclusive valid range, return the value clamped into that range."
+  },
+  {
+    "id": 4,
+    "path": "scalar_arithmetic/Problem004_SafeAdd.rs",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given two unsigned integers whose sum fits in u64, return their sum."
+  },
+  {
+    "id": 5,
+    "path": "scalar_arithmetic/Problem005_SafeSub.rs",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given two unsigned integers where the subtrahend is not larger, return their difference."
+  },
+  {
+    "id": 6,
+    "path": "scalar_arithmetic/Problem006_IncrementBounded.rs",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given an unsigned integer smaller than u64::MAX, return it plus one."
+  },
+  {
+    "id": 7,
+    "path": "scalar_arithmetic/Problem007_DecrementPositive.rs",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given a positive unsigned integer, return it minus one."
+  },
+  {
+    "id": 8,
+    "path": "scalar_arithmetic/Problem008_AbsDiff.rs",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given two unsigned integers, return their absolute difference without underflow."
+  },
+  {
+    "id": 9,
+    "path": "scalar_arithmetic/Problem009_AverageFloor.rs",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given two unsigned integers whose sum fits in u64, return floor((x + y) / 2)."
+  },
+  {
+    "id": 10,
+    "path": "scalar_arithmetic/Problem010_SaturatingSub.rs",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given two unsigned integers, subtract the second from the first, returning zero on underflow."
+  },
+  {
+    "id": 11,
+    "path": "option_result/Problem011_OptionIsSome.rs",
+    "category": "option_result",
+    "requirement_en": "Given an Option<u64>, return true exactly when it contains a value."
+  },
+  {
+    "id": 12,
+    "path": "option_result/Problem012_OptionIsNone.rs",
+    "category": "option_result",
+    "requirement_en": "Given an Option<u64>, return true exactly when it is None."
+  },
+  {
+    "id": 13,
+    "path": "option_result/Problem013_UnwrapOr.rs",
+    "category": "option_result",
+    "requirement_en": "Given an Option<u64> and a default, return the contained value or the default."
+  },
+  {
+    "id": 14,
+    "path": "option_result/Problem014_OptionIncrement.rs",
+    "category": "option_result",
+    "requirement_en": "Given an Option<u64>, increment the contained value when present and safe, otherwise keep None."
+  },
+  {
+    "id": 15,
+    "path": "option_result/Problem015_FilterNonzero.rs",
+    "category": "option_result",
+    "requirement_en": "Given a u64, return Some(x) exactly when x is nonzero, otherwise None."
+  },
+  {
+    "id": 16,
+    "path": "option_result/Problem016_BoolToResult.rs",
+    "category": "option_result",
+    "requirement_en": "Given a boolean and value, return Ok(value) when the boolean is true and Err otherwise."
+  },
+  {
+    "id": 17,
+    "path": "option_result/Problem017_ResultIsOk.rs",
+    "category": "option_result",
+    "requirement_en": "Given a Result<u64, ()>, return true exactly when it is Ok."
+  },
+  {
+    "id": 18,
+    "path": "option_result/Problem018_ResultUnwrapOr.rs",
+    "category": "option_result",
+    "requirement_en": "Given a Result<u64, ()> and a default, return the Ok value or the default."
+  },
+  {
+    "id": 19,
+    "path": "option_result/Problem019_CheckedAddOption.rs",
+    "category": "option_result",
+    "requirement_en": "Given two unsigned integers, return Some(sum) when addition fits in u64 and None otherwise."
+  },
+  {
+    "id": 20,
+    "path": "option_result/Problem020_SafeDivResult.rs",
+    "category": "option_result",
+    "requirement_en": "Given two unsigned integers, return Ok(x / y) when y is nonzero and Err when y is zero."
+  },
+  {
+    "id": 21,
+    "path": "vec_immutable/Problem021_VecLen.rs",
+    "category": "vec_immutable",
+    "requirement_en": "Given an immutable borrowed Vec<u64>, return its length without mutation."
+  },
+  {
+    "id": 22,
+    "path": "vec_immutable/Problem022_VecIsEmpty.rs",
+    "category": "vec_immutable",
+    "requirement_en": "Given an immutable borrowed Vec<u64>, return true exactly when its length is zero."
+  },
+  {
+    "id": 23,
+    "path": "vec_immutable/Problem023_VecFirst.rs",
+    "category": "vec_immutable",
+    "requirement_en": "Given a nonempty borrowed Vec<u64>, return its first element without mutation."
+  },
+  {
+    "id": 24,
+    "path": "vec_immutable/Problem024_VecLast.rs",
+    "category": "vec_immutable",
+    "requirement_en": "Given a nonempty borrowed Vec<u64>, return its last element without mutation."
+  },
+  {
+    "id": 25,
+    "path": "vec_immutable/Problem025_VecGetAt.rs",
+    "category": "vec_immutable",
+    "requirement_en": "Given a borrowed Vec<u64> and a valid index, return the indexed element."
+  },
+  {
+    "id": 26,
+    "path": "vec_immutable/Problem026_VecGetOption.rs",
+    "category": "vec_immutable",
+    "requirement_en": "Given a borrowed Vec<u64> and an index, return Some(element) for in-bounds indices and None otherwise."
+  },
+  {
+    "id": 27,
+    "path": "vec_immutable/Problem027_VecHeadOrDefault.rs",
+    "category": "vec_immutable",
+    "requirement_en": "Given a borrowed Vec<u64> and a default, return the first element when present and the default otherwise."
+  },
+  {
+    "id": 28,
+    "path": "vec_immutable/Problem028_VecLastOrDefault.rs",
+    "category": "vec_immutable",
+    "requirement_en": "Given a borrowed Vec<u64> and a default, return the last element when present and the default otherwise."
+  },
+  {
+    "id": 29,
+    "path": "vec_immutable/Problem029_VecContains.rs",
+    "category": "vec_immutable",
+    "requirement_en": "Given a borrowed Vec<u64> and a target, return true exactly when some element equals the target."
+  },
+  {
+    "id": 30,
+    "path": "vec_immutable/Problem030_VecAllNonzero.rs",
+    "category": "vec_immutable",
+    "requirement_en": "Given a borrowed Vec<u64>, return true exactly when every element is nonzero."
+  },
+  {
+    "id": 31,
+    "path": "vec_immutable/Problem031_VecAnyZero.rs",
+    "category": "vec_immutable",
+    "requirement_en": "Given a borrowed Vec<u64>, return true exactly when at least one element is zero."
+  },
+  {
+    "id": 32,
+    "path": "vec_immutable/Problem032_VecSecond.rs",
+    "category": "vec_immutable",
+    "requirement_en": "Given a borrowed Vec<u64> with at least two elements, return the second element."
+  },
+  {
+    "id": 33,
+    "path": "vec_mutation/Problem033_VecSetAt.rs",
+    "category": "vec_mutation",
+    "requirement_en": "Given a uniquely borrowed Vec<u64>, a valid index, and a value, update exactly that element."
+  },
+  {
+    "id": 34,
+    "path": "vec_mutation/Problem034_VecSwapTwo.rs",
+    "category": "vec_mutation",
+    "requirement_en": "Given a uniquely borrowed Vec<u64> and two valid indices, swap the two elements and leave all others unchanged."
+  },
+  {
+    "id": 35,
+    "path": "vec_mutation/Problem035_VecPush.rs",
+    "category": "vec_mutation",
+    "requirement_en": "Given a uniquely borrowed Vec<u64> and a value, append the value to the vector."
+  },
+  {
+    "id": 36,
+    "path": "vec_mutation/Problem036_VecPop.rs",
+    "category": "vec_mutation",
+    "requirement_en": "Given a nonempty uniquely borrowed Vec<u64>, pop and return the last element."
+  },
+  {
+    "id": 37,
+    "path": "vec_mutation/Problem037_VecReplaceIfInBounds.rs",
+    "category": "vec_mutation",
+    "requirement_en": "Given a uniquely borrowed Vec<u64>, index, and value, update the element only when the index is in bounds and report whether an update happened."
+  },
+  {
+    "id": 38,
+    "path": "vec_mutation/Problem038_VecPopIfNonempty.rs",
+    "category": "vec_mutation",
+    "requirement_en": "Given a uniquely borrowed Vec<u64>, pop the last element when present and return it as an Option."
+  },
+  {
+    "id": 39,
+    "path": "vec_mutation/Problem039_VecPushTwo.rs",
+    "category": "vec_mutation",
+    "requirement_en": "Given a uniquely borrowed Vec<u64> and two values, append both values in order."
+  },
+  {
+    "id": 40,
+    "path": "vec_mutation/Problem040_VecFillAll.rs",
+    "category": "vec_mutation",
+    "requirement_en": "Given a uniquely borrowed Vec<u64> and a value, set every element to that value."
+  },
+  {
+    "id": 41,
+    "path": "vec_mutation/Problem041_VecZeroPrefix.rs",
+    "category": "vec_mutation",
+    "requirement_en": "Given a uniquely borrowed Vec<u64> and a valid prefix length, set the prefix to zero and leave the suffix unchanged."
+  },
+  {
+    "id": 42,
+    "path": "vec_mutation/Problem042_VecCopyPrefix.rs",
+    "category": "vec_mutation",
+    "requirement_en": "Given immutable source and uniquely borrowed destination vectors where destination is long enough, copy all source elements into the destination prefix and leave the rest unchanged."
+  },
+  {
+    "id": 43,
+    "path": "vec_mutation/Problem043_VecIncrementAll.rs",
+    "category": "vec_mutation",
+    "requirement_en": "Given a uniquely borrowed Vec<u64> whose elements can all be incremented, add one to every element."
+  },
+  {
+    "id": 44,
+    "path": "vec_mutation/Problem044_VecSetFirstIfNonempty.rs",
+    "category": "vec_mutation",
+    "requirement_en": "Given a uniquely borrowed Vec<u64> and a value, set the first element only when the vector is nonempty and return whether it changed."
+  },
+  {
+    "id": 45,
+    "path": "ownership_slices/Problem045_TakeVecLen.rs",
+    "category": "ownership_slices",
+    "requirement_en": "Given owned Vec<u64>, consume it and return its length."
+  },
+  {
+    "id": 46,
+    "path": "ownership_slices/Problem046_CloneVec.rs",
+    "category": "ownership_slices",
+    "requirement_en": "Given an immutable borrowed Vec<u64>, return an owned clone with the same sequence of elements."
+  },
+  {
+    "id": 47,
+    "path": "ownership_slices/Problem047_SliceLen.rs",
+    "category": "ownership_slices",
+    "requirement_en": "Given an immutable slice of u64, return its length without indexing."
+  },
+  {
+    "id": 48,
+    "path": "ownership_slices/Problem048_SliceFirst.rs",
+    "category": "ownership_slices",
+    "requirement_en": "Given a nonempty immutable slice of u64, return its first element."
+  },
+  {
+    "id": 49,
+    "path": "ownership_slices/Problem049_ArrayGet3.rs",
+    "category": "ownership_slices",
+    "requirement_en": "Given a borrowed fixed-size array of length three and a valid index, return the indexed element."
+  },
+  {
+    "id": 50,
+    "path": "ownership_slices/Problem050_ArraySet3.rs",
+    "category": "ownership_slices",
+    "requirement_en": "Given a uniquely borrowed fixed-size array of length three, valid index, and value, update exactly that array position."
+  },
+  {
+    "id": 51,
+    "path": "scalar_arithmetic_ext/Problem051_IsEven.rs",
+    "category": "scalar_arithmetic_ext",
+    "requirement_en": "Given an unsigned 64-bit integer, return true exactly when it is even."
+  },
+  {
+    "id": 52,
+    "path": "scalar_arithmetic_ext/Problem052_IsOdd.rs",
+    "category": "scalar_arithmetic_ext",
+    "requirement_en": "Given an unsigned 64-bit integer, return true exactly when it is odd."
+  },
+  {
+    "id": 53,
+    "path": "scalar_arithmetic_ext/Problem053_DoubleBounded.rs",
+    "category": "scalar_arithmetic_ext",
+    "requirement_en": "Given an unsigned 64-bit integer whose double does not overflow, return twice the value."
+  },
+  {
+    "id": 54,
+    "path": "scalar_arithmetic_ext/Problem054_SquareBounded.rs",
+    "category": "scalar_arithmetic_ext",
+    "requirement_en": "Given an unsigned 64-bit integer whose square does not overflow, return its square."
+  },
+  {
+    "id": 55,
+    "path": "scalar_arithmetic_ext/Problem055_Max3U64.rs",
+    "category": "scalar_arithmetic_ext",
+    "requirement_en": "Given three unsigned 64-bit integers, return the greatest of the three values."
+  },
+  {
+    "id": 56,
+    "path": "scalar_arithmetic_ext/Problem056_Min3U64.rs",
+    "category": "scalar_arithmetic_ext",
+    "requirement_en": "Given three unsigned 64-bit integers, return the least of the three values."
+  },
+  {
+    "id": 57,
+    "path": "scalar_arithmetic_ext/Problem057_ClampI32.rs",
+    "category": "scalar_arithmetic_ext",
+    "requirement_en": "Given a signed 32-bit integer and lower and upper bounds with low at most high, clamp the value into that inclusive range."
+  },
+  {
+    "id": 58,
+    "path": "scalar_arithmetic_ext/Problem058_NonnegativeI64.rs",
+    "category": "scalar_arithmetic_ext",
+    "requirement_en": "Given a signed 64-bit integer, return true exactly when it is nonnegative."
+  },
+  {
+    "id": 59,
+    "path": "scalar_arithmetic_ext/Problem059_SafeMulSmall.rs",
+    "category": "scalar_arithmetic_ext",
+    "requirement_en": "Given two unsigned 64-bit integers whose product does not overflow, return their product."
+  },
+  {
+    "id": 60,
+    "path": "scalar_arithmetic_ext/Problem060_MidpointFloor.rs",
+    "category": "scalar_arithmetic_ext",
+    "requirement_en": "Given two unsigned 64-bit integers with sum not overflowing, return the floor midpoint."
+  },
+  {
+    "id": 61,
+    "path": "option_result_ext/Problem061_OptionMapDouble.rs",
+    "category": "option_result_ext",
+    "requirement_en": "Given an optional unsigned integer whose contained value can be doubled without overflow, return an option containing twice the value when present and None otherwise."
+  },
+  {
+    "id": 62,
+    "path": "option_result_ext/Problem062_OptionDefaultZero.rs",
+    "category": "option_result_ext",
+    "requirement_en": "Given an optional unsigned integer, return its contained value when present and zero otherwise."
+  },
+  {
+    "id": 63,
+    "path": "option_result_ext/Problem063_OptionIsZero.rs",
+    "category": "option_result_ext",
+    "requirement_en": "Given an optional unsigned integer, return true exactly when it is Some containing zero."
+  },
+  {
+    "id": 64,
+    "path": "option_result_ext/Problem064_ResultMapIncrement.rs",
+    "category": "option_result_ext",
+    "requirement_en": "Given a Result containing an unsigned integer or error code, and every Ok value can be incremented without overflow, return Ok(value+1) for Ok and preserve Err."
+  },
+  {
+    "id": 65,
+    "path": "option_result_ext/Problem065_ResultDefault.rs",
+    "category": "option_result_ext",
+    "requirement_en": "Given a Result containing an unsigned integer or error code and a default value, return the Ok value when present and the default on Err."
+  },
+  {
+    "id": 66,
+    "path": "option_result_ext/Problem066_CheckedSubOption.rs",
+    "category": "option_result_ext",
+    "requirement_en": "Given two unsigned integers, return Some(x-y) when x is at least y and None otherwise."
+  },
+  {
+    "id": 67,
+    "path": "option_result_ext/Problem067_SafeModuloResult.rs",
+    "category": "option_result_ext",
+    "requirement_en": "Given two unsigned integers, return Ok(x % y) when divisor is nonzero and Err(x) when divisor is zero."
+  },
+  {
+    "id": 68,
+    "path": "option_result_ext/Problem068_OptionOr.rs",
+    "category": "option_result_ext",
+    "requirement_en": "Given two optional unsigned integers, return the first option when it is Some, otherwise return the second option."
+  },
+  {
+    "id": 69,
+    "path": "option_result_ext/Problem069_ResultIsErr.rs",
+    "category": "option_result_ext",
+    "requirement_en": "Given a Result containing an unsigned integer or error code, return true exactly when it is Err."
+  },
+  {
+    "id": 70,
+    "path": "option_result_ext/Problem070_OptionFilterEven.rs",
+    "category": "option_result_ext",
+    "requirement_en": "Given an optional unsigned integer, return the same Some value only when it is even, and None for absent or odd values."
+  },
+  {
+    "id": 71,
+    "path": "vec_immutable_ext/Problem071_VecThird.rs",
+    "category": "vec_immutable_ext",
+    "requirement_en": "Given an immutable vector of unsigned integers with length greater than two, return the third element."
+  },
+  {
+    "id": 72,
+    "path": "vec_immutable_ext/Problem072_VecLenAtLeast.rs",
+    "category": "vec_immutable_ext",
+    "requirement_en": "Given an immutable vector of unsigned integers and a bound, return true exactly when the vector length is at least the bound."
+  },
+  {
+    "id": 73,
+    "path": "vec_immutable_ext/Problem073_VecAllLessThan.rs",
+    "category": "vec_immutable_ext",
+    "requirement_en": "Given an immutable vector and a limit, return true exactly when every element is strictly less than the limit."
+  },
+  {
+    "id": 74,
+    "path": "vec_immutable_ext/Problem074_VecAnyGreaterThan.rs",
+    "category": "vec_immutable_ext",
+    "requirement_en": "Given an immutable vector and a limit, return true exactly when at least one element is greater than the limit."
+  },
+  {
+    "id": 75,
+    "path": "vec_immutable_ext/Problem075_VecCountZero.rs",
+    "category": "vec_immutable_ext",
+    "requirement_en": "Given an immutable vector with length at most u64::MAX, return the number of zero elements."
+  },
+  {
+    "id": 76,
+    "path": "vec_immutable_ext/Problem076_VecSum2.rs",
+    "category": "vec_immutable_ext",
+    "requirement_en": "Given an immutable vector of length two whose two elements sum without overflow, return the sum of its elements."
+  },
+  {
+    "id": 77,
+    "path": "vec_immutable_ext/Problem077_VecPairSorted.rs",
+    "category": "vec_immutable_ext",
+    "requirement_en": "Given an immutable vector of length two, return true exactly when the first element is at most the second."
+  },
+  {
+    "id": 78,
+    "path": "vec_immutable_ext/Problem078_VecGetOrZero.rs",
+    "category": "vec_immutable_ext",
+    "requirement_en": "Given an immutable vector and index, return the element at the index when in bounds and zero otherwise."
+  },
+  {
+    "id": 79,
+    "path": "vec_immutable_ext/Problem079_VecSameLen.rs",
+    "category": "vec_immutable_ext",
+    "requirement_en": "Given two immutable vectors, return true exactly when their lengths are equal."
+  },
+  {
+    "id": 80,
+    "path": "vec_immutable_ext/Problem080_SliceLast.rs",
+    "category": "vec_immutable_ext",
+    "requirement_en": "Given an immutable slice of unsigned integers with positive length, return its last element."
+  },
+  {
+    "id": 81,
+    "path": "vec_mutation_ext/Problem081_VecClearAll.rs",
+    "category": "vec_mutation_ext",
+    "requirement_en": "Given a uniquely borrowed vector, remove all elements."
+  },
+  {
+    "id": 82,
+    "path": "vec_mutation_ext/Problem082_VecSetLast.rs",
+    "category": "vec_mutation_ext",
+    "requirement_en": "Given a uniquely borrowed nonempty vector and a value, update exactly the last element to that value."
+  },
+  {
+    "id": 83,
+    "path": "vec_mutation_ext/Problem083_VecPushIfEmpty.rs",
+    "category": "vec_mutation_ext",
+    "requirement_en": "Given a uniquely borrowed vector and value, push the value only when the vector is initially empty."
+  },
+  {
+    "id": 84,
+    "path": "vec_mutation_ext/Problem084_VecPopIfLenGreaterThanOne.rs",
+    "category": "vec_mutation_ext",
+    "requirement_en": "Given a uniquely borrowed vector, pop one element exactly when the initial length is greater than one."
+  },
+  {
+    "id": 85,
+    "path": "vec_mutation_ext/Problem085_VecSetSecond.rs",
+    "category": "vec_mutation_ext",
+    "requirement_en": "Given a uniquely borrowed vector with at least two elements and a value, update exactly the second element."
+  },
+  {
+    "id": 86,
+    "path": "vec_mutation_ext/Problem086_VecSwapFirstLast.rs",
+    "category": "vec_mutation_ext",
+    "requirement_en": "Given a uniquely borrowed nonempty vector, swap exactly the first and last elements."
+  },
+  {
+    "id": 87,
+    "path": "vec_mutation_ext/Problem087_VecIncrementFirst.rs",
+    "category": "vec_mutation_ext",
+    "requirement_en": "Given a uniquely borrowed nonempty vector whose first element can be incremented without overflow, increment exactly the first element."
+  },
+  {
+    "id": 88,
+    "path": "vec_mutation_ext/Problem088_VecAppendZero.rs",
+    "category": "vec_mutation_ext",
+    "requirement_en": "Given a uniquely borrowed vector, append one zero element."
+  },
+  {
+    "id": 89,
+    "path": "vec_mutation_ext/Problem089_VecTruncateOne.rs",
+    "category": "vec_mutation_ext",
+    "requirement_en": "Given a uniquely borrowed vector, keep only the first element when initially nonempty and leave empty vectors empty."
+  },
+  {
+    "id": 90,
+    "path": "vec_mutation_ext/Problem090_VecSetAllZero.rs",
+    "category": "vec_mutation_ext",
+    "requirement_en": "Given a uniquely borrowed vector, set every element to zero without changing the length."
+  },
+  {
+    "id": 91,
+    "path": "ownership_slices_ext/Problem091_ArraySwap3.rs",
+    "category": "ownership_slices_ext",
+    "requirement_en": "Given a uniquely borrowed fixed-size array of length three and two valid indices, swap exactly those two positions."
+  },
+  {
+    "id": 92,
+    "path": "ownership_slices_ext/Problem092_ArrayFirst3.rs",
+    "category": "ownership_slices_ext",
+    "requirement_en": "Given an immutable fixed-size array of length three, return its first element."
+  },
+  {
+    "id": 93,
+    "path": "ownership_slices_ext/Problem093_ArrayLast3.rs",
+    "category": "ownership_slices_ext",
+    "requirement_en": "Given an immutable fixed-size array of length three, return its last element."
+  },
+  {
+    "id": 94,
+    "path": "ownership_slices_ext/Problem094_ArraySum3Bounded.rs",
+    "category": "ownership_slices_ext",
+    "requirement_en": "Given an immutable fixed-size array of length three whose elements can be summed without overflow, return the sum of all elements."
+  },
+  {
+    "id": 95,
+    "path": "ownership_slices_ext/Problem095_SliceIsEmpty.rs",
+    "category": "ownership_slices_ext",
+    "requirement_en": "Given an immutable slice, return true exactly when it is empty."
+  },
+  {
+    "id": 96,
+    "path": "ownership_slices_ext/Problem096_SliceGetAt.rs",
+    "category": "ownership_slices_ext",
+    "requirement_en": "Given an immutable slice and a valid index, return the element at that index."
+  },
+  {
+    "id": 97,
+    "path": "ownership_slices_ext/Problem097_ArraySetFirst3.rs",
+    "category": "ownership_slices_ext",
+    "requirement_en": "Given a uniquely borrowed fixed-size array of length three and a value, update exactly the first position."
+  },
+  {
+    "id": 98,
+    "path": "ownership_slices_ext/Problem098_ArraySetLast3.rs",
+    "category": "ownership_slices_ext",
+    "requirement_en": "Given a uniquely borrowed fixed-size array of length three and a value, update exactly the last position."
+  },
+  {
+    "id": 99,
+    "path": "ownership_slices_ext/Problem099_ArrayAllZero3.rs",
+    "category": "ownership_slices_ext",
+    "requirement_en": "Given an immutable fixed-size array of length three, return true exactly when all three elements are zero."
+  },
+  {
+    "id": 100,
+    "path": "ownership_slices_ext/Problem100_ArrayAnyZero3.rs",
+    "category": "ownership_slices_ext",
+    "requirement_en": "Given an immutable fixed-size array of length three, return true exactly when at least one element is zero."
+  }
+]

@@ -1,0 +1,1653 @@
+[
+  {
+    "id": 1,
+    "path": "pointers/swap.c",
+    "requirement_en": "Given pointers to two integers, swap their stored values in place.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/pointers/swap.c",
+    "ground_truth_source": "manual",
+    "function_signature": "void swap(int* a, int* b);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "ensures",
+        "expr": "*a == \\old(*b)",
+        "text": "first pointed value equals old second value",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "r2",
+        "type": "ensures",
+        "expr": "*b == \\old(*a)",
+        "text": "second pointed value equals old first value",
+        "source": "manual_requirement_spec"
+      }
+    ],
+    "ground_truth_contract": ""
+  },
+  {
+    "id": 2,
+    "path": "pointers/reset_1st.c",
+    "requirement_en": "Given pointers to two integers, set the first value to 0 only if the second value is nonzero, otherwise leave both unchanged.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/pointers/reset_1st.c",
+    "ground_truth_source": "manual",
+    "function_signature": "void reset_1st_if_2nd_is_true(int* a, int const* b);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "ensures",
+        "expr": "(*b != 0) ==> (*a == 0)",
+        "text": "if second is nonzero then first becomes 0",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "r2",
+        "type": "ensures",
+        "expr": "(*b == 0) ==> (*a == \\old(*a) && *b == \\old(*b))",
+        "text": "if second is zero then both values stay unchanged",
+        "source": "manual_requirement_spec"
+      }
+    ],
+    "ground_truth_contract": ""
+  },
+  {
+    "id": 3,
+    "path": "pointers/order_3.c",
+    "requirement_en": "Given pointers to three integers, reorder the values so they are in nondecreasing order.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/pointers/order_3.c",
+    "ground_truth_source": "manual",
+    "function_signature": "void order_3(int *a, int *b, int *c);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "\\valid(a) && \\valid(b) && \\valid(c)",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "\\separated(a, b, c)",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt3",
+        "type": "assigns",
+        "expr": "*a, *b, *c",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "*a <= *b <= *c",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt5",
+        "type": "ensures",
+        "expr": "*a + *b + *c == \\old(*a) + \\old(*b) + \\old(*c)",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt6",
+        "type": "ensures",
+        "expr": "*a <= \\old(*a) && *a <= \\old(*b) && *a <= \\old(*c)",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt7",
+        "type": "ensures",
+        "expr": "*c >= \\old(*a) && *c >= \\old(*b) && *c >= \\old(*c)",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt8",
+        "type": "ensures",
+        "expr": "*a == \\old(*a) || *a == \\old(*b) || *a == \\old(*c)",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt9",
+        "type": "ensures",
+        "expr": "*b == \\old(*a) || *b == \\old(*b) || *b == \\old(*c)",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt10",
+        "type": "ensures",
+        "expr": "*c == \\old(*a) || *c == \\old(*b) || *c == \\old(*c)",
+        "source": "manual_reference_spec"
+      }
+    ],
+    "ground_truth_contract": "/*@\n    requires \\valid(a) && \\valid(b) && \\valid(c);\n    requires \\separated(a, b, c);\n    assigns *a, *b, *c;\n\n    // 1. Sorted\n    ensures *a <= *b <= *c;\n\n    // 2. Sum Preserved\n    ensures *a + *b + *c == \\old(*a) + \\old(*b) + \\old(*c);\n\n    // 3. Extremes (The Fix)\n    // *a is the minimum, so it must be <= all inputs\n    ensures *a <= \\old(*a) && *a <= \\old(*b) && *a <= \\old(*c);\n    // *c is the maximum, so it must be >= all inputs\n    ensures *c >= \\old(*a) && *c >= \\old(*b) && *c >= \\old(*c);\n\n    // 4. Membership (Still good to have)\n    ensures *a == \\old(*a) || *a == \\old(*b) || *a == \\old(*c);\n    ensures *b == \\old(*a) || *b == \\old(*b) || *b == \\old(*c);\n    ensures *c == \\old(*a) || *c == \\old(*b) || *c == \\old(*c);\n*/"
+  },
+  {
+    "id": 4,
+    "path": "pointers/max_pointers.c",
+    "requirement_en": "Given pointers to two integers, return the larger of the two pointed values without modifying memory.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/pointers/max_pointers.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int max_ptr(int *a, int *b);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "ensures",
+        "expr": "result >= a",
+        "text": "result >= a_value",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "r2",
+        "type": "ensures",
+        "expr": "result >= b",
+        "text": "result >= b_value",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "r3",
+        "type": "ensures",
+        "expr": "result == a || result == b",
+        "text": "result equals one input value",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "\\valid_read(a) && \\valid_read(b)",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "\\separated(a, b)",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt3",
+        "type": "assigns",
+        "expr": "\\nothing",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "\\result >= *a && \\result >= *b",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt5",
+        "type": "ensures",
+        "expr": "\\result == *a || \\result == *b",
+        "source": "manual_reference_spec"
+      }
+    ],
+    "ground_truth_contract": "/*@\n    requires \\valid_read(a) && \\valid_read(b);\n    requires \\separated(a, b);\n    assigns \\nothing;\n    \n    // Correct properties of MAX:\n    // 1. It is at least as big as both\n    ensures \\result >= *a && \\result >= *b;\n    \n    // 2. FIX: It is equal to one OR the other (not both!)\n    ensures \\result == *a || \\result == *b;\n*/"
+  },
+  {
+    "id": 5,
+    "path": "pointers/incr_a_by_b.c",
+    "requirement_en": "Given pointers to integers a and b, increase a by b and return the updated value of a.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/pointers/incr_a_by_b.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int incr_a_by_b(int* a, int const* b);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "ensures",
+        "expr": "*a == \\old(*a) + \\old(*b)",
+        "text": "a is increased by b",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "r2",
+        "type": "ensures",
+        "expr": "result == *a",
+        "text": "returned result equals updated a",
+        "source": "manual_requirement_spec"
+      }
+    ],
+    "ground_truth_contract": ""
+  },
+  {
+    "id": 6,
+    "path": "pointers/div_rem.c",
+    "requirement_en": "Given unsigned x and nonzero unsigned y, store quotient and remainder of x divided by y through output pointers.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/pointers/div_rem.c",
+    "ground_truth_source": "manual",
+    "function_signature": "void div_rem(unsigned x, unsigned y, unsigned* q, unsigned* r);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "requires",
+        "expr": "y != 0",
+        "text": "divisor y is nonzero",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "r2",
+        "type": "ensures",
+        "expr": "x == *q * y + *r",
+        "text": "quotient and remainder satisfy x = q*y + r",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "r3",
+        "type": "ensures",
+        "expr": "*r < y",
+        "text": "remainder is strictly less than y",
+        "source": "manual_requirement_spec"
+      }
+    ],
+    "ground_truth_contract": ""
+  },
+  {
+    "id": 7,
+    "path": "pointers/add_pointers_3_vars.c",
+    "requirement_en": "Given pointers to three integers, return the sum of the three pointed values.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/pointers/add_pointers_3_vars.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int add(int *a, int *b, int *r);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "ensures",
+        "expr": "result == *a + *b + *c",
+        "text": "result equals sum of three pointed values",
+        "source": "manual_requirement_spec"
+      }
+    ],
+    "ground_truth_contract": ""
+  },
+  {
+    "id": 8,
+    "path": "pointers/add_pointers.c",
+    "requirement_en": "Given pointers to two integers, return the sum of the two pointed values.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/pointers/add_pointers.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int add(int *p, int *q);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "ensures",
+        "expr": "result == *a + *b",
+        "text": "result equals sum of two pointed values",
+        "source": "manual_requirement_spec"
+      }
+    ],
+    "ground_truth_contract": ""
+  },
+  {
+    "id": 9,
+    "path": "mutable_arrays/bubble_sort.c",
+    "requirement_en": "Given an integer array and its length, sort the array in nondecreasing order in place.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/mutable_arrays/bubble_sort.c",
+    "ground_truth_source": "manual",
+    "function_signature": "void bubbleSort(int *a, int n);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "\\valid(a+(0..n-1))",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "n > 0",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\forall integer i,j",
+        "source": "manual_reference_spec"
+      }
+    ],
+    "ground_truth_contract": "/*@ \n    requires \\valid(a+(0..n-1));\n    requires n > 0;\n    ensures \\forall integer i,j; 0<=i<=j<=n-1 ==> a[i]<=a[j];\n*/"
+  },
+  {
+    "id": 10,
+    "path": "mutable_arrays/array_double.c",
+    "requirement_en": "Given an integer array and its length, replace each element with double its original value.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/mutable_arrays/array_double.c",
+    "ground_truth_source": "manual",
+    "function_signature": "void arrayDouble(int *a, int n);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "ensures",
+        "expr": "arr[0] == 2 * \\old(arr[0])",
+        "text": "first element becomes double its old value",
+        "source": "manual_requirement_spec"
+      }
+    ],
+    "ground_truth_contract": ""
+  },
+  {
+    "id": 11,
+    "path": "more_arrays/reverse_array.c",
+    "requirement_en": "Given an integer array and its length, reverse the element order in place.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/more_arrays/reverse_array.c",
+    "ground_truth_source": "manual",
+    "function_signature": "void reverse(int *a, int n);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "n > 0",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "\\valid(a + (0..n-1))",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt3",
+        "type": "assigns",
+        "expr": "a[0..n-1]",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "\\forall integer k",
+        "source": "manual_reference_spec"
+      }
+    ],
+    "ground_truth_contract": "/*@\n    requires n > 0;\n    // FIX 1: Must be writable (\\valid), not just readable\n    requires \\valid(a + (0..n-1));\n\n    assigns a[0..n-1];\n\n    // FIX 2: Correct Postcondition for Reverse\n    // \"The element at k is equal to the OLD element at n-1-k\"\n    ensures \\forall integer k; 0 <= k < n ==> a[k] == \\at(a[n-1-k], Pre);\n*/"
+  },
+  {
+    "id": 12,
+    "path": "more_arrays/replace_evens.c",
+    "requirement_en": "Given an integer array and its length, set elements at even indices to 0 and leave odd indices unchanged.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/more_arrays/replace_evens.c",
+    "ground_truth_source": "manual",
+    "function_signature": "void func(int *a, int n);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "ensures",
+        "expr": "arr[0] == 0",
+        "text": "element at index 0 is zero",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "r2",
+        "type": "ensures",
+        "expr": "arr[1] == \\old(arr[1])",
+        "text": "element at index 1 unchanged",
+        "source": "manual_requirement_spec"
+      }
+    ],
+    "ground_truth_contract": ""
+  },
+  {
+    "id": 13,
+    "path": "more_arrays/equal_arrays.c",
+    "requirement_en": "Given two integer arrays and a length, return 1 if all compared elements are equal, otherwise return 0.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/more_arrays/equal_arrays.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int check(int *a, int *b, int n);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "n > 0",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "\\valid_read (a + (0..n-1))",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt3",
+        "type": "requires",
+        "expr": "\\valid_read (b + (0..n-1))",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt4",
+        "type": "assigns",
+        "expr": "\\nothing",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt5",
+        "type": "ensures",
+        "expr": "\\result == 1",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt6",
+        "type": "ensures",
+        "expr": "\\result == 0",
+        "source": "manual_reference_spec"
+      }
+    ],
+    "ground_truth_contract": "/*@ \n    requires n > 0;\n    requires \\valid_read (a + (0..n-1));\n    requires \\valid_read (b + (0..n-1));\n    assigns \\nothing;\n\n    behavior equal:\n        assumes \\forall integer k;  0 <= k < n ==> b[k] == a[k];\n        ensures \\result == 1;\n\n    behavior not_equal:\n        assumes \\exists integer k;  0 <= k < n && b[k] != a[k];\n        ensures \\result == 0;\n*/"
+  },
+  {
+    "id": 14,
+    "path": "miscellaneous/max_of_2.c",
+    "requirement_en": "Given two integers, return the larger value.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/miscellaneous/max_of_2.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int max(int x, int y);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "ensures",
+        "expr": "result >= a",
+        "text": "result >= a",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "r2",
+        "type": "ensures",
+        "expr": "result >= b",
+        "text": "result >= b",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "r3",
+        "type": "ensures",
+        "expr": "result == a || result == b",
+        "text": "result equals a or b",
+        "source": "manual_requirement_spec"
+      }
+    ],
+    "ground_truth_contract": ""
+  },
+  {
+    "id": 15,
+    "path": "miscellaneous/increment_arr.c",
+    "requirement_en": "Given an integer array, its length, and a constant c, add c to every array element in place.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/miscellaneous/increment_arr.c",
+    "ground_truth_source": "manual",
+    "function_signature": "void increment_array_by(int* arr, int n, int c);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "n > 0",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "\\valid_read(arr+(0..n-1))",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\forall integer k",
+        "source": "manual_reference_spec"
+      }
+    ],
+    "ground_truth_contract": "/*@\n    requires n > 0;\n    requires \\valid_read(arr+(0..n-1));\n    ensures \\forall integer k; 0 <= k < n ==> arr[k] == (\\at(arr[k], Pre) + c);\n*/"
+  },
+  {
+    "id": 16,
+    "path": "miscellaneous/array_swap.c",
+    "requirement_en": "Given an integer array and two valid indices, swap the elements at those indices.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/miscellaneous/array_swap.c",
+    "ground_truth_source": "manual",
+    "function_signature": "void array_swap(int* arr, int n, int n1, int n2);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "ensures",
+        "expr": "arr[i] == \\old(arr[j])",
+        "text": "value at index i becomes old value at index j",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "r2",
+        "type": "ensures",
+        "expr": "arr[j] == \\old(arr[i])",
+        "text": "value at index j becomes old value at index i",
+        "source": "manual_requirement_spec"
+      }
+    ],
+    "ground_truth_contract": ""
+  },
+  {
+    "id": 17,
+    "path": "miscellaneous/array_max_advanced.c",
+    "requirement_en": "Given a nonempty integer array and its length, return the maximum element.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/miscellaneous/array_max_advanced.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int array_max_advanced(int* arr, int n);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "requires",
+        "expr": "n > 0",
+        "text": "array is nonempty",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "n > 0",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "\\valid_read(arr+(0..n-1))",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt3",
+        "type": "assigns",
+        "expr": "\\nothing",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "\\forall integer k",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt5",
+        "type": "ensures",
+        "expr": "\\exists integer k",
+        "source": "manual_reference_spec"
+      }
+    ],
+    "ground_truth_contract": "/*@\n    requires n > 0;\n    requires \\valid_read(arr+(0..n-1));\n    \n    assigns \\nothing;\n\n    // FIX 1: Replace '\\max' with the standard logical definition\n    // Condition A: Result is >= all elements\n    ensures \\forall integer k; 0 <= k < n ==> arr[k] <= \\result;\n    \n    // Condition B: Result actually exists in the array\n    ensures \\exists integer k; 0 <= k < n && arr[k] == \\result;\n*/"
+  },
+  {
+    "id": 18,
+    "path": "miscellaneous/array_find.c",
+    "requirement_en": "Given an integer array, its length, and a target value, return the first index of the target or -1 if absent.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/miscellaneous/array_find.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int array_find(int* arr, int n, int x);",
+    "ground_truth_clauses": [
+      {
+        "id": "r2",
+        "type": "ensures",
+        "expr": "result == -1",
+        "text": "if target absent result is -1",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "n >= 0",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "\\valid_read(arr+(0..n-1))",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt3",
+        "type": "assigns",
+        "expr": "\\nothing",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "-1 <= \\result < n",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt5",
+        "type": "ensures",
+        "expr": "0 <= \\result < n ==> arr[\\result] == x",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt6",
+        "type": "ensures",
+        "expr": "(\\result == -1) ==> (\\forall integer i",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt7",
+        "type": "assigns",
+        "expr": "\\nothing",
+        "source": "manual_reference_spec"
+      }
+    ],
+    "ground_truth_contract": "/*@\n    requires n >= 0;\n    requires \\valid_read(arr+(0..n-1));\n    assigns \\nothing;\n\n    ensures -1 <= \\result < n;\n\n    ensures 0 <= \\result < n ==> arr[\\result] == x;\n    ensures (\\result == -1) ==> (\\forall integer i; 0 <= i < n ==> arr[i] != x);\n    assigns \\nothing;\n*/"
+  },
+  {
+    "id": 19,
+    "path": "loops/sum_even.c",
+    "requirement_en": "Given a nonnegative integer n, return the sum of all even numbers from 0 to n inclusive.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/loops/sum_even.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int func(int n);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "requires",
+        "expr": "n >= 0",
+        "text": "n is nonnegative",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "n >= 0",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "n % 2 == 0",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result == n * (n + 2) / 4",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt4",
+        "type": "assigns",
+        "expr": "\\nothing",
+        "source": "manual_reference_spec"
+      }
+    ],
+    "ground_truth_contract": "/*@\n    requires n >= 0;\n    requires n % 2 == 0;       // FIX 1: The formula is only valid for even n\n    \n    // FIX 2: Use integer arithmetic instead of '0.25'\n    ensures \\result == n * (n + 2) / 4;\n    \n    assigns \\nothing;\n*/"
+  },
+  {
+    "id": 20,
+    "path": "loops/count_up_to_n.c",
+    "requirement_en": "Given a nonnegative integer n, iterate a counter from 0 up to n and return n.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/loops/count_up_to_n.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int count_up_to_n(int n);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "requires",
+        "expr": "n >= 0",
+        "text": "input is nonnegative",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "r2",
+        "type": "assigns",
+        "expr": "\\nothing",
+        "text": "function is read-only",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "r3",
+        "type": "ensures",
+        "expr": "\\result == n",
+        "text": "result equals n after counting up",
+        "source": "manual_requirement_spec"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  requires n >= 0;\n  assigns \\nothing;\n  ensures \\result == n;\n*/"
+  },
+  {
+    "id": 21,
+    "path": "loops/mult.c",
+    "requirement_en": "Given integers a and b with a nonnegative, return their product using repeated addition.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/loops/mult.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int mul(int a, int b);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "requires",
+        "expr": "a >= 0",
+        "text": "a is nonnegative",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "r2",
+        "type": "ensures",
+        "expr": "result == a * b",
+        "text": "result equals a*b",
+        "source": "manual_requirement_spec"
+      }
+    ],
+    "ground_truth_contract": ""
+  },
+  {
+    "id": 22,
+    "path": "loops/fact.c",
+    "requirement_en": "Given a nonnegative integer n, return n factorial.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/loops/fact.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int factorial(int n);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "requires",
+        "expr": "n >= 0",
+        "text": "n is nonnegative",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "n >= 0",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "\\result == fact(n)",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt3",
+        "type": "assigns",
+        "expr": "\\nothing",
+        "source": "manual_reference_spec"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  requires  n >= 0;\n  ensures   \\result == fact(n);\n  assigns   \\nothing ; \n*/"
+  },
+  {
+    "id": 23,
+    "path": "loops/4.c",
+    "requirement_en": "Given a nonnegative integer n, return the sum of powers of two from 2^0 through 2^n.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/loops/4.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int fun(int n);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "requires",
+        "expr": "n >= 0",
+        "text": "n is nonnegative",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "n >= 0",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "n < 31",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result == (1 << (n+1)) - 1",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt4",
+        "type": "assigns",
+        "expr": "\\nothing",
+        "source": "manual_reference_spec"
+      }
+    ],
+    "ground_truth_contract": "/*@\n    requires n >= 0;\n    requires n < 31; // Prevent 32-bit integer overflow (2^31)\n    \n    // Use bit-shift logic for powers of 2: (1 << k) is 2^k\n    ensures \\result == (1 << (n+1)) - 1;\n    \n    assigns \\nothing;\n*/"
+  },
+  {
+    "id": 24,
+    "path": "loops/3.c",
+    "requirement_en": "Given a positive integer c, return c by counting loop iterations while decrementing from c to 0.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/loops/3.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int func(int c);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "requires",
+        "expr": "c > 0",
+        "text": "c is positive",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "r2",
+        "type": "ensures",
+        "expr": "result == c",
+        "text": "result equals original c",
+        "source": "manual_requirement_spec"
+      }
+    ],
+    "ground_truth_contract": ""
+  },
+  {
+    "id": 25,
+    "path": "loops/2.c",
+    "requirement_en": "Given a nonnegative integer n, return the arithmetic sum of integers from 0 to n inclusive.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/loops/2.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int sum(char n);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "requires",
+        "expr": "n >= 0",
+        "text": "n is nonnegative",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "n >= 0 && n <= 100",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "\\result >= 0",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result == (int)((n+1)*(n)/2)",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt4",
+        "type": "assigns",
+        "expr": "\\nothing",
+        "source": "manual_reference_spec"
+      }
+    ],
+    "ground_truth_contract": "/*@\n    requires n >= 0 && n <= 100;\n    ensures \\result >= 0;\n    ensures \\result == (int)((n+1)*(n)/2);\n    assigns \\nothing;\n*/"
+  },
+  {
+    "id": 26,
+    "path": "loops/1.c",
+    "requirement_en": "Run a loop that increments a counter from 0 until it reaches 30, yielding final value 30.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/loops/1.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int loop_to_30(void);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "ensures",
+        "expr": "\\result == 30",
+        "text": "final counter value is 30",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "gt1",
+        "type": "assigns",
+        "expr": "\\nothing",
+        "source": "manual_reference_spec"
+      }
+    ],
+    "ground_truth_contract": "/*@\n    assigns \\nothing;\n    ensures \\result == 30;\n*/"
+  },
+  {
+    "id": 27,
+    "path": "immutable_arrays/search_2.c",
+    "requirement_en": "Given an integer array, target value, and length, return 1 if the target exists in the array, else 0.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/immutable_arrays/search_2.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int arraySearch(int *a, int x, int n);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "ensures",
+        "expr": "result == 0 || result == 1",
+        "text": "result is a binary indicator",
+        "source": "manual_requirement_spec"
+      }
+    ],
+    "ground_truth_contract": ""
+  },
+  {
+    "id": 28,
+    "path": "immutable_arrays/search.c",
+    "requirement_en": "Given an integer array, target value, and length, perform linear search and return 1 if found, otherwise 0.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/immutable_arrays/search.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int arraysearch(int* a, int x, int n);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "ensures",
+        "expr": "result == 0 || result == 1",
+        "text": "result is a binary indicator",
+        "source": "manual_requirement_spec"
+      }
+    ],
+    "ground_truth_contract": ""
+  },
+  {
+    "id": 29,
+    "path": "immutable_arrays/sample.c",
+    "requirement_en": "Given nonnegative x and positive y, return the integer quotient of x divided by y using repeated subtraction.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/immutable_arrays/sample.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int fun(int x, int y);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "requires",
+        "expr": "x >= 0",
+        "text": "x is nonnegative",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "r2",
+        "type": "requires",
+        "expr": "y > 0",
+        "text": "y is positive",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "gt1",
+        "type": "assigns",
+        "expr": "\\nothing",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "\\result >= 0",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result * y <= x",
+        "text": "quotient does not exceed x divided by y",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "x < (\\result + 1) * y",
+        "text": "quotient is maximal for integer division",
+        "source": "manual_reference_spec"
+      }
+    ],
+    "ground_truth_contract": "/*@\n    requires x >= 0;\n    requires y > 0;\n    assigns \\nothing;\n    ensures \\result >= 0;\n    ensures \\result * y <= x;\n    ensures x < (\\result + 1) * y;\n*/"
+  },
+  {
+    "id": 30,
+    "path": "immutable_arrays/occurences_of_x.c",
+    "requirement_en": "Given an array, length, and value x, return the number of occurrences of x and output their total sum through a pointer.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/immutable_arrays/occurences_of_x.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int func(int *a, int n, int x, int *sum);",
+    "ground_truth_clauses": [
+      {
+        "id": "r2",
+        "type": "ensures",
+        "expr": "*sum >= 0",
+        "text": "output pointer stores sum of values equal to x",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "n > 0 && x > 0",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "(integer)n * x <= INT_MAX",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt3",
+        "type": "requires",
+        "expr": "\\valid(sum)",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt4",
+        "type": "requires",
+        "expr": "\\valid_read(a + (0..n-1))",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt5",
+        "type": "assigns",
+        "expr": "*sum",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt6",
+        "type": "ensures",
+        "expr": "\\result >= 0 && \\result <= n",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt7",
+        "type": "ensures",
+        "expr": "*sum == \\result * x",
+        "source": "manual_reference_spec"
+      }
+    ],
+    "ground_truth_contract": "/*@\n    requires n > 0 && x > 0;\n    // FIX 1: Prevent Integer Overflow (sum must fit in int)\n    requires (integer)n * x <= INT_MAX;\n    \n    // FIX 2: Declare 'sum' as a valid pointer we can write to\n    requires \\valid(sum);\n    requires \\valid_read(a + (0..n-1));\n\n    // FIX 3: Declare what the function modifies\n    assigns *sum;\n\n    ensures \\result >= 0 && \\result <= n;\n    ensures *sum == \\result * x;\n*/"
+  },
+  {
+    "id": 31,
+    "path": "immutable_arrays/max.c",
+    "requirement_en": "Given a nonempty integer array and length, return the maximum array value.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/immutable_arrays/max.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int arraymax(int* a, int n);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "requires",
+        "expr": "n > 0",
+        "text": "array is nonempty",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "\\valid_read(a + (0..n-1))",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "n > 0",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\forall integer k",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "\\exists integer k",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt5",
+        "type": "assigns",
+        "expr": "\\nothing",
+        "source": "manual_reference_spec"
+      }
+    ],
+    "ground_truth_contract": "/*@ \n    requires \\valid_read(a + (0..n-1));\n    requires n > 0;\n\n    ensures \\forall integer k;  0 <= k < n ==> \\result >=  a[k];\n    ensures \\exists integer k;  0 <= k < n && \\result == a[k];\n\n    assigns \\nothing;\n*/"
+  },
+  {
+    "id": 32,
+    "path": "immutable_arrays/check_evens_in_array.c",
+    "requirement_en": "Given an integer array and length, return 1 if every element is even, otherwise return 0.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/immutable_arrays/check_evens_in_array.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int areElementsEven(int *a, int n);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "ensures",
+        "expr": "result == 0 || result == 1",
+        "text": "result is a binary indicator",
+        "source": "manual_requirement_spec"
+      }
+    ],
+    "ground_truth_contract": ""
+  },
+  {
+    "id": 33,
+    "path": "immutable_arrays/binary_search.c",
+    "requirement_en": "Given a sorted integer array, target value, and length, return the target index via binary search or -1 if not found.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/immutable_arrays/binary_search.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int binarysearch(int* a, int x, int n);",
+    "ground_truth_clauses": [
+      {
+        "id": "r3",
+        "type": "ensures",
+        "expr": "result == -1",
+        "text": "if absent result is -1",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "n > 0",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "\\valid_read(a+(0..n-1))",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt3",
+        "type": "requires",
+        "expr": "\\forall integer k, l",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt4",
+        "type": "assigns",
+        "expr": "\\nothing",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt5",
+        "type": "ensures",
+        "expr": "\\result >= -1 && \\result < n",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt6",
+        "type": "ensures",
+        "expr": "a[\\result] == x",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt7",
+        "type": "ensures",
+        "expr": "\\result == -1",
+        "source": "manual_reference_spec"
+      }
+    ],
+    "ground_truth_contract": "/*@\n    requires n > 0;\n    requires \\valid_read(a+(0..n-1));\n    requires \\forall integer k, l; 0 <= k <= l < n ==> a[k] <= a[l];\n    \n    assigns \\nothing;\n\n    ensures \\result >= -1 && \\result < n;\n\n    behavior present:\n        assumes \\exists integer k ; 0 <= k < n && a[k] == x ;\n        ensures a[\\result] == x ;\n\n    behavior not_present:\n        assumes \\forall integer k ; 0 <= k < n ==> a[k] != x ;\n        ensures \\result == -1;\n\n    disjoint behaviors;\n    complete behaviors;\n*/"
+  },
+  {
+    "id": 34,
+    "path": "immutable_arrays/array_sum.c",
+    "requirement_en": "Given an integer array and length, return the sum of its elements.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/immutable_arrays/array_sum.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int sumArray(int *a, int n);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "n > 0",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "\\valid_read(a + (0..n-1))",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt3",
+        "type": "assigns",
+        "expr": "\\nothing",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "\\result == sumArr(a, n)",
+        "source": "manual_reference_spec"
+      }
+    ],
+    "ground_truth_contract": "/*@\n    requires n > 0;\n    requires \\valid_read(a + (0..n-1));\n    assigns \\nothing;\n    ensures \\result == sumArr(a, n);\n*/"
+  },
+  {
+    "id": 35,
+    "path": "general_wp_problems/wp1.c",
+    "requirement_en": "Given integers x and y, adjust y by +10 and x by -5, then return their sum.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/general_wp_problems/wp1.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int function(int x, int y);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "ensures",
+        "expr": "result == x + y + 5",
+        "text": "result equals (x - 5) + (y + 10)",
+        "source": "manual_requirement_spec"
+      }
+    ],
+    "ground_truth_contract": ""
+  },
+  {
+    "id": 36,
+    "path": "general_wp_problems/triangle_sides.c",
+    "requirement_en": "Given three side lengths, return 1 if they satisfy triangle inequality, else return 0.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/general_wp_problems/triangle_sides.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int validts(int a, int b, int c);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "ensures",
+        "expr": "result == 0 || result == 1",
+        "text": "result is a binary indicator",
+        "source": "manual_requirement_spec"
+      }
+    ],
+    "ground_truth_contract": ""
+  },
+  {
+    "id": 37,
+    "path": "general_wp_problems/triangle_angles.c",
+    "requirement_en": "Given three angles, return 1 if all are positive and sum to 180, otherwise return 0.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/general_wp_problems/triangle_angles.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int triangle(int a, int b, int c);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "ensures",
+        "expr": "result == 0 || result == 1",
+        "text": "result is a binary indicator",
+        "source": "manual_requirement_spec"
+      }
+    ],
+    "ground_truth_contract": ""
+  },
+  {
+    "id": 38,
+    "path": "general_wp_problems/swap.c",
+    "requirement_en": "Given pointers to two integers, swap their values.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/general_wp_problems/swap.c",
+    "ground_truth_source": "manual",
+    "function_signature": "void swap(int* a, int* b);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "ensures",
+        "expr": "*a == \\old(*b) && *b == \\old(*a)",
+        "text": "swap pointed values",
+        "source": "manual_requirement_spec"
+      }
+    ],
+    "ground_truth_contract": ""
+  },
+  {
+    "id": 39,
+    "path": "general_wp_problems/simple_interest.c",
+    "requirement_en": "Given principal, time, and rate, return simple interest computed as p*n*r/100.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/general_wp_problems/simple_interest.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int simple(int p,int n,int r);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "ensures",
+        "expr": "result == p * n * r / 100",
+        "text": "result equals p*n*r/100",
+        "source": "manual_requirement_spec"
+      }
+    ],
+    "ground_truth_contract": ""
+  },
+  {
+    "id": 40,
+    "path": "general_wp_problems/power.c",
+    "requirement_en": "Given integer x and nonnegative exponent n, return x raised to the power n.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/general_wp_problems/power.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int power(int x, int n);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "requires",
+        "expr": "n >= 0",
+        "text": "n is nonnegative",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "n >= 0",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt2",
+        "type": "assigns",
+        "expr": "\\nothing",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result == Pow(x, n)",
+        "source": "manual_reference_spec"
+      }
+    ],
+    "ground_truth_contract": "/*@\n    requires n >= 0;\n    \n    // Prevent overflow (optional, but good for strict verification)\n    // requires \\abs(x) <= 46340 || n < 10; \n    \n    assigns \\nothing;\n\n    // Postcondition: The result matches the logical definition\n    ensures \\result == Pow(x, n);\n*/"
+  },
+  {
+    "id": 41,
+    "path": "general_wp_problems/max_of_2.c",
+    "requirement_en": "Given two integers, return the greater one (or either when equal).",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/general_wp_problems/max_of_2.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int max ( int x, int y );",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "ensures",
+        "expr": "result >= x",
+        "text": "result >= x",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "r2",
+        "type": "ensures",
+        "expr": "result >= y",
+        "text": "result >= y",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "r3",
+        "type": "ensures",
+        "expr": "result == x || result == y",
+        "text": "result equals x or y",
+        "source": "manual_requirement_spec"
+      }
+    ],
+    "ground_truth_contract": ""
+  },
+  {
+    "id": 42,
+    "path": "general_wp_problems/gcd.c",
+    "requirement_en": "Given two nonnegative integers, return their greatest common divisor.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/general_wp_problems/gcd.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int gcd(int a, int b);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "requires",
+        "expr": "x >= 0 && y >= 0",
+        "text": "x and y are nonnegative",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "r2",
+        "type": "ensures",
+        "expr": "x % result == 0 && y % result == 0",
+        "text": "result divides x and y",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a >= 0 && b >= 0",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt2",
+        "type": "assigns",
+        "expr": "\\nothing",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result == GCD(a, b)",
+        "source": "manual_reference_spec"
+      }
+    ],
+    "ground_truth_contract": "/*@\n    requires a >= 0 && b >= 0;\n    \n    // FIX: 'decreases' must come BEFORE assigns/ensures\n    decreases a + b;\n    \n    assigns \\nothing;\n    ensures \\result == GCD(a, b);\n*/"
+  },
+  {
+    "id": 43,
+    "path": "general_wp_problems/diff.c",
+    "requirement_en": "Given integers x and y, return the difference x minus y.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/general_wp_problems/diff.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int diff (int x, int y);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "ensures",
+        "expr": "result == x - y",
+        "text": "result equals x - y",
+        "source": "manual_requirement_spec"
+      }
+    ],
+    "ground_truth_contract": ""
+  },
+  {
+    "id": 44,
+    "path": "general_wp_problems/ani.c",
+    "requirement_en": "Given integer n, return 1 plus the count of terms in the sequence 7,10,13,... that are less than or equal to n.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/general_wp_problems/ani.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int fun(int n);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "n >= 4",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "\\result == (n - 4) / 3 + 1",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt3",
+        "type": "assigns",
+        "expr": "\\nothing",
+        "source": "manual_reference_spec"
+      }
+    ],
+    "ground_truth_contract": "/*@\n    requires n >= 4;\n    ensures \\result == (n - 4) / 3 + 1; // FIX: Use integer arithmetic\n    assigns \\nothing;\n*/"
+  },
+  {
+    "id": 45,
+    "path": "general_wp_problems/add.c",
+    "requirement_en": "Given two integers, return their sum.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/general_wp_problems/add.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int add(int x, int y);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "ensures",
+        "expr": "result == x + y",
+        "text": "result equals x + y",
+        "source": "manual_requirement_spec"
+      }
+    ],
+    "ground_truth_contract": ""
+  },
+  {
+    "id": 46,
+    "path": "general_wp_problems/absolute_value.c",
+    "requirement_en": "Given an integer, return its absolute value.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/general_wp_problems/absolute_value.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int abs(int val);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "ensures",
+        "expr": "result >= 0",
+        "text": "result is nonnegative",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "r2",
+        "type": "ensures",
+        "expr": "result == x || result == -x",
+        "text": "result equals x or -x",
+        "source": "manual_requirement_spec"
+      }
+    ],
+    "ground_truth_contract": ""
+  },
+  {
+    "id": 47,
+    "path": "arrays_and_loops/5.c",
+    "requirement_en": "Given x, y, and an output pointer r with y positive, return quotient and store remainder such that x = quotient*y + remainder and remainder < y.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/arrays_and_loops/5.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int fun(int x, int y , int *r);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "requires",
+        "expr": "y > 0",
+        "text": "y is positive",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "r2",
+        "type": "ensures",
+        "expr": "x == result * y + *r",
+        "text": "x = quotient*y + remainder",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "r3",
+        "type": "ensures",
+        "expr": "0 <= *r && *r < y",
+        "text": "0 <= remainder < y",
+        "source": "manual_requirement_spec"
+      }
+    ],
+    "ground_truth_contract": ""
+  },
+  {
+    "id": 48,
+    "path": "arrays_and_loops/4.c",
+    "requirement_en": "Given a nonnegative integer x, return x by decrementing a counter to zero and counting iterations.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/arrays_and_loops/4.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int test(int x);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "requires",
+        "expr": "x >= 0",
+        "text": "x is nonnegative",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "r2",
+        "type": "ensures",
+        "expr": "result == x",
+        "text": "result equals x",
+        "source": "manual_requirement_spec"
+      }
+    ],
+    "ground_truth_contract": ""
+  },
+  {
+    "id": 49,
+    "path": "arrays_and_loops/3.c",
+    "requirement_en": "Given a nonzero integer selector a, choose fixed values and return 10 divided by their sum (which evaluates to 1 for nonzero a).",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/arrays_and_loops/3.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int func(int a);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "requires",
+        "expr": "a != 0",
+        "text": "selector a is nonzero",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "r2",
+        "type": "ensures",
+        "expr": "result == 1",
+        "text": "result equals 1 for any nonzero a",
+        "source": "manual_requirement_spec"
+      }
+    ],
+    "ground_truth_contract": ""
+  },
+  {
+    "id": 50,
+    "path": "arrays_and_loops/2.c",
+    "requirement_en": "Given a nonempty integer array and its length, return the maximum element.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/arrays_and_loops/2.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int arraymax(int* a, int n);",
+    "ground_truth_clauses": [
+      {
+        "id": "r1",
+        "type": "requires",
+        "expr": "n > 0",
+        "text": "array is nonempty",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "\\valid_read(a + (0..n-1))",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "n > 0",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\forall integer k",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "\\exists integer k",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt5",
+        "type": "assigns",
+        "expr": "\\nothing",
+        "source": "manual_reference_spec"
+      }
+    ],
+    "ground_truth_contract": "/*@ \n    requires \\valid_read(a + (0..n-1));\n    requires n > 0;\n\n    ensures \\forall integer k;  0 <= k < n ==> \\result >=  a[k];\n    ensures \\exists integer k;  0 <= k < n && \\result == a[k];\n\n    assigns \\nothing;\n*/"
+  },
+  {
+    "id": 51,
+    "path": "arrays_and_loops/1.c",
+    "requirement_en": "Given base and height, return the integer area of a triangle computed as base*height/2.",
+    "ground_truth_file": "/workspace/benchmarks/frama-c-problems/ground-truth/arrays_and_loops/1.c",
+    "ground_truth_source": "manual",
+    "function_signature": "int area(int base, int height);",
+    "ground_truth_clauses": [
+      {
+        "id": "r2",
+        "type": "ensures",
+        "expr": "result == base * height / 2",
+        "text": "result == base*height/2",
+        "source": "manual_requirement_spec"
+      },
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "base >= 0 && height >= 0",
+        "source": "manual_reference_spec"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "\\result == (base * height)/2",
+        "source": "manual_reference_spec"
+      }
+    ],
+    "ground_truth_contract": "/*@\n    requires base >= 0 && height >= 0;\n    ensures \\result == (base * height)/2;\n*/"
+  }
+]

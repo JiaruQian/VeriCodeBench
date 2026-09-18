@@ -1,0 +1,9 @@
+config:
+  task: "verina_proof"
+  problems: "data/verina_unsat.jsonl"
+  n_attempts: 1
+  max_turns: 16
+  n_worker_threads: 20
+  use_mcp: false
+  model: gpt-5
+

@@ -1,0 +1,3729 @@
+[
+  {
+    "id": 1,
+    "path": "array_basics/Problem001_ArrayLength.java",
+    "category": "array_basics",
+    "requirement_en": "Given a non-null integer array, return its length without modifying the array.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/array_basics/Problem001_ArrayLength.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int arrayLength(int[] a);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null",
+        "text": "array reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result == a.length",
+        "text": "result is array length",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null;\n  @ assignable \\nothing;\n  @ ensures \\result == a.length;\n  @*/"
+  },
+  {
+    "id": 2,
+    "path": "array_basics/Problem002_IsEmpty.java",
+    "category": "array_basics",
+    "requirement_en": "Given a non-null integer array, return true exactly when its length is zero.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/array_basics/Problem002_IsEmpty.java",
+    "ground_truth_source": "manual",
+    "function_signature": "boolean isEmpty(int[] a);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null",
+        "text": "array reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result <==> a.length == 0",
+        "text": "empty iff length is zero",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null;\n  @ assignable \\nothing;\n  @ ensures \\result <==> a.length == 0;\n  @*/"
+  },
+  {
+    "id": 3,
+    "path": "array_basics/Problem003_FirstElement.java",
+    "category": "array_basics",
+    "requirement_en": "Given a non-null nonempty integer array, return its first element without modifying it.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/array_basics/Problem003_FirstElement.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int first(int[] a);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null",
+        "text": "array reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "a.length > 0",
+        "text": "array is nonempty",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result == a[0]",
+        "text": "returns first element",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null;\n  @ requires a.length > 0;\n  @ assignable \\nothing;\n  @ ensures \\result == a[0];\n  @*/"
+  },
+  {
+    "id": 4,
+    "path": "array_basics/Problem004_LastElement.java",
+    "category": "array_basics",
+    "requirement_en": "Given a non-null nonempty integer array, return its last element without modifying it.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/array_basics/Problem004_LastElement.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int last(int[] a);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null",
+        "text": "array reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "a.length > 0",
+        "text": "array is nonempty",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result == a[a.length - 1]",
+        "text": "returns last element",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null;\n  @ requires a.length > 0;\n  @ assignable \\nothing;\n  @ ensures \\result == a[a.length - 1];\n  @*/"
+  },
+  {
+    "id": 5,
+    "path": "array_basics/Problem005_GetAtIndex.java",
+    "category": "array_basics",
+    "requirement_en": "Given a non-null integer array and a valid index, return the element at that index.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/array_basics/Problem005_GetAtIndex.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int getAt(int[] a, int i);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null",
+        "text": "array reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "0 <= i && i < a.length",
+        "text": "index is valid",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result == a[i]",
+        "text": "returns indexed value",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null;\n  @ requires 0 <= i && i < a.length;\n  @ assignable \\nothing;\n  @ ensures \\result == a[i];\n  @*/"
+  },
+  {
+    "id": 6,
+    "path": "mutable_arrays/Problem006_SetAtIndex.java",
+    "category": "mutable_arrays",
+    "requirement_en": "Given a non-null integer array, a valid index, and a value, store the value at the index and leave all other elements unchanged.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/mutable_arrays/Problem006_SetAtIndex.java",
+    "ground_truth_source": "manual",
+    "function_signature": "void setAt(int[] a, int i, int v);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null",
+        "text": "array reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "0 <= i && i < a.length",
+        "text": "index is valid",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "assignable",
+        "expr": "a[i]",
+        "text": "only indexed element may change",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "a[i] == v",
+        "text": "stores requested value",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt5",
+        "type": "ensures",
+        "expr": "(\\forall int k; 0 <= k && k < a.length && k != i; a[k] == \\old(a[k]))",
+        "text": "other elements unchanged",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null;\n  @ requires 0 <= i && i < a.length;\n  @ assignable a[i];\n  @ ensures a[i] == v;\n  @ ensures (\\forall int k; 0 <= k && k < a.length && k != i; a[k] == \\old(a[k]));\n  @*/"
+  },
+  {
+    "id": 7,
+    "path": "mutable_arrays/Problem007_SwapTwoIndices.java",
+    "category": "mutable_arrays",
+    "requirement_en": "Given a non-null integer array and two valid indices, swap the two indexed elements.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/mutable_arrays/Problem007_SwapTwoIndices.java",
+    "ground_truth_source": "manual",
+    "function_signature": "void swap(int[] a, int i, int j);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null",
+        "text": "array reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "0 <= i && i < a.length",
+        "text": "first index is valid",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "requires",
+        "expr": "0 <= j && j < a.length",
+        "text": "second index is valid",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "assignable",
+        "expr": "a[i], a[j]",
+        "text": "only selected elements may change",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt5",
+        "type": "ensures",
+        "expr": "a[i] == \\old(a[j])",
+        "text": "first receives old second",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt6",
+        "type": "ensures",
+        "expr": "a[j] == \\old(a[i])",
+        "text": "second receives old first",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null;\n  @ requires 0 <= i && i < a.length;\n  @ requires 0 <= j && j < a.length;\n  @ assignable a[i], a[j];\n  @ ensures a[i] == \\old(a[j]);\n  @ ensures a[j] == \\old(a[i]);\n  @*/"
+  },
+  {
+    "id": 8,
+    "path": "mutable_arrays/Problem008_ZeroPrefix.java",
+    "category": "mutable_arrays",
+    "requirement_en": "Given a non-null integer array and a valid prefix length n, set the first n elements to zero and leave the suffix unchanged.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/mutable_arrays/Problem008_ZeroPrefix.java",
+    "ground_truth_source": "manual",
+    "function_signature": "void zeroPrefix(int[] a, int n);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null",
+        "text": "array reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "0 <= n && n <= a.length",
+        "text": "prefix length is valid",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "assignable",
+        "expr": "a[0 .. n-1]",
+        "text": "only prefix may change",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "(\\forall int k; 0 <= k && k < n; a[k] == 0)",
+        "text": "prefix is zero",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt5",
+        "type": "ensures",
+        "expr": "(\\forall int k; n <= k && k < a.length; a[k] == \\old(a[k]))",
+        "text": "suffix unchanged",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null;\n  @ requires 0 <= n && n <= a.length;\n  @ assignable a[0 .. n-1];\n  @ ensures (\\forall int k; 0 <= k && k < n; a[k] == 0);\n  @ ensures (\\forall int k; n <= k && k < a.length; a[k] == \\old(a[k]));\n  @*/"
+  },
+  {
+    "id": 9,
+    "path": "mutable_arrays/Problem009_FillArray.java",
+    "category": "mutable_arrays",
+    "requirement_en": "Given a non-null integer array and a value, set every element to that value.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/mutable_arrays/Problem009_FillArray.java",
+    "ground_truth_source": "manual",
+    "function_signature": "void fill(int[] a, int v);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null",
+        "text": "array reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "a[*]",
+        "text": "array elements may change",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "(\\forall int k; 0 <= k && k < a.length; a[k] == v)",
+        "text": "all elements set to value",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null;\n  @ assignable a[*];\n  @ ensures (\\forall int k; 0 <= k && k < a.length; a[k] == v);\n  @*/"
+  },
+  {
+    "id": 10,
+    "path": "array_search/Problem010_ContainsValue.java",
+    "category": "array_search",
+    "requirement_en": "Given a non-null integer array and a target value, return true exactly when some element equals the target.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/array_search/Problem010_ContainsValue.java",
+    "ground_truth_source": "manual",
+    "function_signature": "boolean contains(int[] a, int target);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null",
+        "text": "array reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result <==> (\\exists int k; 0 <= k && k < a.length; a[k] == target)",
+        "text": "result reports target presence",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null;\n  @ assignable \\nothing;\n  @ ensures \\result <==> (\\exists int k; 0 <= k && k < a.length; a[k] == target);\n  @*/"
+  },
+  {
+    "id": 11,
+    "path": "array_search/Problem011_FirstIndexOf.java",
+    "category": "array_search",
+    "requirement_en": "Given a non-null integer array and a target value, return the first target index or -1 if absent.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/array_search/Problem011_FirstIndexOf.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int indexOf(int[] a, int target);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null",
+        "text": "array reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result == -1 ==> (\\forall int k; 0 <= k && k < a.length; a[k] != target)",
+        "text": "absent iff -1",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "\\result >= 0 ==> a[\\result] == target",
+        "text": "nonnegative result points to target",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt5",
+        "type": "ensures",
+        "expr": "\\result >= 0 ==> (\\forall int k; 0 <= k && k < \\result; a[k] != target)",
+        "text": "returned index is first",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null;\n  @ assignable \\nothing;\n  @ ensures -1 <= \\result && \\result < a.length;\n  @ ensures \\result == -1 ==> (\\forall int k; 0 <= k && k < a.length; a[k] != target);\n  @ ensures \\result >= 0 ==> a[\\result] == target;\n  @ ensures \\result >= 0 ==> (\\forall int k; 0 <= k && k < \\result; a[k] != target);\n  @*/"
+  },
+  {
+    "id": 12,
+    "path": "array_search/Problem012_CountValue.java",
+    "category": "array_search",
+    "requirement_en": "Given a non-null integer array and a target value, count occurrences of the target.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/array_search/Problem012_CountValue.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int countValue(int[] a, int target);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null",
+        "text": "array reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "0 <= \\result && \\result <= a.length",
+        "text": "count is within array bounds",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null;\n  @ assignable \\nothing;\n  @ ensures 0 <= \\result && \\result <= a.length;\n  @*/"
+  },
+  {
+    "id": 13,
+    "path": "array_predicates/Problem013_AllEven.java",
+    "category": "array_predicates",
+    "requirement_en": "Given a non-null integer array, return true exactly when every element is even.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/array_predicates/Problem013_AllEven.java",
+    "ground_truth_source": "manual",
+    "function_signature": "boolean allEven(int[] a);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null",
+        "text": "array reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result <==> (\\forall int k; 0 <= k && k < a.length; a[k] % 2 == 0)",
+        "text": "result reports all-even property",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null;\n  @ assignable \\nothing;\n  @ ensures \\result <==> (\\forall int k; 0 <= k && k < a.length; a[k] % 2 == 0);\n  @*/"
+  },
+  {
+    "id": 14,
+    "path": "array_predicates/Problem014_AnyNegative.java",
+    "category": "array_predicates",
+    "requirement_en": "Given a non-null integer array, return true exactly when at least one element is negative.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/array_predicates/Problem014_AnyNegative.java",
+    "ground_truth_source": "manual",
+    "function_signature": "boolean anyNegative(int[] a);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null",
+        "text": "array reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result <==> (\\exists int k; 0 <= k && k < a.length; a[k] < 0)",
+        "text": "result reports negative presence",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null;\n  @ assignable \\nothing;\n  @ ensures \\result <==> (\\exists int k; 0 <= k && k < a.length; a[k] < 0);\n  @*/"
+  },
+  {
+    "id": 15,
+    "path": "array_extrema/Problem015_ArrayMax.java",
+    "category": "array_extrema",
+    "requirement_en": "Given a non-null nonempty integer array, return a maximum element without modifying the array.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/array_extrema/Problem015_ArrayMax.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int max(int[] a);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null",
+        "text": "array reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "a.length > 0",
+        "text": "array is nonempty",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "(\\forall int k; 0 <= k && k < a.length; \\result >= a[k])",
+        "text": "result is at least every element",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt5",
+        "type": "ensures",
+        "expr": "(\\exists int k; 0 <= k && k < a.length; \\result == a[k])",
+        "text": "result is drawn from array",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null;\n  @ requires a.length > 0;\n  @ assignable \\nothing;\n  @ ensures (\\forall int k; 0 <= k && k < a.length; \\result >= a[k]);\n  @ ensures (\\exists int k; 0 <= k && k < a.length; \\result == a[k]);\n  @*/"
+  },
+  {
+    "id": 16,
+    "path": "array_extrema/Problem016_ArrayMin.java",
+    "category": "array_extrema",
+    "requirement_en": "Given a non-null nonempty integer array, return a minimum element without modifying the array.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/array_extrema/Problem016_ArrayMin.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int min(int[] a);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null",
+        "text": "array reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "a.length > 0",
+        "text": "array is nonempty",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "(\\forall int k; 0 <= k && k < a.length; \\result <= a[k])",
+        "text": "result is no greater than every element",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt5",
+        "type": "ensures",
+        "expr": "(\\exists int k; 0 <= k && k < a.length; \\result == a[k])",
+        "text": "result is drawn from array",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null;\n  @ requires a.length > 0;\n  @ assignable \\nothing;\n  @ ensures (\\forall int k; 0 <= k && k < a.length; \\result <= a[k]);\n  @ ensures (\\exists int k; 0 <= k && k < a.length; \\result == a[k]);\n  @*/"
+  },
+  {
+    "id": 17,
+    "path": "mutable_arrays/Problem017_CopyArray.java",
+    "category": "mutable_arrays",
+    "requirement_en": "Given non-null source and destination arrays where the destination is long enough, copy all source elements into the destination.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/mutable_arrays/Problem017_CopyArray.java",
+    "ground_truth_source": "manual",
+    "function_signature": "void copy(int[] src, int[] dst);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "src != null && dst != null",
+        "text": "arrays are non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "dst.length >= src.length",
+        "text": "destination is large enough",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "assignable",
+        "expr": "dst[0 .. src.length-1]",
+        "text": "destination prefix may change",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "(\\forall int k; 0 <= k && k < src.length; dst[k] == src[k])",
+        "text": "destination receives source contents",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires src != null && dst != null;\n  @ requires dst.length >= src.length;\n  @ assignable dst[0 .. src.length-1];\n  @ ensures (\\forall int k; 0 <= k && k < src.length; dst[k] == src[k]);\n  @*/"
+  },
+  {
+    "id": 18,
+    "path": "mutable_arrays/Problem018_IncrementAll.java",
+    "category": "mutable_arrays",
+    "requirement_en": "Given a non-null integer array whose elements can be safely incremented, add one to every element.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/mutable_arrays/Problem018_IncrementAll.java",
+    "ground_truth_source": "manual",
+    "function_signature": "void incrementAll(int[] a);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null",
+        "text": "array reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "(\\forall int k; 0 <= k && k < a.length; a[k] < Integer.MAX_VALUE)",
+        "text": "increment cannot overflow",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "assignable",
+        "expr": "a[*]",
+        "text": "array elements may change",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "(\\forall int k; 0 <= k && k < a.length; a[k] == \\old(a[k]) + 1)",
+        "text": "each element incremented",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null;\n  @ requires (\\forall int k; 0 <= k && k < a.length; a[k] < Integer.MAX_VALUE);\n  @ assignable a[*];\n  @ ensures (\\forall int k; 0 <= k && k < a.length; a[k] == \\old(a[k]) + 1);\n  @*/"
+  },
+  {
+    "id": 19,
+    "path": "mutable_arrays/Problem019_DoubleAll.java",
+    "category": "mutable_arrays",
+    "requirement_en": "Given a non-null integer array whose elements can be safely doubled, double every element in place.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/mutable_arrays/Problem019_DoubleAll.java",
+    "ground_truth_source": "manual",
+    "function_signature": "void doubleAll(int[] a);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null",
+        "text": "array reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "(\\forall int k; 0 <= k && k < a.length; Integer.MIN_VALUE/2 <= a[k] && a[k] <= Integer.MAX_VALUE/2)",
+        "text": "doubling cannot overflow",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "assignable",
+        "expr": "a[*]",
+        "text": "array elements may change",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "(\\forall int k; 0 <= k && k < a.length; a[k] == 2 * \\old(a[k]))",
+        "text": "each element doubled",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null;\n  @ requires (\\forall int k; 0 <= k && k < a.length; Integer.MIN_VALUE/2 <= a[k] && a[k] <= Integer.MAX_VALUE/2);\n  @ assignable a[*];\n  @ ensures (\\forall int k; 0 <= k && k < a.length; a[k] == 2 * \\old(a[k]));\n  @*/"
+  },
+  {
+    "id": 20,
+    "path": "mutable_arrays/Problem020_ReplaceEvenIndices.java",
+    "category": "mutable_arrays",
+    "requirement_en": "Given a non-null integer array, set elements at even indices to zero and leave odd indices unchanged.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/mutable_arrays/Problem020_ReplaceEvenIndices.java",
+    "ground_truth_source": "manual",
+    "function_signature": "void clearEvenIndices(int[] a);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null",
+        "text": "array reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "a[*]",
+        "text": "array elements may change",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "(\\forall int k; 0 <= k && k < a.length && k % 2 == 0; a[k] == 0)",
+        "text": "even indices cleared",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "(\\forall int k; 0 <= k && k < a.length && k % 2 != 0; a[k] == \\old(a[k]))",
+        "text": "odd indices unchanged",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null;\n  @ assignable a[*];\n  @ ensures (\\forall int k; 0 <= k && k < a.length && k % 2 == 0; a[k] == 0);\n  @ ensures (\\forall int k; 0 <= k && k < a.length && k % 2 != 0; a[k] == \\old(a[k]));\n  @*/"
+  },
+  {
+    "id": 21,
+    "path": "array_ordering/Problem021_AdjacentSwapIfDescending.java",
+    "category": "array_ordering",
+    "requirement_en": "Given a non-null integer array and a valid adjacent pair, swap the pair only if it is descending.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/array_ordering/Problem021_AdjacentSwapIfDescending.java",
+    "ground_truth_source": "manual",
+    "function_signature": "void swapIfDescending(int[] a, int i);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null",
+        "text": "array reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "0 <= i && i + 1 < a.length",
+        "text": "adjacent pair is valid",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "assignable",
+        "expr": "a[i], a[i+1]",
+        "text": "only adjacent pair may change",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "a[i] <= a[i+1]",
+        "text": "pair is ordered",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt5",
+        "type": "ensures",
+        "expr": "a[i] == \\old(a[i]) || a[i] == \\old(a[i+1])",
+        "text": "first output is from pair",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt6",
+        "type": "ensures",
+        "expr": "a[i+1] == \\old(a[i]) || a[i+1] == \\old(a[i+1])",
+        "text": "second output is from pair",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null;\n  @ requires 0 <= i && i + 1 < a.length;\n  @ assignable a[i], a[i+1];\n  @ ensures a[i] <= a[i+1];\n  @ ensures a[i] == \\old(a[i]) || a[i] == \\old(a[i+1]);\n  @ ensures a[i+1] == \\old(a[i]) || a[i+1] == \\old(a[i+1]);\n  @*/"
+  },
+  {
+    "id": 22,
+    "path": "array_ordering/Problem022_SelectionSortThree.java",
+    "category": "array_ordering",
+    "requirement_en": "Given a non-null integer array of length three, sort the three elements in nondecreasing order in place.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/array_ordering/Problem022_SelectionSortThree.java",
+    "ground_truth_source": "manual",
+    "function_signature": "void sort3(int[] a);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null",
+        "text": "array reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "a.length == 3",
+        "text": "array has exactly three elements",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "assignable",
+        "expr": "a[0], a[1], a[2]",
+        "text": "three elements may change",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "a[0] <= a[1] && a[1] <= a[2]",
+        "text": "array is sorted",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt5",
+        "type": "ensures",
+        "expr": "a[0] + a[1] + a[2] == \\old(a[0]) + \\old(a[1]) + \\old(a[2])",
+        "text": "sum is preserved",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null;\n  @ requires a.length == 3;\n  @ assignable a[0], a[1], a[2];\n  @ ensures a[0] <= a[1] && a[1] <= a[2];\n  @ ensures a[0] + a[1] + a[2] == \\old(a[0]) + \\old(a[1]) + \\old(a[2]);\n  @*/"
+  },
+  {
+    "id": 23,
+    "path": "scalar_arithmetic/Problem023_Max2.java",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given two integers, return the greater value.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/scalar_arithmetic/Problem023_Max2.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int max2(int x, int y);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "\\result >= x && \\result >= y",
+        "text": "result is at least both inputs",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result == x || \\result == y",
+        "text": "result equals an input",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ assignable \\nothing;\n  @ ensures \\result >= x && \\result >= y;\n  @ ensures \\result == x || \\result == y;\n  @*/"
+  },
+  {
+    "id": 24,
+    "path": "scalar_arithmetic/Problem024_Min2.java",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given two integers, return the smaller value.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/scalar_arithmetic/Problem024_Min2.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int min2(int x, int y);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "\\result <= x && \\result <= y",
+        "text": "result is no greater than both inputs",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result == x || \\result == y",
+        "text": "result equals an input",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ assignable \\nothing;\n  @ ensures \\result <= x && \\result <= y;\n  @ ensures \\result == x || \\result == y;\n  @*/"
+  },
+  {
+    "id": 25,
+    "path": "scalar_arithmetic/Problem025_AbsNonMin.java",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given an integer other than Integer.MIN_VALUE, return its absolute value.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/scalar_arithmetic/Problem025_AbsNonMin.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int abs(int x);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "x != Integer.MIN_VALUE",
+        "text": "negation cannot overflow",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result >= 0",
+        "text": "result is nonnegative",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "\\result == x || \\result == -x",
+        "text": "result is absolute value",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires x != Integer.MIN_VALUE;\n  @ assignable \\nothing;\n  @ ensures \\result >= 0;\n  @ ensures \\result == x || \\result == -x;\n  @*/"
+  },
+  {
+    "id": 26,
+    "path": "scalar_arithmetic/Problem026_Clamp.java",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given integers x, lo, and hi with lo <= hi, clamp x into the closed interval [lo, hi].",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/scalar_arithmetic/Problem026_Clamp.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int clamp(int x, int lo, int hi);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "lo <= hi",
+        "text": "bounds are ordered",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "lo <= \\result && \\result <= hi",
+        "text": "result is inside interval",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires lo <= hi;\n  @ assignable \\nothing;\n  @ ensures lo <= \\result && \\result <= hi;\n  @ ensures (lo <= x && x <= hi) ==> \\result == x;\n  @ ensures x < lo ==> \\result == lo;\n  @ ensures x > hi ==> \\result == hi;\n  @*/"
+  },
+  {
+    "id": 27,
+    "path": "scalar_arithmetic/Problem027_SafeAdd.java",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given two integers whose mathematical sum is inside int range, return their sum.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/scalar_arithmetic/Problem027_SafeAdd.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int safeAdd(int x, int y);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "Integer.MIN_VALUE <= (long)x + (long)y && (long)x + (long)y <= Integer.MAX_VALUE",
+        "text": "addition cannot overflow",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result == x + y",
+        "text": "returns sum",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires Integer.MIN_VALUE <= (long)x + (long)y && (long)x + (long)y <= Integer.MAX_VALUE;\n  @ assignable \\nothing;\n  @ ensures \\result == x + y;\n  @*/"
+  },
+  {
+    "id": 28,
+    "path": "scalar_arithmetic/Problem028_SafeSubtract.java",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given two integers whose mathematical difference is inside int range, return x minus y.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/scalar_arithmetic/Problem028_SafeSubtract.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int safeSubtract(int x, int y);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "Integer.MIN_VALUE <= (long)x - (long)y && (long)x - (long)y <= Integer.MAX_VALUE",
+        "text": "subtraction cannot overflow",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result == x - y",
+        "text": "returns difference",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires Integer.MIN_VALUE <= (long)x - (long)y && (long)x - (long)y <= Integer.MAX_VALUE;\n  @ assignable \\nothing;\n  @ ensures \\result == x - y;\n  @*/"
+  },
+  {
+    "id": 29,
+    "path": "scalar_arithmetic/Problem029_TriangleAngles.java",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given three angles, return true exactly when all are positive and their mathematical sum is 180.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/scalar_arithmetic/Problem029_TriangleAngles.java",
+    "ground_truth_source": "manual",
+    "function_signature": "boolean validTriangleAngles(int a, int b, int c);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "\\result <==> (a > 0 && b > 0 && c > 0 && (long)a + (long)b + (long)c == 180L)",
+        "text": "result reports valid angle triangle",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ assignable \\nothing;\n  @ ensures \\result <==> (a > 0 && b > 0 && c > 0 && (long)a + (long)b + (long)c == 180L);\n  @*/"
+  },
+  {
+    "id": 30,
+    "path": "scalar_arithmetic/Problem030_TriangleSides.java",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given three side lengths, return true exactly when they satisfy the strict mathematical triangle inequality.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/scalar_arithmetic/Problem030_TriangleSides.java",
+    "ground_truth_source": "manual",
+    "function_signature": "boolean validTriangleSides(int a, int b, int c);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "\\result <==> (a > 0 && b > 0 && c > 0 && (long)a + (long)b > (long)c && (long)a + (long)c > (long)b && (long)b + (long)c > (long)a)",
+        "text": "result reports valid side triangle",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ assignable \\nothing;\n  @ ensures \\result <==> (a > 0 && b > 0 && c > 0 && (long)a + (long)b > (long)c && (long)a + (long)c > (long)b && (long)b + (long)c > (long)a);\n  @*/"
+  },
+  {
+    "id": 31,
+    "path": "loop_arithmetic/Problem031_SumToN.java",
+    "category": "loop_arithmetic",
+    "requirement_en": "Given n between 0 and 65535, return the arithmetic sum 0 + ... + n.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/loop_arithmetic/Problem031_SumToN.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int sumToN(int n);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "0 <= n && n <= 65535",
+        "text": "input range prevents overflow",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result == n * (n + 1) / 2",
+        "text": "returns arithmetic sum",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires 0 <= n && n <= 65535;\n  @ assignable \\nothing;\n  @ ensures \\result == n * (n + 1) / 2;\n  @*/"
+  },
+  {
+    "id": 32,
+    "path": "loop_arithmetic/Problem032_RepeatedAdditionProduct.java",
+    "category": "loop_arithmetic",
+    "requirement_en": "Given nonnegative a and bounded b, return a*b using repeated addition.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/loop_arithmetic/Problem032_RepeatedAdditionProduct.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int multiplyByRepeatedAdd(int a, int b);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "0 <= a && a <= 10000",
+        "text": "iteration count is bounded and nonnegative",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "-10000 <= b && b <= 10000",
+        "text": "product fits int",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "\\result == a * b",
+        "text": "returns product",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires 0 <= a && a <= 10000;\n  @ requires -10000 <= b && b <= 10000;\n  @ assignable \\nothing;\n  @ ensures \\result == a * b;\n  @*/"
+  },
+  {
+    "id": 33,
+    "path": "exceptions/Problem033_RequireNonNullLength.java",
+    "category": "exceptions",
+    "requirement_en": "Given an integer array, return its length when non-null and throw IllegalArgumentException when null.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/exceptions/Problem033_RequireNonNullLength.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int requireLength(int[] a);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null",
+        "text": "normal case requires non-null array",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "\\result == a.length",
+        "text": "normal case returns length",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "signals",
+        "expr": "a == null ==> IllegalArgumentException",
+        "text": "null input throws IllegalArgumentException",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null;\n  @ assignable \\nothing;\n  @ ensures \\result == a.length;\n  @ also\n  @ public exceptional_behavior\n  @ requires a == null;\n  @ assignable \\nothing;\n  @ signals_only IllegalArgumentException;\n  @ signals (IllegalArgumentException e) true;\n  @*/"
+  },
+  {
+    "id": 34,
+    "path": "exceptions/Problem034_SafeDivideException.java",
+    "category": "exceptions",
+    "requirement_en": "Given integers x and y, return x/y when y is nonzero and division cannot overflow, and throw IllegalArgumentException when y is zero.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/exceptions/Problem034_SafeDivideException.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int divide(int x, int y);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "y != 0",
+        "text": "normal case divisor is nonzero",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "!(x == Integer.MIN_VALUE && y == -1)",
+        "text": "division cannot overflow",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result == x / y",
+        "text": "normal case returns quotient",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "signals",
+        "expr": "y == 0 ==> IllegalArgumentException",
+        "text": "zero divisor throws IllegalArgumentException",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt5",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires y != 0;\n  @ requires !(x == Integer.MIN_VALUE && y == -1);\n  @ assignable \\nothing;\n  @ ensures \\result == x / y;\n  @ also\n  @ public exceptional_behavior\n  @ requires y == 0;\n  @ assignable \\nothing;\n  @ signals_only IllegalArgumentException;\n  @ signals (IllegalArgumentException e) true;\n  @*/"
+  },
+  {
+    "id": 35,
+    "path": "exceptions/Problem035_BoundedIndexException.java",
+    "category": "exceptions",
+    "requirement_en": "Given an array and index, return the indexed element for valid inputs and throw IllegalArgumentException when the array is null or the index is invalid.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/exceptions/Problem035_BoundedIndexException.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int checkedGet(int[] a, int i);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null && 0 <= i && i < a.length",
+        "text": "normal case has non-null array and valid index",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "\\result == a[i]",
+        "text": "returns indexed element",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "signals",
+        "expr": "a == null || i < 0 || i >= a.length ==> IllegalArgumentException",
+        "text": "bad input throws IllegalArgumentException",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null && 0 <= i && i < a.length;\n  @ assignable \\nothing;\n  @ ensures \\result == a[i];\n  @ also\n  @ public exceptional_behavior\n  @ requires a == null || i < 0 || (a != null && i >= a.length);\n  @ assignable \\nothing;\n  @ signals_only IllegalArgumentException;\n  @ signals (IllegalArgumentException e) true;\n  @*/"
+  },
+  {
+    "id": 36,
+    "path": "nullability/Problem036_NonNullResult.java",
+    "category": "nullability",
+    "requirement_en": "Given a possibly null String and a fallback non-null String, return the input when non-null, otherwise the fallback.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/nullability/Problem036_NonNullResult.java",
+    "ground_truth_source": "manual",
+    "function_signature": "String defaultString(String s, String fallback);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "fallback != null",
+        "text": "fallback is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result != null",
+        "text": "result is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "s != null ==> \\result == s",
+        "text": "non-null input returned",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt5",
+        "type": "ensures",
+        "expr": "s == null ==> \\result == fallback",
+        "text": "fallback returned for null input",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires fallback != null;\n  @ assignable \\nothing;\n  @ ensures \\result != null;\n  @ ensures s != null ==> \\result == s;\n  @ ensures s == null ==> \\result == fallback;\n  @*/"
+  },
+  {
+    "id": 37,
+    "path": "object_frames/Problem037_BoxSetValue.java",
+    "category": "object_frames",
+    "requirement_en": "Given a non-null mutable Box and a value, update only the box value field.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/object_frames/Problem037_BoxSetValue.java",
+    "ground_truth_source": "manual",
+    "function_signature": "void setBox(Box box, int v);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "box != null",
+        "text": "box reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "box.value",
+        "text": "only box value field may change",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "box.value == v",
+        "text": "box field receives value",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires box != null;\n  @ assignable box.value;\n  @ ensures box.value == v;\n  @*/",
+    "type_context": "public static class Box { public int value; }"
+  },
+  {
+    "id": 38,
+    "path": "object_frames/Problem038_BoxNoMutationRead.java",
+    "category": "object_frames",
+    "requirement_en": "Given a non-null mutable Box, return its value without modifying the box.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/object_frames/Problem038_BoxNoMutationRead.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int readBox(Box box);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "box != null",
+        "text": "box reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result == box.value",
+        "text": "returns field value",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires box != null;\n  @ assignable \\nothing;\n  @ ensures \\result == box.value;\n  @*/",
+    "type_context": "public static class Box { public int value; }"
+  },
+  {
+    "id": 39,
+    "path": "object_invariants/Problem039_CounterIncrement.java",
+    "category": "object_invariants",
+    "requirement_en": "Given a non-null Counter whose value can be safely incremented, increment it by one.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/object_invariants/Problem039_CounterIncrement.java",
+    "ground_truth_source": "manual",
+    "function_signature": "void increment(Counter c);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "c != null",
+        "text": "counter reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "c.value < Integer.MAX_VALUE",
+        "text": "increment cannot overflow",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "assignable",
+        "expr": "c.value",
+        "text": "only counter value may change",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "c.value == \\old(c.value) + 1",
+        "text": "counter is incremented",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires c != null;\n  @ requires c.value < Integer.MAX_VALUE;\n  @ assignable c.value;\n  @ ensures c.value == \\old(c.value) + 1;\n  @*/",
+    "type_context": "public static class Counter {\n        //@ public invariant value >= 0;\n        public int value;\n    }"
+  },
+  {
+    "id": 40,
+    "path": "object_invariants/Problem040_CounterDecrementIfPositive.java",
+    "category": "object_invariants",
+    "requirement_en": "Given a non-null Counter, decrement it only when its value is positive and preserve nonnegativity.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/object_invariants/Problem040_CounterDecrementIfPositive.java",
+    "ground_truth_source": "manual",
+    "function_signature": "void decrementIfPositive(Counter c);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "c != null",
+        "text": "counter reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "c.value",
+        "text": "only counter value may change",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\old(c.value) > 0 ==> c.value == \\old(c.value) - 1",
+        "text": "positive counter decremented",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "\\old(c.value) == 0 ==> c.value == 0",
+        "text": "zero counter unchanged",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt5",
+        "type": "ensures",
+        "expr": "c.value >= 0",
+        "text": "invariant-like nonnegativity preserved",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires c != null;\n  @ assignable c.value;\n  @ ensures \\old(c.value) > 0 ==> c.value == \\old(c.value) - 1;\n  @ ensures \\old(c.value) == 0 ==> c.value == 0;\n  @ ensures c.value >= 0;\n  @*/",
+    "type_context": "public static class Counter {\n        //@ public invariant value >= 0;\n        public int value;\n    }"
+  },
+  {
+    "id": 41,
+    "path": "object_frames/Problem041_PairSumReadonly.java",
+    "category": "object_frames",
+    "requirement_en": "Given a non-null Pair, return the sum of its two fields without modifying the object.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/object_frames/Problem041_PairSumReadonly.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int sumPair(Pair p);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "p != null",
+        "text": "pair reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "Integer.MIN_VALUE <= (long)p.left + (long)p.right && (long)p.left + (long)p.right <= Integer.MAX_VALUE",
+        "text": "field sum cannot overflow",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "\\result == p.left + p.right",
+        "text": "returns field sum",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires p != null;\n  @ requires Integer.MIN_VALUE <= (long)p.left + (long)p.right && (long)p.left + (long)p.right <= Integer.MAX_VALUE;\n  @ assignable \\nothing;\n  @ ensures \\result == p.left + p.right;\n  @*/",
+    "type_context": "public static class Pair { public int left; public int right; }"
+  },
+  {
+    "id": 42,
+    "path": "object_invariants/Problem042_RangeContains.java",
+    "category": "object_invariants",
+    "requirement_en": "Given a non-null Range, return true exactly when x is inside its inclusive bounds.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/object_invariants/Problem042_RangeContains.java",
+    "ground_truth_source": "manual",
+    "function_signature": "boolean contains(Range r, int x);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "r != null",
+        "text": "range reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result <==> (r.low <= x && x <= r.high)",
+        "text": "result reports inclusive membership",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires r != null;\n  @ assignable \\nothing;\n  @ ensures \\result <==> (r.low <= x && x <= r.high);\n  @*/",
+    "type_context": "public static class Range {\n        //@ public invariant low <= high;\n        public int low;\n        public int high;\n    }"
+  },
+  {
+    "id": 43,
+    "path": "object_frames/Problem043_FrameTwoBoxes.java",
+    "category": "object_frames",
+    "requirement_en": "Given two distinct non-null boxes, update the first box and leave the second box unchanged.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/object_frames/Problem043_FrameTwoBoxes.java",
+    "ground_truth_source": "manual",
+    "function_signature": "void updateFirst(Box a, Box b, int v);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null && b != null",
+        "text": "box references are non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "a != b",
+        "text": "boxes are distinct",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "assignable",
+        "expr": "a.value",
+        "text": "only first box value may change",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "a.value == v",
+        "text": "first box updated",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt5",
+        "type": "ensures",
+        "expr": "b.value == \\old(b.value)",
+        "text": "second box unchanged",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null && b != null;\n  @ requires a != b;\n  @ assignable a.value;\n  @ ensures a.value == v;\n  @ ensures b.value == \\old(b.value);\n  @*/",
+    "type_context": "public static class Box { public int value; }"
+  },
+  {
+    "id": 44,
+    "path": "exceptions/Problem044_DigitValueException.java",
+    "category": "exceptions",
+    "requirement_en": "Given a character, return its decimal digit value when it is between '0' and '9', otherwise throw IllegalArgumentException.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/exceptions/Problem044_DigitValueException.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int digitValue(char ch);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "'0' <= ch && ch <= '9'",
+        "text": "normal case has decimal digit character",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "0 <= \\result && \\result <= 9",
+        "text": "result is a digit value",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "\\result == ch - '0'",
+        "text": "result is character offset from zero",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt5",
+        "type": "signals",
+        "expr": "ch < '0' || ch > '9' ==> IllegalArgumentException",
+        "text": "non-digit throws IllegalArgumentException",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires '0' <= ch && ch <= '9';\n  @ assignable \\nothing;\n  @ ensures 0 <= \\result && \\result <= 9;\n  @ ensures \\result == ch - '0';\n  @ also\n  @ public exceptional_behavior\n  @ requires ch < '0' || ch > '9';\n  @ assignable \\nothing;\n  @ signals_only IllegalArgumentException;\n  @ signals (IllegalArgumentException e) true;\n  @*/"
+  },
+  {
+    "id": 45,
+    "path": "scalar_arithmetic/Problem045_IsPositive.java",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given an integer x, return true exactly when x is positive.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/scalar_arithmetic/Problem045_IsPositive.java",
+    "ground_truth_source": "manual",
+    "function_signature": "boolean isPositive(int x);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "\\result <==> x > 0",
+        "text": "result reports positivity",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ assignable \\nothing;\n  @ ensures \\result <==> x > 0;\n  @*/"
+  },
+  {
+    "id": 46,
+    "path": "scalar_arithmetic/Problem046_IsNonnegative.java",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given an integer x, return true exactly when x is nonnegative.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/scalar_arithmetic/Problem046_IsNonnegative.java",
+    "ground_truth_source": "manual",
+    "function_signature": "boolean isNonnegative(int x);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "\\result <==> x >= 0",
+        "text": "result reports nonnegativity",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ assignable \\nothing;\n  @ ensures \\result <==> x >= 0;\n  @*/"
+  },
+  {
+    "id": 47,
+    "path": "scalar_arithmetic/Problem047_IsZero.java",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given an integer x, return true exactly when x is zero.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/scalar_arithmetic/Problem047_IsZero.java",
+    "ground_truth_source": "manual",
+    "function_signature": "boolean isZero(int x);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "\\result <==> x == 0",
+        "text": "result reports zero",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ assignable \\nothing;\n  @ ensures \\result <==> x == 0;\n  @*/"
+  },
+  {
+    "id": 48,
+    "path": "scalar_arithmetic/Problem048_IsEven.java",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given an integer x, return true exactly when x is even.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/scalar_arithmetic/Problem048_IsEven.java",
+    "ground_truth_source": "manual",
+    "function_signature": "boolean isEven(int x);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "\\result <==> x % 2 == 0",
+        "text": "result reports evenness",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ assignable \\nothing;\n  @ ensures \\result <==> x % 2 == 0;\n  @*/"
+  },
+  {
+    "id": 49,
+    "path": "scalar_arithmetic/Problem049_SameSignNonzero.java",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given two nonzero integers, return true exactly when they have the same sign.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/scalar_arithmetic/Problem049_SameSignNonzero.java",
+    "ground_truth_source": "manual",
+    "function_signature": "boolean sameSign(int x, int y);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "x != 0 && y != 0",
+        "text": "inputs are nonzero",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result <==> ((x > 0 && y > 0) || (x < 0 && y < 0))",
+        "text": "result reports same sign",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires x != 0 && y != 0;\n  @ assignable \\nothing;\n  @ ensures \\result <==> ((x > 0 && y > 0) || (x < 0 && y < 0));\n  @*/"
+  },
+  {
+    "id": 50,
+    "path": "scalar_arithmetic/Problem050_Max3.java",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given three integers, return a value that is at least all three and equal to one of them.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/scalar_arithmetic/Problem050_Max3.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int max3(int a, int b, int c);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "\\result >= a && \\result >= b && \\result >= c",
+        "text": "result is at least every input",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result == a || \\result == b || \\result == c",
+        "text": "result equals an input",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ assignable \\nothing;\n  @ ensures \\result >= a && \\result >= b && \\result >= c;\n  @ ensures \\result == a || \\result == b || \\result == c;\n  @*/"
+  },
+  {
+    "id": 51,
+    "path": "scalar_arithmetic/Problem051_Min3.java",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given three integers, return a value that is at most all three and equal to one of them.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/scalar_arithmetic/Problem051_Min3.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int min3(int a, int b, int c);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "\\result <= a && \\result <= b && \\result <= c",
+        "text": "result is at most every input",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result == a || \\result == b || \\result == c",
+        "text": "result equals an input",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ assignable \\nothing;\n  @ ensures \\result <= a && \\result <= b && \\result <= c;\n  @ ensures \\result == a || \\result == b || \\result == c;\n  @*/"
+  },
+  {
+    "id": 52,
+    "path": "scalar_arithmetic/Problem052_SafeNegate.java",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given an integer other than Integer.MIN_VALUE, return its negation.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/scalar_arithmetic/Problem052_SafeNegate.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int safeNegate(int x);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "x != Integer.MIN_VALUE",
+        "text": "negation cannot overflow",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result == -x",
+        "text": "returns negation",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires x != Integer.MIN_VALUE;\n  @ assignable \\nothing;\n  @ ensures \\result == -x;\n  @*/"
+  },
+  {
+    "id": 53,
+    "path": "scalar_arithmetic/Problem053_SquareSmall.java",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given x between -46340 and 46340, return x squared.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/scalar_arithmetic/Problem053_SquareSmall.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int square(int x);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "-46340 <= x && x <= 46340",
+        "text": "square fits int",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result == x * x",
+        "text": "returns square",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "\\result >= 0",
+        "text": "square is nonnegative",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires -46340 <= x && x <= 46340;\n  @ assignable \\nothing;\n  @ ensures \\result == x * x;\n  @ ensures \\result >= 0;\n  @*/"
+  },
+  {
+    "id": 54,
+    "path": "scalar_arithmetic/Problem054_SuccessorSafe.java",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given an integer below Integer.MAX_VALUE, return its successor.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/scalar_arithmetic/Problem054_SuccessorSafe.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int successor(int x);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "x < Integer.MAX_VALUE",
+        "text": "successor cannot overflow",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result == x + 1",
+        "text": "returns successor",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires x < Integer.MAX_VALUE;\n  @ assignable \\nothing;\n  @ ensures \\result == x + 1;\n  @*/"
+  },
+  {
+    "id": 55,
+    "path": "scalar_arithmetic/Problem055_PredecessorSafe.java",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given an integer above Integer.MIN_VALUE, return its predecessor.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/scalar_arithmetic/Problem055_PredecessorSafe.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int predecessor(int x);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "x > Integer.MIN_VALUE",
+        "text": "predecessor cannot overflow",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result == x - 1",
+        "text": "returns predecessor",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires x > Integer.MIN_VALUE;\n  @ assignable \\nothing;\n  @ ensures \\result == x - 1;\n  @*/"
+  },
+  {
+    "id": 56,
+    "path": "scalar_arithmetic/Problem056_BoundedIdentity.java",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given x in the closed interval [lo, hi], return x unchanged.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/scalar_arithmetic/Problem056_BoundedIdentity.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int boundedIdentity(int x, int lo, int hi);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "lo <= x && x <= hi",
+        "text": "input is within bounds",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result == x",
+        "text": "returns input unchanged",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "lo <= \\result && \\result <= hi",
+        "text": "result remains within bounds",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires lo <= x && x <= hi;\n  @ assignable \\nothing;\n  @ ensures \\result == x;\n  @ ensures lo <= \\result && \\result <= hi;\n  @*/"
+  },
+  {
+    "id": 57,
+    "path": "scalar_arithmetic/Problem057_DistanceFromZero.java",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given a nonnegative integer x, return its distance from zero.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/scalar_arithmetic/Problem057_DistanceFromZero.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int distanceFromZero(int x);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "x >= 0",
+        "text": "input is nonnegative",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result == x",
+        "text": "distance equals input",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "\\result >= 0",
+        "text": "distance is nonnegative",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires x >= 0;\n  @ assignable \\nothing;\n  @ ensures \\result == x;\n  @ ensures \\result >= 0;\n  @*/"
+  },
+  {
+    "id": 58,
+    "path": "scalar_arithmetic/Problem058_InClosedInterval.java",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given x, lo, and hi with lo <= hi, return true exactly when x is inside [lo, hi].",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/scalar_arithmetic/Problem058_InClosedInterval.java",
+    "ground_truth_source": "manual",
+    "function_signature": "boolean inClosedInterval(int x, int lo, int hi);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "lo <= hi",
+        "text": "bounds are ordered",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result <==> (lo <= x && x <= hi)",
+        "text": "result reports interval membership",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires lo <= hi;\n  @ assignable \\nothing;\n  @ ensures \\result <==> (lo <= x && x <= hi);\n  @*/"
+  },
+  {
+    "id": 59,
+    "path": "scalar_arithmetic/Problem059_StrictBetween.java",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given x, lo, and hi with lo < hi, return true exactly when x is strictly between them.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/scalar_arithmetic/Problem059_StrictBetween.java",
+    "ground_truth_source": "manual",
+    "function_signature": "boolean strictlyBetween(int x, int lo, int hi);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "lo < hi",
+        "text": "bounds are strictly ordered",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result <==> (lo < x && x < hi)",
+        "text": "result reports strict interval membership",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires lo < hi;\n  @ assignable \\nothing;\n  @ ensures \\result <==> (lo < x && x < hi);\n  @*/"
+  },
+  {
+    "id": 60,
+    "path": "scalar_arithmetic/Problem060_ChooseFirstIfTrue.java",
+    "category": "scalar_arithmetic",
+    "requirement_en": "Given a boolean flag and two integers, return x when the flag is true and y otherwise.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/scalar_arithmetic/Problem060_ChooseFirstIfTrue.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int choose(boolean flag, int x, int y);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "flag ==> \\result == x",
+        "text": "true flag selects first value",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "!flag ==> \\result == y",
+        "text": "false flag selects second value",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ assignable \\nothing;\n  @ ensures flag ==> \\result == x;\n  @ ensures !flag ==> \\result == y;\n  @*/"
+  },
+  {
+    "id": 61,
+    "path": "boolean_logic/Problem061_BoolAnd.java",
+    "category": "boolean_logic",
+    "requirement_en": "Given two booleans, return their conjunction.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/boolean_logic/Problem061_BoolAnd.java",
+    "ground_truth_source": "manual",
+    "function_signature": "boolean boolAnd(boolean a, boolean b);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "\\result <==> (a && b)",
+        "text": "returns conjunction",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ assignable \\nothing;\n  @ ensures \\result <==> (a && b);\n  @*/"
+  },
+  {
+    "id": 62,
+    "path": "boolean_logic/Problem062_BoolOr.java",
+    "category": "boolean_logic",
+    "requirement_en": "Given two booleans, return their disjunction.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/boolean_logic/Problem062_BoolOr.java",
+    "ground_truth_source": "manual",
+    "function_signature": "boolean boolOr(boolean a, boolean b);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "\\result <==> (a || b)",
+        "text": "returns disjunction",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ assignable \\nothing;\n  @ ensures \\result <==> (a || b);\n  @*/"
+  },
+  {
+    "id": 63,
+    "path": "boolean_logic/Problem063_BoolXor.java",
+    "category": "boolean_logic",
+    "requirement_en": "Given two booleans, return true exactly when they differ.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/boolean_logic/Problem063_BoolXor.java",
+    "ground_truth_source": "manual",
+    "function_signature": "boolean boolXor(boolean a, boolean b);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "\\result <==> (a != b)",
+        "text": "returns exclusive-or",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ assignable \\nothing;\n  @ ensures \\result <==> (a != b);\n  @*/"
+  },
+  {
+    "id": 64,
+    "path": "boolean_logic/Problem064_BoolNot.java",
+    "category": "boolean_logic",
+    "requirement_en": "Given a boolean, return its negation.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/boolean_logic/Problem064_BoolNot.java",
+    "ground_truth_source": "manual",
+    "function_signature": "boolean boolNot(boolean a);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "\\result <==> !a",
+        "text": "returns negation",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ assignable \\nothing;\n  @ ensures \\result <==> !a;\n  @*/"
+  },
+  {
+    "id": 65,
+    "path": "boolean_logic/Problem065_BoolImplies.java",
+    "category": "boolean_logic",
+    "requirement_en": "Given two booleans, return true exactly when a implies b.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/boolean_logic/Problem065_BoolImplies.java",
+    "ground_truth_source": "manual",
+    "function_signature": "boolean implies(boolean a, boolean b);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "\\result <==> (!a || b)",
+        "text": "returns implication",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ assignable \\nothing;\n  @ ensures \\result <==> (!a || b);\n  @*/"
+  },
+  {
+    "id": 66,
+    "path": "boolean_logic/Problem066_BothNonzero.java",
+    "category": "boolean_logic",
+    "requirement_en": "Given two integers, return true exactly when both are nonzero.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/boolean_logic/Problem066_BothNonzero.java",
+    "ground_truth_source": "manual",
+    "function_signature": "boolean bothNonzero(int x, int y);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "\\result <==> (x != 0 && y != 0)",
+        "text": "result reports both nonzero",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ assignable \\nothing;\n  @ ensures \\result <==> (x != 0 && y != 0);\n  @*/"
+  },
+  {
+    "id": 67,
+    "path": "boolean_logic/Problem067_AtLeastOneZero.java",
+    "category": "boolean_logic",
+    "requirement_en": "Given two integers, return true exactly when at least one is zero.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/boolean_logic/Problem067_AtLeastOneZero.java",
+    "ground_truth_source": "manual",
+    "function_signature": "boolean atLeastOneZero(int x, int y);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "\\result <==> (x == 0 || y == 0)",
+        "text": "result reports any zero",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ assignable \\nothing;\n  @ ensures \\result <==> (x == 0 || y == 0);\n  @*/"
+  },
+  {
+    "id": 68,
+    "path": "boolean_logic/Problem068_AllThreePositive.java",
+    "category": "boolean_logic",
+    "requirement_en": "Given three integers, return true exactly when all three are positive.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/boolean_logic/Problem068_AllThreePositive.java",
+    "ground_truth_source": "manual",
+    "function_signature": "boolean allThreePositive(int a, int b, int c);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "\\result <==> (a > 0 && b > 0 && c > 0)",
+        "text": "result reports all-positive property",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ assignable \\nothing;\n  @ ensures \\result <==> (a > 0 && b > 0 && c > 0);\n  @*/"
+  },
+  {
+    "id": 69,
+    "path": "array_extra/Problem069_SecondElement.java",
+    "category": "array_extra",
+    "requirement_en": "Given a non-null integer array of length at least two, return its second element.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/array_extra/Problem069_SecondElement.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int second(int[] a);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null",
+        "text": "array reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "a.length >= 2",
+        "text": "array has a second element",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "\\result == a[1]",
+        "text": "returns second element",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null;\n  @ requires a.length >= 2;\n  @ assignable \\nothing;\n  @ ensures \\result == a[1];\n  @*/"
+  },
+  {
+    "id": 70,
+    "path": "array_extra/Problem070_PenultimateElement.java",
+    "category": "array_extra",
+    "requirement_en": "Given a non-null integer array of length at least two, return its penultimate element.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/array_extra/Problem070_PenultimateElement.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int penultimate(int[] a);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null",
+        "text": "array reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "a.length >= 2",
+        "text": "array has a penultimate element",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "\\result == a[a.length - 2]",
+        "text": "returns penultimate element",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null;\n  @ requires a.length >= 2;\n  @ assignable \\nothing;\n  @ ensures \\result == a[a.length - 2];\n  @*/"
+  },
+  {
+    "id": 71,
+    "path": "array_extra/Problem071_FirstPlusLastSafe.java",
+    "category": "array_extra",
+    "requirement_en": "Given a non-null nonempty array whose first and last elements can be safely added, return their sum.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/array_extra/Problem071_FirstPlusLastSafe.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int firstPlusLast(int[] a);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null",
+        "text": "array reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "a.length > 0",
+        "text": "array is nonempty",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "requires",
+        "expr": "Integer.MIN_VALUE <= (long)a[0] + (long)a[a.length - 1] && (long)a[0] + (long)a[a.length - 1] <= Integer.MAX_VALUE",
+        "text": "endpoint sum cannot overflow",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt5",
+        "type": "ensures",
+        "expr": "\\result == a[0] + a[a.length - 1]",
+        "text": "returns endpoint sum",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null;\n  @ requires a.length > 0;\n  @ requires Integer.MIN_VALUE <= (long)a[0] + (long)a[a.length - 1] && (long)a[0] + (long)a[a.length - 1] <= Integer.MAX_VALUE;\n  @ assignable \\nothing;\n  @ ensures \\result == a[0] + a[a.length - 1];\n  @*/"
+  },
+  {
+    "id": 72,
+    "path": "array_extra/Problem072_ArrayHasLengthAtLeast.java",
+    "category": "array_extra",
+    "requirement_en": "Given a non-null integer array and nonnegative n, return true exactly when the array length is at least n.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/array_extra/Problem072_ArrayHasLengthAtLeast.java",
+    "ground_truth_source": "manual",
+    "function_signature": "boolean hasLengthAtLeast(int[] a, int n);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null",
+        "text": "array reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "n >= 0",
+        "text": "threshold is nonnegative",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "\\result <==> a.length >= n",
+        "text": "result reports minimum length",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null;\n  @ requires n >= 0;\n  @ assignable \\nothing;\n  @ ensures \\result <==> a.length >= n;\n  @*/"
+  },
+  {
+    "id": 73,
+    "path": "array_extra/Problem073_SetFirst.java",
+    "category": "array_extra",
+    "requirement_en": "Given a non-null nonempty array and a value, store the value in the first element.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/array_extra/Problem073_SetFirst.java",
+    "ground_truth_source": "manual",
+    "function_signature": "void setFirst(int[] a, int v);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null",
+        "text": "array reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "a.length > 0",
+        "text": "array is nonempty",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "assignable",
+        "expr": "a[0]",
+        "text": "only first element may change",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "a[0] == v",
+        "text": "first element is updated",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null;\n  @ requires a.length > 0;\n  @ assignable a[0];\n  @ ensures a[0] == v;\n  @*/"
+  },
+  {
+    "id": 74,
+    "path": "array_extra/Problem074_SetLast.java",
+    "category": "array_extra",
+    "requirement_en": "Given a non-null nonempty array and a value, store the value in the last element.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/array_extra/Problem074_SetLast.java",
+    "ground_truth_source": "manual",
+    "function_signature": "void setLast(int[] a, int v);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null",
+        "text": "array reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "a.length > 0",
+        "text": "array is nonempty",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "assignable",
+        "expr": "a[a.length - 1]",
+        "text": "only last element may change",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "a[a.length - 1] == v",
+        "text": "last element is updated",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null;\n  @ requires a.length > 0;\n  @ assignable a[a.length - 1];\n  @ ensures a[a.length - 1] == v;\n  @*/"
+  },
+  {
+    "id": 75,
+    "path": "array_extra/Problem075_IncrementFirstSafe.java",
+    "category": "array_extra",
+    "requirement_en": "Given a non-null nonempty array whose first element can be safely incremented, increment only the first element.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/array_extra/Problem075_IncrementFirstSafe.java",
+    "ground_truth_source": "manual",
+    "function_signature": "void incrementFirst(int[] a);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null",
+        "text": "array reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "a.length > 0",
+        "text": "array is nonempty",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "requires",
+        "expr": "a[0] < Integer.MAX_VALUE",
+        "text": "increment cannot overflow",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "assignable",
+        "expr": "a[0]",
+        "text": "only first element may change",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt5",
+        "type": "ensures",
+        "expr": "a[0] == \\old(a[0]) + 1",
+        "text": "first element incremented",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null;\n  @ requires a.length > 0;\n  @ requires a[0] < Integer.MAX_VALUE;\n  @ assignable a[0];\n  @ ensures a[0] == \\old(a[0]) + 1;\n  @*/"
+  },
+  {
+    "id": 76,
+    "path": "array_extra/Problem076_CopyFirstToLast.java",
+    "category": "array_extra",
+    "requirement_en": "Given a non-null array of length at least two, copy the first element into the last element.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/array_extra/Problem076_CopyFirstToLast.java",
+    "ground_truth_source": "manual",
+    "function_signature": "void copyFirstToLast(int[] a);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null",
+        "text": "array reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "a.length >= 2",
+        "text": "array has distinct first and last positions",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "assignable",
+        "expr": "a[a.length - 1]",
+        "text": "only last element may change",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "a[a.length - 1] == \\old(a[0])",
+        "text": "last receives old first",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null;\n  @ requires a.length >= 2;\n  @ assignable a[a.length - 1];\n  @ ensures a[a.length - 1] == \\old(a[0]);\n  @*/"
+  },
+  {
+    "id": 77,
+    "path": "array_extra/Problem077_SwapFirstLast.java",
+    "category": "array_extra",
+    "requirement_en": "Given a non-null array of length at least two, swap the first and last elements.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/array_extra/Problem077_SwapFirstLast.java",
+    "ground_truth_source": "manual",
+    "function_signature": "void swapFirstLast(int[] a);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null",
+        "text": "array reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "a.length >= 2",
+        "text": "array has endpoints to swap",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "assignable",
+        "expr": "a[0], a[a.length - 1]",
+        "text": "only endpoints may change",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "a[0] == \\old(a[a.length - 1])",
+        "text": "first receives old last",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt5",
+        "type": "ensures",
+        "expr": "a[a.length - 1] == \\old(a[0])",
+        "text": "last receives old first",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null;\n  @ requires a.length >= 2;\n  @ assignable a[0], a[a.length - 1];\n  @ ensures a[0] == \\old(a[a.length - 1]);\n  @ ensures a[a.length - 1] == \\old(a[0]);\n  @*/"
+  },
+  {
+    "id": 78,
+    "path": "array_extra/Problem078_ThreeArraySumSafe.java",
+    "category": "array_extra",
+    "requirement_en": "Given a non-null length-three array whose elements can be safely summed, return the sum of the three elements.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/array_extra/Problem078_ThreeArraySumSafe.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int sum3Array(int[] a);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null",
+        "text": "array reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "a.length == 3",
+        "text": "array length is three",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "requires",
+        "expr": "Integer.MIN_VALUE <= (long)a[0] + (long)a[1] && (long)a[0] + (long)a[1] <= Integer.MAX_VALUE",
+        "text": "first addition cannot overflow",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "requires",
+        "expr": "Integer.MIN_VALUE <= (long)(a[0] + a[1]) + (long)a[2] && (long)(a[0] + a[1]) + (long)a[2] <= Integer.MAX_VALUE",
+        "text": "second addition cannot overflow",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt5",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt6",
+        "type": "ensures",
+        "expr": "\\result == a[0] + a[1] + a[2]",
+        "text": "returns three-element sum",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null;\n  @ requires a.length == 3;\n  @ requires Integer.MIN_VALUE <= (long)a[0] + (long)a[1] && (long)a[0] + (long)a[1] <= Integer.MAX_VALUE;\n  @ requires Integer.MIN_VALUE <= (long)(a[0] + a[1]) + (long)a[2] && (long)(a[0] + a[1]) + (long)a[2] <= Integer.MAX_VALUE;\n  @ assignable \\nothing;\n  @ ensures \\result == a[0] + a[1] + a[2];\n  @*/"
+  },
+  {
+    "id": 79,
+    "path": "array_extra/Problem079_FirstIsZero.java",
+    "category": "array_extra",
+    "requirement_en": "Given a non-null nonempty array, return true exactly when the first element is zero.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/array_extra/Problem079_FirstIsZero.java",
+    "ground_truth_source": "manual",
+    "function_signature": "boolean firstIsZero(int[] a);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null",
+        "text": "array reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "a.length > 0",
+        "text": "array is nonempty",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "\\result <==> a[0] == 0",
+        "text": "result reports whether first element is zero",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null;\n  @ requires a.length > 0;\n  @ assignable \\nothing;\n  @ ensures \\result <==> a[0] == 0;\n  @*/"
+  },
+  {
+    "id": 80,
+    "path": "array_extra/Problem080_LastIsPositive.java",
+    "category": "array_extra",
+    "requirement_en": "Given a non-null nonempty array, return true exactly when the last element is positive.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/array_extra/Problem080_LastIsPositive.java",
+    "ground_truth_source": "manual",
+    "function_signature": "boolean lastIsPositive(int[] a);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null",
+        "text": "array reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "a.length > 0",
+        "text": "array is nonempty",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "\\result <==> a[a.length - 1] > 0",
+        "text": "result reports whether last element is positive",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null;\n  @ requires a.length > 0;\n  @ assignable \\nothing;\n  @ ensures \\result <==> a[a.length - 1] > 0;\n  @*/"
+  },
+  {
+    "id": 81,
+    "path": "array_extra/Problem081_MiddleOfThree.java",
+    "category": "array_extra",
+    "requirement_en": "Given a non-null array of length three, return its middle element.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/array_extra/Problem081_MiddleOfThree.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int middleOfThree(int[] a);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null",
+        "text": "array reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "a.length == 3",
+        "text": "array length is three",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "\\result == a[1]",
+        "text": "returns middle element",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null;\n  @ requires a.length == 3;\n  @ assignable \\nothing;\n  @ ensures \\result == a[1];\n  @*/"
+  },
+  {
+    "id": 82,
+    "path": "array_extra/Problem082_SetPair.java",
+    "category": "array_extra",
+    "requirement_en": "Given a non-null array with at least two elements, store x in the first element and y in the second.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/array_extra/Problem082_SetPair.java",
+    "ground_truth_source": "manual",
+    "function_signature": "void setPair(int[] a, int x, int y);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null",
+        "text": "array reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "a.length >= 2",
+        "text": "array has two elements",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "assignable",
+        "expr": "a[0], a[1]",
+        "text": "only first two elements may change",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "a[0] == x",
+        "text": "first element updated",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt5",
+        "type": "ensures",
+        "expr": "a[1] == y",
+        "text": "second element updated",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null;\n  @ requires a.length >= 2;\n  @ assignable a[0], a[1];\n  @ ensures a[0] == x;\n  @ ensures a[1] == y;\n  @*/"
+  },
+  {
+    "id": 83,
+    "path": "array_extra/Problem083_ClearFirstTwo.java",
+    "category": "array_extra",
+    "requirement_en": "Given a non-null array with at least two elements, set its first two elements to zero.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/array_extra/Problem083_ClearFirstTwo.java",
+    "ground_truth_source": "manual",
+    "function_signature": "void clearFirstTwo(int[] a);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null",
+        "text": "array reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "a.length >= 2",
+        "text": "array has two elements",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "assignable",
+        "expr": "a[0], a[1]",
+        "text": "only first two elements may change",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "a[0] == 0",
+        "text": "first element cleared",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt5",
+        "type": "ensures",
+        "expr": "a[1] == 0",
+        "text": "second element cleared",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null;\n  @ requires a.length >= 2;\n  @ assignable a[0], a[1];\n  @ ensures a[0] == 0;\n  @ ensures a[1] == 0;\n  @*/"
+  },
+  {
+    "id": 84,
+    "path": "array_extra/Problem084_FirstTwoOrdered.java",
+    "category": "array_extra",
+    "requirement_en": "Given a non-null array with at least two elements, return true exactly when the first element is no greater than the second.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/array_extra/Problem084_FirstTwoOrdered.java",
+    "ground_truth_source": "manual",
+    "function_signature": "boolean firstTwoOrdered(int[] a);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null",
+        "text": "array reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "a.length >= 2",
+        "text": "array has two elements",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "\\result <==> a[0] <= a[1]",
+        "text": "result reports first-pair ordering",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null;\n  @ requires a.length >= 2;\n  @ assignable \\nothing;\n  @ ensures \\result <==> a[0] <= a[1];\n  @*/"
+  },
+  {
+    "id": 85,
+    "path": "strings_chars/Problem085_StringLength.java",
+    "category": "strings_chars",
+    "requirement_en": "Given a non-null String, return its length.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/strings_chars/Problem085_StringLength.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int stringLength(String s);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "s != null",
+        "text": "string reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result == s.length()",
+        "text": "returns string length",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires s != null;\n  @ assignable \\nothing;\n  @ ensures \\result == s.length();\n  @*/"
+  },
+  {
+    "id": 86,
+    "path": "strings_chars/Problem086_StringIsEmpty.java",
+    "category": "strings_chars",
+    "requirement_en": "Given a non-null String, return true exactly when its length is zero.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/strings_chars/Problem086_StringIsEmpty.java",
+    "ground_truth_source": "manual",
+    "function_signature": "boolean stringIsEmpty(String s);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "s != null",
+        "text": "string reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result <==> s.length() == 0",
+        "text": "result reports empty string",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires s != null;\n  @ assignable \\nothing;\n  @ ensures \\result <==> s.length() == 0;\n  @*/"
+  },
+  {
+    "id": 87,
+    "path": "strings_chars/Problem087_FirstChar.java",
+    "category": "strings_chars",
+    "requirement_en": "Given a non-null nonempty String, return its first character.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/strings_chars/Problem087_FirstChar.java",
+    "ground_truth_source": "manual",
+    "function_signature": "char firstChar(String s);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "s != null",
+        "text": "string reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "s.length() > 0",
+        "text": "string is nonempty",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "\\result == s.charAt(0)",
+        "text": "returns first character",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires s != null;\n  @ requires s.length() > 0;\n  @ assignable \\nothing;\n  @ ensures \\result == s.charAt(0);\n  @*/"
+  },
+  {
+    "id": 88,
+    "path": "strings_chars/Problem088_LastChar.java",
+    "category": "strings_chars",
+    "requirement_en": "Given a non-null nonempty String, return its last character.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/strings_chars/Problem088_LastChar.java",
+    "ground_truth_source": "manual",
+    "function_signature": "char lastChar(String s);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "s != null",
+        "text": "string reference is non-null",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "requires",
+        "expr": "s.length() > 0",
+        "text": "string is nonempty",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "ensures",
+        "expr": "\\result == s.charAt(s.length() - 1)",
+        "text": "returns last character",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires s != null;\n  @ requires s.length() > 0;\n  @ assignable \\nothing;\n  @ ensures \\result == s.charAt(s.length() - 1);\n  @*/"
+  },
+  {
+    "id": 89,
+    "path": "strings_chars/Problem089_IsLowercaseAscii.java",
+    "category": "strings_chars",
+    "requirement_en": "Given a character, return true exactly when it is a lowercase ASCII letter.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/strings_chars/Problem089_IsLowercaseAscii.java",
+    "ground_truth_source": "manual",
+    "function_signature": "boolean isLowerAscii(char ch);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "\\result <==> ('a' <= ch && ch <= 'z')",
+        "text": "result reports lowercase ASCII",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ assignable \\nothing;\n  @ ensures \\result <==> ('a' <= ch && ch <= 'z');\n  @*/"
+  },
+  {
+    "id": 90,
+    "path": "strings_chars/Problem090_IsUppercaseAscii.java",
+    "category": "strings_chars",
+    "requirement_en": "Given a character, return true exactly when it is an uppercase ASCII letter.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/strings_chars/Problem090_IsUppercaseAscii.java",
+    "ground_truth_source": "manual",
+    "function_signature": "boolean isUpperAscii(char ch);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "\\result <==> ('A' <= ch && ch <= 'Z')",
+        "text": "result reports uppercase ASCII",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ assignable \\nothing;\n  @ ensures \\result <==> ('A' <= ch && ch <= 'Z');\n  @*/"
+  },
+  {
+    "id": 91,
+    "path": "strings_chars/Problem091_AsciiToLower.java",
+    "category": "strings_chars",
+    "requirement_en": "Given an uppercase ASCII letter, return the corresponding lowercase letter.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/strings_chars/Problem091_AsciiToLower.java",
+    "ground_truth_source": "manual",
+    "function_signature": "char toLowerAscii(char ch);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "'A' <= ch && ch <= 'Z'",
+        "text": "input is uppercase ASCII",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result == ch + ('a' - 'A')",
+        "text": "returns lowercase counterpart",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires 'A' <= ch && ch <= 'Z';\n  @ assignable \\nothing;\n  @ ensures \\result == ch + ('a' - 'A');\n  @*/"
+  },
+  {
+    "id": 92,
+    "path": "strings_chars/Problem092_AsciiDigitCheck.java",
+    "category": "strings_chars",
+    "requirement_en": "Given a character, return true exactly when it is an ASCII digit.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/strings_chars/Problem092_AsciiDigitCheck.java",
+    "ground_truth_source": "manual",
+    "function_signature": "boolean isAsciiDigit(char ch);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "ensures",
+        "expr": "\\result <==> ('0' <= ch && ch <= '9')",
+        "text": "result reports ASCII digit",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ assignable \\nothing;\n  @ ensures \\result <==> ('0' <= ch && ch <= '9');\n  @*/"
+  },
+  {
+    "id": 93,
+    "path": "exceptions/Problem093_RequirePositive.java",
+    "category": "exceptions",
+    "requirement_en": "Given an integer x, return x when it is positive and throw IllegalArgumentException otherwise.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/exceptions/Problem093_RequirePositive.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int requirePositive(int x);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "x > 0",
+        "text": "normal case requires positive input",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result == x",
+        "text": "normal case returns input",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "signals",
+        "expr": "x <= 0 ==> IllegalArgumentException",
+        "text": "nonpositive input throws IllegalArgumentException",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires x > 0;\n  @ assignable \\nothing;\n  @ ensures \\result == x;\n  @ also\n  @ public exceptional_behavior\n  @ requires x <= 0;\n  @ assignable \\nothing;\n  @ signals_only IllegalArgumentException;\n  @ signals (IllegalArgumentException e) true;\n  @*/"
+  },
+  {
+    "id": 94,
+    "path": "exceptions/Problem094_RequireNonnegative.java",
+    "category": "exceptions",
+    "requirement_en": "Given an integer x, return x when it is nonnegative and throw IllegalArgumentException otherwise.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/exceptions/Problem094_RequireNonnegative.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int requireNonnegative(int x);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "x >= 0",
+        "text": "normal case requires nonnegative input",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result == x",
+        "text": "normal case returns input",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "signals",
+        "expr": "x < 0 ==> IllegalArgumentException",
+        "text": "negative input throws IllegalArgumentException",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires x >= 0;\n  @ assignable \\nothing;\n  @ ensures \\result == x;\n  @ also\n  @ public exceptional_behavior\n  @ requires x < 0;\n  @ assignable \\nothing;\n  @ signals_only IllegalArgumentException;\n  @ signals (IllegalArgumentException e) true;\n  @*/"
+  },
+  {
+    "id": 95,
+    "path": "exceptions/Problem095_CheckedCharAt.java",
+    "category": "exceptions",
+    "requirement_en": "Given a String and index, return the character at the index for valid inputs and throw IllegalArgumentException otherwise.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/exceptions/Problem095_CheckedCharAt.java",
+    "ground_truth_source": "manual",
+    "function_signature": "char checkedCharAt(String s, int i);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "s != null && 0 <= i && i < s.length()",
+        "text": "normal case has non-null string and valid index",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result == s.charAt(i)",
+        "text": "normal case returns indexed character",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "signals",
+        "expr": "s == null || i < 0 || i >= s.length() ==> IllegalArgumentException",
+        "text": "bad input throws IllegalArgumentException",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires s != null && 0 <= i && i < s.length();\n  @ assignable \\nothing;\n  @ ensures \\result == s.charAt(i);\n  @ also\n  @ public exceptional_behavior\n  @ requires s == null || i < 0 || (s != null && i >= s.length());\n  @ assignable \\nothing;\n  @ signals_only IllegalArgumentException;\n  @ signals (IllegalArgumentException e) true;\n  @*/"
+  },
+  {
+    "id": 96,
+    "path": "exceptions/Problem096_CheckedFirst.java",
+    "category": "exceptions",
+    "requirement_en": "Given an array, return its first element when non-null and nonempty, otherwise throw IllegalArgumentException.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/exceptions/Problem096_CheckedFirst.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int checkedFirst(int[] a);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null && a.length > 0",
+        "text": "normal case has nonempty array",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result == a[0]",
+        "text": "normal case returns first element",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "signals",
+        "expr": "a == null || a.length == 0 ==> IllegalArgumentException",
+        "text": "null or empty array throws IllegalArgumentException",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null && a.length > 0;\n  @ assignable \\nothing;\n  @ ensures \\result == a[0];\n  @ also\n  @ public exceptional_behavior\n  @ requires a == null || (a != null && a.length == 0);\n  @ assignable \\nothing;\n  @ signals_only IllegalArgumentException;\n  @ signals (IllegalArgumentException e) true;\n  @*/"
+  },
+  {
+    "id": 97,
+    "path": "exceptions/Problem097_CheckedLast.java",
+    "category": "exceptions",
+    "requirement_en": "Given an array, return its last element when non-null and nonempty, otherwise throw IllegalArgumentException.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/exceptions/Problem097_CheckedLast.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int checkedLast(int[] a);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "a != null && a.length > 0",
+        "text": "normal case has nonempty array",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result == a[a.length - 1]",
+        "text": "normal case returns last element",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "signals",
+        "expr": "a == null || a.length == 0 ==> IllegalArgumentException",
+        "text": "null or empty array throws IllegalArgumentException",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires a != null && a.length > 0;\n  @ assignable \\nothing;\n  @ ensures \\result == a[a.length - 1];\n  @ also\n  @ public exceptional_behavior\n  @ requires a == null || (a != null && a.length == 0);\n  @ assignable \\nothing;\n  @ signals_only IllegalArgumentException;\n  @ signals (IllegalArgumentException e) true;\n  @*/"
+  },
+  {
+    "id": 98,
+    "path": "exceptions/Problem098_RequireUppercaseAscii.java",
+    "category": "exceptions",
+    "requirement_en": "Given a character, return it when it is uppercase ASCII and throw IllegalArgumentException otherwise.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/exceptions/Problem098_RequireUppercaseAscii.java",
+    "ground_truth_source": "manual",
+    "function_signature": "char requireUpperAscii(char ch);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "'A' <= ch && ch <= 'Z'",
+        "text": "normal case has uppercase ASCII",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result == ch",
+        "text": "normal case returns character",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "signals",
+        "expr": "ch < 'A' || ch > 'Z' ==> IllegalArgumentException",
+        "text": "non-uppercase input throws IllegalArgumentException",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires 'A' <= ch && ch <= 'Z';\n  @ assignable \\nothing;\n  @ ensures \\result == ch;\n  @ also\n  @ public exceptional_behavior\n  @ requires ch < 'A' || ch > 'Z';\n  @ assignable \\nothing;\n  @ signals_only IllegalArgumentException;\n  @ signals (IllegalArgumentException e) true;\n  @*/"
+  },
+  {
+    "id": 99,
+    "path": "exceptions/Problem099_RequireSortedPair.java",
+    "category": "exceptions",
+    "requirement_en": "Given two integers x and y, return x when x <= y and throw IllegalArgumentException otherwise.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/exceptions/Problem099_RequireSortedPair.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int requireSortedPair(int x, int y);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "x <= y",
+        "text": "normal case has ordered pair",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result == x",
+        "text": "normal case returns first value",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "signals",
+        "expr": "x > y ==> IllegalArgumentException",
+        "text": "descending pair throws IllegalArgumentException",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires x <= y;\n  @ assignable \\nothing;\n  @ ensures \\result == x;\n  @ also\n  @ public exceptional_behavior\n  @ requires x > y;\n  @ assignable \\nothing;\n  @ signals_only IllegalArgumentException;\n  @ signals (IllegalArgumentException e) true;\n  @*/"
+  },
+  {
+    "id": 100,
+    "path": "exceptions/Problem100_CheckedSuccessor.java",
+    "category": "exceptions",
+    "requirement_en": "Given an integer below Integer.MAX_VALUE, return its successor and throw IllegalArgumentException at Integer.MAX_VALUE.",
+    "ground_truth_file": "benchmarks/java-problems/ground-truth/exceptions/Problem100_CheckedSuccessor.java",
+    "ground_truth_source": "manual",
+    "function_signature": "int checkedSuccessor(int x);",
+    "ground_truth_clauses": [
+      {
+        "id": "gt1",
+        "type": "requires",
+        "expr": "x < Integer.MAX_VALUE",
+        "text": "normal case avoids overflow",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt2",
+        "type": "assignable",
+        "expr": "\\nothing",
+        "text": "does not mutate state",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt3",
+        "type": "ensures",
+        "expr": "\\result == x + 1",
+        "text": "normal case returns successor",
+        "source": "manual_jml_ground_truth"
+      },
+      {
+        "id": "gt4",
+        "type": "signals",
+        "expr": "x == Integer.MAX_VALUE ==> IllegalArgumentException",
+        "text": "maximum input throws IllegalArgumentException",
+        "source": "manual_jml_ground_truth"
+      }
+    ],
+    "ground_truth_contract": "/*@\n  @ public normal_behavior\n  @ requires x < Integer.MAX_VALUE;\n  @ assignable \\nothing;\n  @ ensures \\result == x + 1;\n  @ also\n  @ public exceptional_behavior\n  @ requires x == Integer.MAX_VALUE;\n  @ assignable \\nothing;\n  @ signals_only IllegalArgumentException;\n  @ signals (IllegalArgumentException e) true;\n  @*/"
+  }
+]

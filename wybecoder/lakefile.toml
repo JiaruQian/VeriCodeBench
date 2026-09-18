@@ -1,0 +1,12 @@
+name = "svagent"
+version = "0.1.0"
+defaultTargets = []
+
+[[require]]
+name = "Loom"
+git = "https://github.com/faabian/loom.git"
+rev = "mantas-loom-naming"
+
+[[require]]
+name = "loogle"
+git = "https://github.com/MantasBaksys/loogle"
